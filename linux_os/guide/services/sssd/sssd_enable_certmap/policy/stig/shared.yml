@@ -14,7 +14,7 @@ checktext: |-
     maprule = (userCertificate;binary={cert!bin})
     domains = testing.test
 
-    If the certmap section does not exist, ask the System Administrator to indicate how certificates are mapped to accounts.  If there is no evidence of certificate mapping, this is a finding.
+    If the certmap section does not exist, ask the system administrator (SA) to indicate how certificates are mapped to accounts. If there is no evidence of certificate mapping, this is a finding.
 
 fixtext: |-
     Configure {{{ full_name }}} to map the authenticated identity to the user or group account by adding or modifying the certmap section of the "/etc/sssd/sssd.conf" file based on the following example:

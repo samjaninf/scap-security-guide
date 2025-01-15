@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Enable the fips_mode SELinux Boolean'
 
@@ -13,9 +12,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80418-7
 
 references:
     cis-csc: '13'

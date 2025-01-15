@@ -7,9 +7,31 @@ auid: 1000
 basic_properties_derived: true
 benchmark_id: FEDORA
 benchmark_root: ../../linux_os/guide
+bootable_containers_supported: 'false'
 chrony_conf_path: /etc/chrony.conf
+chrony_d_path: /etc/chrony.d/
 components_root: ../../components
 cpes:
+- fedora_45:
+    check_id: installed_OS_is_fedora
+    name: cpe:/o:fedoraproject:fedora:45
+    title: Fedora 45
+- fedora_44:
+    check_id: installed_OS_is_fedora
+    name: cpe:/o:fedoraproject:fedora:44
+    title: Fedora 44
+- fedora_43:
+    check_id: installed_OS_is_fedora
+    name: cpe:/o:fedoraproject:fedora:43
+    title: Fedora 43
+- fedora_42:
+    check_id: installed_OS_is_fedora
+    name: cpe:/o:fedoraproject:fedora:42
+    title: Fedora 42
+- fedora_41:
+    check_id: installed_OS_is_fedora
+    name: cpe:/o:fedoraproject:fedora:41
+    title: Fedora 41
 - fedora_40:
     check_id: installed_OS_is_fedora
     name: cpe:/o:fedoraproject:fedora:40
@@ -18,20 +40,10 @@ cpes:
     check_id: installed_OS_is_fedora
     name: cpe:/o:fedoraproject:fedora:39
     title: Fedora 39
-- fedora_38:
-    check_id: installed_OS_is_fedora
-    name: cpe:/o:fedoraproject:fedora:38
-    title: Fedora 38
-- fedora_37:
-    check_id: installed_OS_is_fedora
-    name: cpe:/o:fedoraproject:fedora:37
-    title: Fedora 37
-- fedora_36:
-    check_id: installed_OS_is_fedora
-    name: cpe:/o:fedoraproject:fedora:36
-    title: Fedora 36
 cpes_root: ../../shared/applicability
 dconf_gdm_dir: distro.d
+dynamic_uid_max: 65519
+dynamic_uid_min: 61184
 faillock_path: /var/run/faillock
 full_name: Fedora
 future_pkg_release: 62f2920f
@@ -46,6 +58,7 @@ grub2_boot_path: /boot/grub2
 grub2_uefi_boot_path: /boot/grub2
 grub_helper_executable: grubby
 init_system: systemd
+journald_conf_dir_path: /etc/systemd/journald.conf.d
 latest_pkg_release: 6202d9c6
 latest_pkg_version: eb10b464
 latest_release_fingerprint: 6A51BBABBA3D5467B6171221809A8D7CEB10B464
@@ -80,11 +93,12 @@ rawhide_pkg_version: a15b79cc
 rawhide_release_fingerprint: 115DF9AEF857853EE8445D0A0727707EA15B79CC
 rawhide_version: 40
 reference_uris:
-  anssi: http://www.ssi.gouv.fr/administration/bonnes-pratiques/
+  anssi: https://cyber.gouv.fr/sites/default/files/document/linux_configuration-en-v2.pdf
   app-srg: https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=application-servers
+  app-srg-ctr: https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=container-platform
+  bsi: https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Grundschutz/International/bsi_it_gs_comp_2022.pdf
   cis-csc: https://www.cisecurity.org/controls/
   cjis: https://www.fbi.gov/file-repository/cjis-security-policy-v5_5_20160601-2-1.pdf
-  cnss: http://www.cnss.gov/Assets/pdf/CNSSI-1253.pdf
   cobit5: https://www.isaca.org/resources/cobit
   cui: http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171.pdf
   dcid: not_officially_available
@@ -93,7 +107,7 @@ reference_uris:
   isa-62443-2009: https://www.isa.org/products/isa-62443-2-1-2009-security-for-industrial-automat
   isa-62443-2013: https://www.isa.org/products/ansi-isa-62443-3-3-99-03-03-2013-security-for-indu
   ism: https://www.cyber.gov.au/acsc/view-all-content/ism
-  iso27001-2013: https://www.iso.org/standard/54534.html
+  iso27001-2013: https://www.iso.org/contents/data/standard/05/45/54534.html
   nerc-cip: https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx
   nist: http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf
   nist-csf: https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf

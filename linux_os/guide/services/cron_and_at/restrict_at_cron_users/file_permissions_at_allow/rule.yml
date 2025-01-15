@@ -1,7 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,rhel8,rhel9,sle12,sle15,ubuntu2004,ubuntu2204
-
 title: 'Verify Permissions on /etc/at.allow file'
 
 {{%  if 'rhel' not in product %}}
@@ -25,23 +23,19 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86244-1
     cce@rhel8: CCE-86903-2
     cce@rhel9: CCE-86904-0
+    cce@rhel10: CCE-90283-3
     cce@sle12: CCE-91689-0
     cce@sle15: CCE-91319-4
+    cce@slmicro5: CCE-93926-4
 
 references:
-    cis@alinux2: 5.1.8
-    cis@alinux3: 5.1.8
-    cis@rhel7: 5.1.9
-    cis@rhel8: 5.1.9
-    cis@rhel9: 5.1.9
     cis@sle12: 5.1.9
     cis@sle15: 5.1.9
+    cis@slmicro5: 5.1.9
     cis@ubuntu2004: 5.1.9
     cis@ubuntu2204: 5.1.9
-    pcidss4: "2.2.6"
 
 ocil_clause: '{{{ ocil_clause_file_permissions(file="/etc/at.allow", perms=target_perms) }}}'
 
@@ -52,5 +46,4 @@ template:
     name: file_permissions
     vars:
         filepath: /etc/at.allow
-        missing_file_pass: 'true'
         filemode: '{{{ target_perms_octal }}}'

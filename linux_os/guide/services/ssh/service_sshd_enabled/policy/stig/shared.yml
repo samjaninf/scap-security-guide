@@ -21,3 +21,4 @@ fixtext: |-
     To enable the sshd service run the following command:
 
     $ systemctl enable --now sshd
+

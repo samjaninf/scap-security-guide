@@ -12,26 +12,22 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83474-7
     cce@rhel8: CCE-83475-4
     cce@rhel9: CCE-83928-2
+    cce@rhel10: CCE-89477-4
     cce@sle12: CCE-91699-9
     cce@sle15: CCE-91329-3
+    cce@slmicro5: CCE-93972-8
 
 references:
-    cis@alinux2: 6.1.8
-    cis@alinux3: 6.1.9
-    cis@rhel7: 6.1.9
-    cis@rhel8: 6.1.9
-    cis@rhel9: 6.1.4
     cis@sle12: 6.1.7
     cis@sle15: 6.1.7
+    cis@slmicro5: 6.1.7
     cis@ubuntu2004: 6.1.8
     cis@ubuntu2204: 6.1.4
-    disa: CCI-002223
+    disa: CCI-000366
     nist: AC-6 (1)
     pcidss: Req-8.7
-    pcidss4: "7.2.6"
     srg: SRG-OS-000480-GPOS-00227
 
 ocil_clause: '{{{ ocil_clause_file_group_owner(file="/etc/group-", group="root") }}}'
@@ -48,4 +44,3 @@ template:
     vars:
         filepath: /etc/group-
         gid_or_name: '0'
-        missing_file_pass: 'true'

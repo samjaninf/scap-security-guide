@@ -160,16 +160,16 @@ multiple benchmarks in our project:
 
 The **Linux OS** benchmark describes Linux Operating System in general.
 This benchmark is used by multiple ComplianceAsCode products, eg.
-`rhel7`, `fedora`, `ubuntu1604`, `sle15` etc. The benchmark is located
+`rhel9`, `fedora`, `ubuntu1604`, `sle15` etc. The benchmark is located
 in `/linux_os/guide`.
 
 The products specify which benchmark they use as a source of content in
 their `product.yml` file using `benchmark_root` key. For example,
-`rhel7` product specifies that it uses the Linux OS benchmark.
+`rhel9` product specifies that it uses the Linux OS benchmark.
 
-    $ cat products/rhel7/product.yml
-    product: rhel7
-    full_name: Red Hat Enterprise Linux 7
+    $ cat products/rhel9/product.yml
+    product: rhel9
+    full_name: Red Hat Enterprise Linux 9
     type: platform
 
     benchmark_root: "../linux_os/guide"
@@ -180,13 +180,7 @@ Rules from multiple locations can be used for a single Benchmark. There
 is an optional key `additional_content_directories` for a list of paths
 to some arbitrary Groups of Rules to be included in the benchmark. Note
 that the additional directories cannot contain a benchmark file
-(`benchmark.yml`), otherwise it fails to build the content. Of all the
-rules collected only the following would become a part of the benchmark:
-
--   rules that have the `prodtype` specified in correspondence with the
-    benchmark;
-
--   rules that have no `prodtype` metadata.
+(`benchmark.yml`), otherwise it fails to build the content.
 
 <!-- -->
 
@@ -247,7 +241,7 @@ layout:
 -   **Do not** use capital letters
 
 -   If product versions are required, use major or LTS versions only. For
-    example, `rhel7`, `ubuntu2004`, etc.
+    example, `rhel9`, `ubuntu2004`, etc.
 
 -   If the content does not depend on specific versions,
     **do not** add version numbers. For example: `fedora`, `firefox`, etc.
@@ -257,8 +251,8 @@ using and navigating the content.
 
 For example:
 
-    $ tree -d products/rhel7
-    products/rhel7
+    $ tree -d products/rhel9
+    products/rhel9
     ├── kickstart
     ├── overlays
     ├── profiles
@@ -292,7 +286,7 @@ For example:
 </tr>
 <tr class="odd">
 <td><p><code>transforms</code></p></td>
-<td><p><code>Required</code> Contains XSLT files and scripts that are used to transform the content into the expected compliance document such as XCCDF, OVAL, Datastream, etc.</p></td>
+<td><p><code>Required</code> Contains XSLT files and scripts that are used to transform the content into the expected compliance document such as XCCDF, OVAL, data stream, etc.</p></td>
 </tr>
 </tbody>
 </table>
@@ -369,7 +363,7 @@ all_cmake_products=(
 <pre>
 ...
 product_directories = ['debian11', 'fedora', 'ol7', 'ol8', 'opensuse',
-                       'rhel7', 'rhel8', 'sle12',
+                       'rhel8', 'rhel9', 'sle12',
                        'ubuntu1604', 'ubuntu1804', 'rhosp13',
                        'chromium', 'eap6', 'firefox',
                        'example'<b>, 'custom6'</b>]
@@ -396,7 +390,7 @@ MULTI_PLATFORM_LIST = ["rhel", "fedora", "rhosp", "rhv", "debian", "ubuntu",
 <pre>
 ...
 MULTI_PLATFORM_MAPPING = {
-    "multi_platform_debian": ["debian10", "debian11"],
+    "multi_platform_debian": ["debian11", "debian12"],
     "multi_platform_example": ["example"],
     <b>"multi_platform_custom": ["custom6"],</b>
     "multi_platform_fedora": ["fedora"],
@@ -624,27 +618,20 @@ requirements or how it is applied.
 A profile should define these attributes:
 
 -   `title`: Human-readable title of the profile.
-
 -   `description`: Human-readable HTML description, which provides
     broader context for non-experts than the rationale.
-
 -   `extends`: The `id` of a profile to be extended. A profile can make
     incremental changes based on another profile, via `extends`
     attribute. The extendee can then, via the `selections` attribute,
     select/unselect rules and change XCCDF Value selectors.
-
--   `selections`: List composed of items of these types:
-
--   `` id`s of rules to be included in the profile, e.g. `accounts_tmout ``,
+-  `selections`: List composed of items of these types:
+    -   IDs of rules to be included in the profile, e.g. `accounts_tmout `,
     or
-
--   `` id`s of rules to be excluded from the profile prefixed by an exclamation mark, e.g. `!accounts_tmout ``,
+    - IDs of rules to be excluded from the profile prefixed by an exclamation mark, e.g. `!accounts_tmout`,
     or
-
--   changes to XCCDF Value selectors, e.g. `var_accounts_tmout=10_min`,
+    -   changes to XCCDF Value selectors, e.g. `var_accounts_tmout=10_min`,
     or
-
--   rule refinements, e.g. `accounts_tmout.severity=high`.
+    -   rule refinements, e.g. `accounts_tmout.severity=high`.
 
 
 ## Controls
@@ -713,6 +700,7 @@ Nesting can be accomplished both by
 * nesting whole control definitions, or by
 * nesting references to existing controls in the `policy:control` format, where the `policy:` part can be skipped
 if the reference points to a control in that policy.
+ * To nest all controls of a policy level, use `all` followed by the level. e.g: `cis_ocp4_1_4_0:all:level_2`.
 
 Nesting using references allows reuse of controls across multiple policies.
 
@@ -749,8 +737,8 @@ between XCCDF rules which directly implement the given controls (represented by
 The `rules` and `related_rules` keys consist of a list of rule IDs and variable
 selections.
 
-If a rule needs to be chosen only in some of products despite its `prodtype` we
-can use Jinja macros inside the controls file to choose products.
+If a rule needs to be chosen only in some of the products we can use Jinja macros
+inside the controls file to choose products.
 
 After we finish our analysis, we will insert our findings to the controls file,
 the file will look like this:
@@ -935,7 +923,9 @@ The `status` key may hold the following values:
                 automation).
 
 * `automated`: The control is addressed by the product and can be automatically
-               checked for.
+               checked for. In case a part of a requirement cannot be
+               reasonably automated but the rest is fully automated, this
+               status is appropriate as well.
 
 * `manual`: The control cannot or should not be automated, and should be addressed manually.
 
@@ -975,7 +965,7 @@ controls:
     - https://my-ticket-tracker.com/issue/2
 ```
 
-
+(controls_file_format)=
 ### Controls file format
 
 This is a complete schema of the YAML file format.
@@ -986,6 +976,8 @@ title: short title (required key)
 original_title: used as a reference for policies not yet available in English
 source: a link to the original policy, eg. a URL of a PDF document
 controls_dir: a directory containing files representing controls that will be imported into this policy
+reference_type: Reference type represented by control IDs in this policy.
+product: list of product IDs, set if the policy is specific to a single or number of products.
 levels: a list of levels, the first one is default
   - id: level ID (required key)
     inherits_from: a list of IDs of levels inheriting from
@@ -1009,6 +1001,7 @@ Full example of a controls file:
 id: abcd
 title: ABCD Benchmark for securing Linux systems
 source: https://www.abcd.com/linux.pdf
+reference_type: abcd
 levels:
   - id: low
   - id: high
@@ -1074,6 +1067,38 @@ controls:
           - accounts_password_pam_ocredit
           - var_password_pam_ocredit=1
       - other-policy:other-control
+```
+
+(auto_ref_controls_to_rules)=
+### Using Controls for Automated Reference Assignment to Rules
+
+Control files inherently establish the correspondence between the requirements of a specified policy and individual rules.
+That represents a reverse mapping compared to the function of the `references` key in `rule.yml` files.
+The `references` key in `rule.yml` maps the rule to a requirement of an external policy.
+If a control file is used to map the policy requirements, then the references don't need to be specified in `rule.yml`.
+Instead, the build system is able to assign the references to rules automatically at the build time.
+This feature of the build system saves time and avoids data duplication, because the references are centralized in the control file, and they are not specified in `rule.yml` files.
+To use the automated reference assignement, the `reference_type` key must be added to the control file.
+The value of this key represents the type of reference that will be assigned.
+
+For example, to instruct the build system to use the control file to automatically assign `anssi` references to all rules listed in the control file, add the following line to the control file:
+
+```
+reference_type: anssi
+```
+
+The usage of `reference_type` key results in adding a reference to all rules in that control file across all products.
+This is a useful behavior for the control files that represent a product agnostic policy, for example ANSSI.
+However, some policies, for example CIS Benchmarks, are specific for a single product, so we represent them by separate control files, eg. `cis_rhel8.yml` and `cis_rhel9.yml`.
+These files define the same `reference_type`.
+To ensure the correct reference source for a given product we need to label the control file as product-specific.
+Product-specific control files need to have the `product` key set.
+
+For example, to instruct the build system to automatically assign `cis` references to all rules listed in the control file when building the `rhel9` product, include the following lines to the control file:
+
+```
+product: rhel9
+reference_type: cis
 ```
 
 ### Using controls in profiles
@@ -1219,7 +1244,7 @@ the different status options that were documented earlier in this
 documentation.
 
 ```
-$ utils/controleval.py stats -i cis_rhel7 -l l2_server
+$ utils/controleval.py stats -i cis_rhel9 -l l2_server -p rhel9
 ```
 
 For more details about the `controleval.py` too, run `utils/controleval.py --help`.
@@ -1233,7 +1258,7 @@ In order for export for DISA the IDs of your control must be SRG ID form the Gen
 
 If you have an existing product that you want to base your new STIG you can create the skeleton with the following command:
 
-    $ ./utils/build_stig_control.py --split -p rhel9 -m shared/references/disa-os-srg-v2r3.xml -o controls/srg_gpos.yml
+    $ ./utils/build_stig_control.py --split -p rhel9 -m shared/references/disa-os-srg-v3r1.xml -o controls/srg_gpos.yml
 
 The manual (`-m`) should be an SRG XML from DISA.
 

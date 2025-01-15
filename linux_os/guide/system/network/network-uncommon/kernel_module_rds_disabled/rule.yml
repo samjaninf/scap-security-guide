@@ -15,14 +15,12 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-82869-9
     cce@rhel8: CCE-82870-7
     cce@rhel9: CCE-84064-5
+    cce@rhel10: CCE-89280-2
 
 references:
     cis-csc: 11,14,3,9
-    cis@alinux2: 3.4.3
-    cis@rhel7: 3.5.3
     cis@ubuntu2004: 3.4.3
     cis@ubuntu2204: 3.4.3
     cobit5: BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS05.02,DSS05.05,DSS06.06

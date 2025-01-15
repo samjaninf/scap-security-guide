@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhv4,sle15
 
 title: 'Disable rexec Service'
 
@@ -19,14 +18,13 @@ rationale: |-
 severity: high
 
 identifiers:
-    cce@rhel7: CCE-27408-4
     cce@rhel8: CCE-80884-0
     cce@rhel9: CCE-88104-5
+    cce@rhel10: CCE-90241-1
     cce@sle15: CCE-91420-0
 
 references:
     cis-csc: 11,12,14,15,3,8,9
-    cis@rhel7: 2.2.17
     cobit5: APO13.01,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.04,DSS05.02,DSS05.03,DSS05.05,DSS06.06
     cui: 3.1.13,3.4.7
     disa: CCI-000068,CCI-001436
@@ -39,7 +37,7 @@ references:
 
 {{{ complete_ocil_entry_socket_and_service_disabled("rexec") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

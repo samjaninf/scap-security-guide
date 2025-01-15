@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Configure The Number of Allowed Simultaneous Requests'
 
@@ -19,12 +18,6 @@ rationale: |-
     time a connection may be inactive).
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80551-5
-
-references:
-    stigid: WG110
 
 ocil_clause: 'it is not'
 

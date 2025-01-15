@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Configure AIDE to Verify Access Control Lists (ACLs)'
 
@@ -8,14 +7,19 @@ description: |-
     By default, the <tt>acl</tt> option is added to the <tt>FIPSR</tt> ruleset in AIDE.
     If using a custom ruleset or the <tt>acl</tt> option is missing, add <tt>acl</tt>
     to the appropriate ruleset.
-    For example, add <tt>acl</tt> to the following line in <tt>/etc/aide.conf</tt>:
+    For example, add <tt>acl</tt> to the following line in <tt>{{{ aide_conf_path }}}</tt>:
     <pre>FIPSR = p+i+n+u+g+s+m+c+acl+selinux+xattrs+sha256</pre>
     AIDE rules can be configured in multiple ways; this is merely one example that is already
     configured by default.
 
+    {{% if "debian" in product %}}
+    The remediation provided with this rule adds <tt>acl</tt> to the OwnerMode rule
+    in <tt>{{{ aide_conf_path }}}</tt>
+    {{% else %}}
     The remediation provided with this rule adds <tt>acl</tt> to all rule sets available in
-    <tt>/etc/aide.conf</tt>
-
+    <tt>{{{ aide_conf_path }}}</tt>
+    {{% endif %}}
+    
 rationale: |-
     ACLs can provide permissions beyond those permitted through the file mode and must be
     verified by the file integrity tools.
@@ -23,14 +27,14 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80375-9
     cce@rhel8: CCE-84220-3
     cce@rhel9: CCE-90837-6
+    cce@rhel10: CCE-89640-7
     cce@sle12: CCE-83150-3
     cce@sle15: CCE-85623-7
+    cce@slmicro5: CCE-93742-5
 
 references:
-    anssi: BP28(R51)
     cis-csc: 2,3
     cobit5: APO01.06,BAI03.05,BAI06.01,DSS06.02
     disa: CCI-000366
@@ -42,7 +46,6 @@ references:
     srg: SRG-OS-000480-GPOS-00227
     stigid@ol7: OL07-00-021600
     stigid@ol8: OL08-00-040310
-    stigid@rhel7: RHEL-07-021600
     stigid@rhel8: RHEL-08-040310
     stigid@sle12: SLES-12-010520
     stigid@sle15: SLES-15-040040
@@ -51,7 +54,7 @@ ocil_clause: 'the acl option is missing or not added to the correct ruleset'
 
 ocil: |-
     To determine that AIDE is verifying ACLs, run the following command:
-    <pre>$ grep acl /etc/aide.conf</pre>
+    <pre>$ grep acl {{{ aide_conf_path }}}</pre>
     Verify that the <tt>acl</tt> option is added to the correct ruleset.
 
 fixtext: |-

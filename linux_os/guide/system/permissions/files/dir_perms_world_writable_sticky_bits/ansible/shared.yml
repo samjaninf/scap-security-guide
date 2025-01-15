@@ -1,4 +1,4 @@
-# platform = multi_platform_sle,multi_platform_ol,multi_platform_rhel
+# platform = multi_platform_sle,multi_platform_slmicro,multi_platform_ol,multi_platform_rhel
 # reboot = false
 # strategy = restrict
 # complexity = low
@@ -21,6 +21,7 @@
   ansible.builtin.set_fact:
     world_writable_dirs: '{{ world_writable_dirs | union(item.stdout_lines) | list }}'
   loop: "{{ result_found_dirs.results }}"
+  when: result_found_dirs is not skipped and item is not skipped
 
 - name: "{{{ rule_title }}} - Ensure Sticky Bit is Set on Local World Writable Directories"
   ansible.builtin.file:

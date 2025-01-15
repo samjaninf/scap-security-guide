@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Disable Kernel Parameter for Accepting Source-Routed Packets on IPv6 Interfaces by Default'
 
@@ -20,23 +19,18 @@ severity: medium
 
 identifiers:
     cce@rhcos4: CCE-82481-3
-    cce@rhel7: CCE-80355-1
     cce@rhel8: CCE-81015-0
     cce@rhel9: CCE-84130-4
+    cce@rhel10: CCE-89135-8
     cce@sle12: CCE-83227-9
     cce@sle15: CCE-85653-4
+    cce@slmicro5: CCE-93632-8
 
 references:
-    anssi: BP28(R22)
-    ccn@rhel9: A.8.SEC-RHEL6
     cis-csc: 1,12,13,14,15,16,18,4,6,8,9
-    cis@alinux2: 3.2.1
-    cis@alinux3: 3.3.1
-    cis@rhel7: 3.3.1
-    cis@rhel8: 3.3.1
-    cis@rhel9: 3.3.1
     cis@sle12: 3.3.1
     cis@sle15: 3.3.1
+    cis@slmicro5: 3.3.1
     cis@ubuntu2004: 3.3.1
     cis@ubuntu2204: 3.3.1
     cobit5: APO01.06,APO13.01,DSS01.05,DSS03.01,DSS05.02,DSS05.04,DSS05.07,DSS06.02
@@ -62,10 +56,13 @@ fixtext: |-
 
 srg_requirement: '{{{ full_name }}} must not forward IPv6 source-routed packets by default.'
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl
     vars:
         sysctlvar: net.ipv6.conf.default.accept_source_route
         datatype: int
+{{% if "openeuler" in product or "kylinserver" in product %}}
+        missing_parameter_pass: 'true'
+{{% endif %}}

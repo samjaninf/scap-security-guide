@@ -1,7 +1,7 @@
 policy: Security Requirements Guide - General Purpose Operating System
 title: Security Requirements Guide - General Purpose Operating System
 id: srg_gpos
-version: 'v2r3'
+version: 'v3r1'
 source: https://public.cyber.mil/stigs/downloads/
 controls_dir: srg_gpos
 levels:
@@ -22,11 +22,8 @@ controls:
             - sshd_approved_macs=stig_extended
             - sshd_approved_ciphers=stig_extended
             - sshd_idle_timeout_value=10_minutes
-            - var_accounts_authorized_local_users_regex=rhel8
+            - var_accounts_authorized_local_users_regex=rhel9
             - var_account_disable_post_pw_expiration=35
-            - var_auditd_action_mail_acct=root
-            - var_auditd_space_left_percentage=25pc
-            - var_auditd_space_left_action=email
             - login_banner_text=dod_banners
             - var_authselect_profile=sssd
             - var_auditd_name_format=stig

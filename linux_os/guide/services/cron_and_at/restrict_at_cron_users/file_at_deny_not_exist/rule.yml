@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,rhel7,rhel8,rhel9,sle12,sle15,ubuntu2204
 
 title: 'Ensure that /etc/at.deny does not exist'
 
@@ -15,22 +14,18 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86944-6
     cce@rhel8: CCE-86945-3
     cce@rhel9: CCE-86946-1
+    cce@rhel10: CCE-89507-8
     cce@sle12: CCE-91683-3
     cce@sle15: CCE-91313-7
+    cce@slmicro5: CCE-93929-8
 
 references:
-    cis@alinux2: 5.1.8
-    cis@alinux3: 5.1.8
-    cis@rhel7: 5.1.9
-    cis@rhel8: 5.1.9
-    cis@rhel9: 5.1.9
     cis@sle12: 5.1.9
     cis@sle15: 5.1.9
+    cis@slmicro5: 5.1.9
     cis@ubuntu2204: 5.1.9
-    pcidss4: "2.2.6"
 
 ocil_clause: 'the file /etc/at.deny exists'
 

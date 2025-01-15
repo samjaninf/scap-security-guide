@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8,rhel9
 
 title: 'Disable the authlogin_yubikey SELinux Boolean'
 
@@ -12,9 +11,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80427-8
 
 references:
     cui: 3.7.2

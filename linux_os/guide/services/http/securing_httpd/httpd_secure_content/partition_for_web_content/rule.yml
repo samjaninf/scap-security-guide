@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Ensure Web Content Located on Separate partition'
 
@@ -20,8 +19,6 @@ rationale: |-
 
 severity: medium
 
-references:
-    stigid: WG205
 
 ocil_clause: 'it is not'
 

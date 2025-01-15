@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,uos20
 
 title: 'Disable At Service (atd)'
 
@@ -21,7 +20,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80345-2
     cce@rhel8: CCE-80871-7
     cce@rhel9: CCE-84164-3
 
@@ -40,8 +38,6 @@ ocil_clause: |-
 
 ocil: |-
     {{{ ocil_service_disabled(service="atd") }}}
-
-platform: machine
 
 template:
     name: service_disabled

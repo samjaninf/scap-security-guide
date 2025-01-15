@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9
 
 title: 'Disable Cockpit Management Server'
 
@@ -14,7 +13,7 @@ rationale: |-
 
 severity: medium
 
-platform: machine
+platform: system_with_kernel
 
 ocil_clause: |-
     {{{ ocil_clause_service_disabled(service="cockpit") }}}

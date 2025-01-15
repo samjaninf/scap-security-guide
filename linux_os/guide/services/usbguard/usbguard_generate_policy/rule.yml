@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol8,ol9,rhel8,rhel9
 
 title: 'Generate USBGuard Policy'
 
@@ -19,12 +18,11 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-83774-0
     cce@rhel9: CCE-88882-6
+    cce@rhel10: CCE-88632-5
 
 references:
-    ccn@rhel9: A.23.SEC-RHEL1
-    disa: CCI-000416,CCI-001958
+    disa: CCI-001958
     nist: CM-8(3)(a),IA-3
-    ospp: FMT_SMF_EXT.1
     srg: SRG-OS-000378-GPOS-00163
     stigid@ol8: OL08-00-040140
     stigid@rhel8: RHEL-08-040140

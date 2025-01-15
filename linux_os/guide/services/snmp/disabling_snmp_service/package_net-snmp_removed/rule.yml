@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: debian10,debian11,fedora,ol7,ol8,rhcos4,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Uninstall net-snmp Package'
 
@@ -21,22 +20,19 @@ rationale: |-
 severity: unknown
 
 identifiers:
-    cce@rhel7: CCE-80275-1
     cce@rhel8: CCE-85980-1
     cce@rhel9: CCE-85981-9
+    cce@rhel10: CCE-89193-7
     cce@sle12: CCE-91645-2
     cce@sle15: CCE-91288-1
+    cce@slmicro5: CCE-93891-0
 
 references:
-    ccn@rhel9: A.8.SEC-RHEL4
-    cis@rhel7: 2.2.13
-    cis@rhel8: 2.2.14
-    cis@rhel9: 2.2.12
     cis@sle12: 2.2.15
     cis@sle15: 2.2.15
+    cis@slmicro5: 2.2.15
     cis@ubuntu2004: 2.2.14
     cis@ubuntu2204: 2.2.13
-    pcidss4: "2.2.4"
 
 {{% if pkg_manager != "apt_get" %}}
 {{{ complete_ocil_entry_package(package="net-snmp") }}}
@@ -48,9 +44,9 @@ template:
     name: package_removed
     vars:
         pkgname: net-snmp
-        pkgname@debian10: snmp
         pkgname@debian11: snmp
         pkgname@ubuntu1604: snmp
         pkgname@ubuntu1804: snmp
         pkgname@ubuntu2004: snmp
         pkgname@ubuntu2204: snmp
+        pkgname@ubuntu2404: snmpd

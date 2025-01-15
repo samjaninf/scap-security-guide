@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,fedora,rhcos4,rhel7,rhel8
 
 title: 'Disable Kernel Support for USB via Bootloader Configuration'
 
@@ -19,7 +18,7 @@ severity: unknown
 
 identifiers:
     cce@rhcos4: CCE-82661-0
-    cce@rhel7: CCE-26548-8
+    cce@rhel10: CCE-88814-9
 
 references:
     cis-csc: 12,16

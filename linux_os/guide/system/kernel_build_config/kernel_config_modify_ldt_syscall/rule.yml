@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel8,rhel9
 
 title: 'Disable the LDT (local descriptor table)'
 
@@ -26,9 +25,9 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-88827-1
     cce@rhel9: CCE-88828-9
+    cce@rhel10: CCE-86522-0
 
-references:
-    anssi: BP28(R25)
+platform: x86_64_arch
 
 ocil_clause: 'the kernel was not built with the required value'
 

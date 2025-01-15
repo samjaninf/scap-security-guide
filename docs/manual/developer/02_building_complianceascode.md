@@ -1,7 +1,7 @@
 # Building ComplianceAsCode
 
 ## Fast Track
-Ok, if you are eager to start contributing, seeing the things happening faster and are passionate about automation, this is what you need for now. Every technical procedure described in the next sessions of this guide is covered by the [ansible-role-openscap](https://galaxy.ansible.com/marcusburghardt/ansible_role_openscap) role.
+Ok, if you are eager to start contributing, seeing the things happening faster and are passionate about automation, this is what you need for now. Every technical procedure described in the next sessions of this guide is covered by the [openscap](https://galaxy.ansible.com/ui/standalone/roles/marcusburghardt/openscap/) role.
 
 Do you prefer to see it working before starting to use it? Please, take a look in this demo:
 [![ansible-role-openscap demo](https://img.youtube.com/vi/YI5lo1P0gw0/3.jpg)](http://www.youtube.com/watch?v=YI5lo1P0gw0 "watch an ansible-role-openscap demo")
@@ -13,11 +13,11 @@ dnf install -y ansible python3
 ```
 Then you can download the ansible role:
 ```bash
-ansible-galaxy install marcusburghardt.ansible_role_openscap
+ansible-galaxy install marcusburghardt.openscap
 ```
 Now it is time to run it. To help with this, the function also comes with a pre-configured Ansible environment for this. It is recommended to use this environment in order to ensure that it is only applicable to this context, not impacting any other possible Ansible settings you may have on your computer:
 ```bash
-cp -r ~/.ansible/roles/marcusburghardt.ansible_role_openscap/files/Ansible_Samples/ ~/Ansible
+cp -r ~/.ansible/roles/marcusburghardt.openscap/files/Ansible_Samples/ ~/Ansible
 cd ~/Ansible/
 ansible-playbook -K ansible_openscap.yml
 ```
@@ -30,16 +30,10 @@ less ~/OpenSCAP/STARTGUIDE.md
 ## Installing build dependencies
 
 ### Required Dependencies
-On *Red Hat Enterprise Linux 7* make sure the following packages are installed:
-
-```bash
-yum install cmake make openscap-utils openscap-scanner
-```
-
 On *Red Hat Enterprise Linux 8* and *Fedora* the package list but must also include python3:
 
 ```bash
-yum install cmake make openscap-utils openscap-scanner python3
+dnf install cmake make openscap-utils openscap-scanner python3 python3-setuptools
 ```
 
 On *Ubuntu* and *Debian*, make sure the packages `libopenscap8`,
@@ -159,6 +153,26 @@ apt-get install ninja-build
 
 ### Sphinx packages (Developer Documentation)
 
+Building docs can be done via tox file or manually.  Note that tox creates a
+virtual environment to handle all dependencies defined in the docs requirements
+file.
+
+#### Using the tox file
+
+```bash
+# Fedora/RHEL
+yum install tox
+
+# Ubuntu/Debian
+apt-get install tox
+```
+
+```bash
+tox -e docs
+```
+
+#### Manual method
+
 Install Sphinx packages if you want to generate HTML Documentation, from source directory run:
 
 ```bash
@@ -171,6 +185,10 @@ apt-get install python3-sphinx
 
 ```bash
 pip install -r docs/requirements.txt
+```
+
+```bash
+make -C docs html
 ```
 
 ### Pandas (SRG Export HTML)
@@ -249,15 +267,15 @@ cd build/
 cmake ../
 # To build all security content
 make -j4
-# To build security content for one specific product, for example for *Red Hat Enterprise Linux 7*
-make -j4 rhel7
+# To build security content for one specific product, for example for *Red Hat Enterprise Linux 9*
+make -j4 rhel9
 ```
 
 Or use the `build_product` script from the base directory that removes
 whatever is in the `build` directory and builds a specific product:
 
 ```bash
-./build_product rhel7
+./build_product rhel9
 ```
 
 For more information about available options, call `./build_product --help`.
@@ -269,12 +287,30 @@ To build specific content for a specific product:
 ```bash
 cd build/
 cmake ../
-make -j4 rhel7-content  # SCAP XML files for RHEL7
-make -j4 rhel7-guides  # HTML guides for RHEL7
-make -j4 rhel7-tables  # HTML tables for RHEL7
-make -j4 rhel7-profile-bash-scripts  # remediation Bash scripts for all RHEL7 profiles
-make -j4 rhel7-profile-playbooks # Ansible Playbooks for all RHEL7 profiles
-make -j4 rhel7  # everything above for RHEL7
+make -j4 rhel9-content  # SCAP XML files for RHEL9
+make -j4 rhel9-guides  # HTML guides for RHEL9
+make -j4 rhel9-tables  # HTML tables for RHEL9
+make -j4 rhel9-profile-bash-scripts  # remediation Bash scripts for all RHEL9 profiles
+make -j4 rhel9-profile-playbooks # Ansible Playbooks for all RHEL9 profiles
+make -j4 rhel9  # everything above for RHEL9
+```
+
+### Building thin The Datastreams
+
+A thin Datastream is a Datastream that contains only one rule with minimal SCAP parts, without any additional OVAL checks, XCCDF groups, profiles, and CPE checks.
+
+This command will generate thin Datastreams for each rule for the product.
+The thin Datastreams are located in the build `build/thin_ds` directory.
+
+```bash
+    ./build_product fedora --thin
+```
+
+This command generates a thin Datastream for the specific rule specified as a parameter.
+The thin Datastream is stored under the normal Datastream name (for example, `ssg-fedora-ds.xml`).
+
+```bash
+    ./build_product fedora --rule-id enable_fips_mode
 ```
 
 ### Configuring CMake options using GUI
@@ -320,7 +356,7 @@ make -j4 stats # display statistics in text format for all products
 make -j4 profile-stats # display statistics in text format for all profiles in all products
 ```
 
-You can also create statistics per product. Prepend the product name (e.g.: `rhel7-stats`) to the make target.
+You can also create statistics per product. Prepend the product name (e.g.: `rhel9-stats`) to the make target.
 
 #### HTML Output
 
@@ -338,7 +374,7 @@ If you want to go deeper into statistics, refer to [Profile Statistics and Utili
 
 ### Generating Sphinx Documentation
 Generate HTML documentation of the project that includes developer documentation,
-supported Jinja Macros documentation, python modules documentation, SSG Test Suite
+supported Jinja Macros documentation, python modules documentation, Automatus
 documentation and release tools documentation:
 
 ```bash
@@ -350,8 +386,8 @@ make -j4 docs # check docs/index.html file
 ### Building compliant SCAP 1.2 content
 
 The build system builds SCAP content with OVAL 5.11.
-This means that the SCAP 1.3 datastream conforms to SCAP standard version 1.3.
-But the SCAP 1.2 datastream is not fully conformant with SCAP standard version 1.2, as up to OVAL 5.10 version is allowed.
+This means that the SCAP 1.3 data stream conforms to SCAP standard version 1.3.
+But the SCAP 1.2 data stream is not fully conformant with SCAP standard version 1.2, as up to OVAL 5.10 version is allowed.
 As SCAP 1.3 allows up to OVAL 5.11 and SCAP 1.2 allows up to OVAL 5.10.
 This project no longer builds content that is fully SCAP 1.2 compliant as we no longer support OVAL 5.10.
 The last release supporting SCAP 1.2 content was [v0.1.64](https://github.com/ComplianceAsCode/content/releases/tag/v0.1.64).
@@ -380,21 +416,19 @@ it will be the `content/build` folder.
 ### SCAP XML files
 
 The SCAP XML files will be called `ssg-${PRODUCT}-${TYPE}.xml`. For example
-`ssg-rhel7-ds.xml` is the SCAP 1.3 *Red Hat Enterprise Linux 7* **source datastream**,
-and `ssg-rhel7-ds-1.2.xml` is the SCAP 1.2 **source datastream**.
+`ssg-rhel9-ds.xml` is the SCAP 1.3 *Red Hat Enterprise Linux 9* **source data stream**.
 
-We recommend using **source datastream** if you have a choice.
+We recommend using **source data stream** if you have a choice.
 The build system also generates separate XCCDF, OVAL, OCIL and CPE files:
 
 ```bash
-$ ls -1 ssg-rhel7-*.xml
-ssg-rhel7-cpe-dictionary.xml
-ssg-rhel7-cpe-oval.xml
-ssg-rhel7-ds.xml
-ssg-rhel7-ds-1.2.xml
-ssg-rhel7-ocil.xml
-ssg-rhel7-oval.xml
-ssg-rhel7-xccdf.xml
+$ ls -1 ssg-rhel9-*.xml
+ssg-rhel9-cpe-dictionary.xml
+ssg-rhel9-cpe-oval.xml
+ssg-rhel9-ds.xml
+ssg-rhel9-ocil.xml
+ssg-rhel9-oval.xml
+ssg-rhel9-xccdf.xml
 ```
 
 These can be ingested by any SCAP-compatible scanning tool, to enable automated
@@ -402,16 +436,19 @@ checking.
 
 ### HTML Guides
 
-The human readable HTML guide index files will be called
-`ssg-${PRODUCT}-guide-index.html`. For example `ssg-rhel7-guide-index.html`.
+The human-readable HTML guide index files will be called
+`ssg-${PRODUCT}-guide-index.html`. For example `ssg-rhel9-guide-index.html`.
 This file will let the user browse all profiles available for that product.
 The prose guide HTML contains practical, actionable information for auditors
-and administrators. They are placed in the guides folder.
+and administrators. They are placed in the `guides` folder.
 ```bash
-$ ls -1 guides/ssg-rhel7-*.html
-guides/ssg-rhel7-guide-ospp42.html
-guides/ssg-rhel7-guide-ospp.html
-guides/ssg-rhel7-guide-pci-dss.html
+$ ls -1 guides/ssg-rhel9-*.html
+guides/ssg-rhel9-guide-anssi_bp28_enhanced.html
+guides/ssg-rhel9-guide-anssi_bp28_high.html
+guides/ssg-rhel9-guide-anssi_bp28_intermediary.html
+guides/ssg-rhel9-guide-anssi_bp28_minimal.html
+guides/ssg-rhel9-guide-ccn_advanced.html
+guides/ssg-rhel9-guide-ccn_basic.html
 ...
 ```
 
@@ -420,15 +457,14 @@ Spreadsheet HTML tables - potentially useful as the basis for a
 *Security Requirements Traceability Matrix (SRTM) document*:
 
 ```bash
-$ ls -1 tables/table-rhel7-*.html
-...
-tables/table-rhel7-nistrefs-ospp.html
-tables/table-rhel7-nistrefs-stig.html
-tables/table-rhel7-pcidssrefs.html
-tables/table-rhel7-srgmap-flat.html
-tables/table-rhel7-srgmap.html
-tables/table-rhel7-stig.html
-...
+$ ls -1 tables/table-rhel9-*.html
+tables/table-rhel9-cces.html
+tables/table-rhel9-srgmap-flat.html
+tables/table-rhel9-srgmap.html
+tables/table-rhel9-stig_gui-testinfo.html
+tables/table-rhel9-stig.html
+tables/table-rhel9-stig-manual.html
+tables/table-rhel9-stig-testinfo.html
 ```
 
 ### Ansible Playbooks
@@ -436,43 +472,52 @@ tables/table-rhel7-stig.html
 #### Profile Ansible Playbooks
 These Playbooks contain the remediations for a profile.
 ```bash
-$ ls -1 ansible/rhel7-playbook-*.yml
-ansible/rhel7-playbook-C2S.yml
-ansible/rhel7-playbook-ospp.yml
-ansible/rhel7-playbook-pci-dss.yml
+$ ls -1 ansible/rhel9-playbook-*.yml
+ansible/rhel9-playbook-anssi_bp28_enhanced.yml
+ansible/rhel9-playbook-anssi_bp28_high.yml
+ansible/rhel9-playbook-anssi_bp28_intermediary.yml
+ansible/rhel9-playbook-anssi_bp28_minimal.yml
+ansible/rhel9-playbook-ccn_advanced.yml
+ansible/rhel9-playbook-ccn_basic.yml
+ansible/rhel9-playbook-ccn_intermediate.yml
+
 ...
 ```
 
 #### Rule Ansible Playbooks
 These Playbooks contain just the remediation for a rule, in the context of a profile.
 ```bash
-$ ls -1 ansible/rhel7-playbook-*.yml
-$ ls -1 rhel7/playbooks/pci-dss/*.yml
-rhel7/playbooks/pci-dss/account_disable_post_pw_expiration.yml
-rhel7/playbooks/pci-dss/accounts_maximum_age_login_defs.yml
-rhel7/playbooks/pci-dss/accounts_password_pam_dcredit.yml
-rhel7/playbooks/pci-dss/accounts_password_pam_lcredit.yml
+$ ls -1 rhel9/playbooks/pci-dss/*.yml | head
+rhel9/playbooks/pci-dss/account_disable_post_pw_expiration.yml
+rhel9/playbooks/pci-dss/accounts_maximum_age_login_defs.yml
+rhel9/playbooks/pci-dss/accounts_no_uid_except_zero.yml
+rhel9/playbooks/pci-dss/accounts_password_pam_dcredit.yml
 ...
 ```
-
+~~
 #### Rule SCE Checks
 
 These scripts contain SCE content for the specified rule.
 
 ```bash
-$ ls -1 ubuntu2004/checks/sce/
-accounts_users_own_home_directories.sh
+$ ls -1 rhel9/checks/sce/
+ip6tables_rules_for_open_ports.sh
+iptables_rules_for_open_ports.sh
 metadata.json
+set_iptables_outbound_n_established.sh
+set_nftables_base_chain.sh
+set_nftables_table.sh
+ssh_keys_passphrase_protected.sh
 ```
 
 ### Profile Bash Scripts
 These Bash Scripts contains the remediations for a profile.
 ```bash
-$ ls -1 bash/rhel7-script-*.sh
-bash/rhel7-script-C2S.sh
+$ ls -1 bash/rhel9-script-*.sh
+bash/rhel9-script-anssi_bp28_enhanced.sh
 ...
-bash/rhel7-script-ospp.sh
-bash/rhel7-script-pci-dss.sh
+bash/rhel9-script-e8.sh
+bash/rhel9-script-hipaa.sh
 ...
 ```
 
@@ -490,7 +535,7 @@ ctest -L quick
 ctest -LE quick -j4
 ```
 
-Note: CTest does not run [SSG Test Suite](https://github.com/ComplianceAsCode/content/tree/master/tests) which provides simple system of test scenarios for testing profiles and rule remediations.
+Note: CTest does not run [Automatus](https://github.com/ComplianceAsCode/content/tree/master/tests) which provides simple system of test scenarios for testing profiles and rule remediations.
 
 ## Profiling the buildsystem
 
@@ -620,7 +665,7 @@ To build all the content, run a container without any flags.
 docker run --cap-drop=all --name oscap-content oscap:latest
 ```
 
-Using `docker cp` to copy all the generated content to the your host:
+Using `docker cp` to copy all the generated content to your host:
 
 ```bash
 docker cp oscap-content:/home/oscap/content/build $(pwd)/container_build

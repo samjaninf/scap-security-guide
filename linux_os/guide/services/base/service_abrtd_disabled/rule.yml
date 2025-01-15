@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,ol7,ol8,ol9,rhel7,rhel8,uos20
 
 title: 'Disable Automatic Bug Reporting Tool (abrtd)'
 
@@ -20,7 +19,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82027-4
     cce@rhel8: CCE-80870-9
     cce@rhel9: CCE-84234-4
 
@@ -39,7 +37,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="abrtd") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

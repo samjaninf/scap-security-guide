@@ -25,7 +25,9 @@ REMEDIATION_TO_EXT_MAP = {
     'puppet': '.pp',
     'ignition': '.yml',
     'kubernetes': '.yml',
-    'blueprint': '.toml'
+    'blueprint': '.toml',
+    'kickstart': '.cfg',
+    'bootc': '.bo'
 }
 
 
@@ -331,11 +333,8 @@ class AnsibleRemediation(Remediation):
         return result
 
     def _get_rule_reference(self, ref_class):
-        refs = self.associated_rule.references.get(ref_class, "")
-        if refs:
-            return refs.split(",")
-        else:
-            return []
+        refs = self.associated_rule.references.get(ref_class, [])
+        return refs
 
     def inject_package_facts_task(self, parsed_snippet):
         """ Injects a package_facts task only if
@@ -461,6 +460,24 @@ class BlueprintRemediation(Remediation):
             file_path, "blueprint")
 
 
+class KickstartRemediation(Remediation):
+    """
+    This provides class for Kickstart remediations
+    """
+    def __init__(self, file_path):
+        super(KickstartRemediation, self).__init__(
+            file_path, "kickstart")
+
+
+class BootcRemediation(Remediation):
+    """
+    This provides class for Bootc remediations
+    """
+    def __init__(self, file_path):
+        super(BootcRemediation, self).__init__(
+            file_path, "bootc")
+
+
 REMEDIATION_TO_CLASS = {
     'anaconda': AnacondaRemediation,
     'ansible': AnsibleRemediation,
@@ -469,6 +486,8 @@ REMEDIATION_TO_CLASS = {
     'ignition': IgnitionRemediation,
     'kubernetes': KubernetesRemediation,
     'blueprint': BlueprintRemediation,
+    'kickstart': KickstartRemediation,
+    'bootc': BootcRemediation,
 }
 
 
@@ -606,7 +625,10 @@ def expand_xccdf_subs(fix, remediation_type):
 
     elif remediation_type == "bash":
         pattern = r'\(bash-populate\s*(\S+)\)'
-
+    elif remediation_type == "kickstart":
+        pattern = r'\(kickstart-populate\s*(\S+)\)'
+    elif remediation_type == "bootc":
+        pattern = r'\(bootc-populate\s*(\S+)\)'
     else:
         sys.stderr.write("Unknown remediation type '%s'\n" % (remediation_type))
         sys.exit(1)

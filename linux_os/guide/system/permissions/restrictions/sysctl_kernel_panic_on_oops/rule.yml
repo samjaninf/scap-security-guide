@@ -16,16 +16,13 @@ warnings:
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-90766-7
     cce@rhel8: CCE-87666-4
     cce@rhel9: CCE-88666-3
-
-references:
-    anssi: BP28(R9)
+    cce@rhel10: CCE-88293-6
 
 {{{ complete_ocil_entry_sysctl_option_value(sysctl="kernel.panic_on_oops", value="1") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

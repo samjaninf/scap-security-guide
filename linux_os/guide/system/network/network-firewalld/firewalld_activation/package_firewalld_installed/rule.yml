@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Install firewalld Package'
 
@@ -21,18 +20,17 @@ severity: medium
 
 identifiers:
     cce@rhcos4: CCE-82521-6
-    cce@rhel7: CCE-82999-4
     cce@rhel8: CCE-82998-6
     cce@rhel9: CCE-84021-5
+    cce@rhel10: CCE-88164-9
     cce@sle12: CCE-91461-4
     cce@sle15: CCE-85698-9
+    cce@slmicro5: CCE-94010-6
 
 references:
-    cis@alinux3: 3.4.1.1
-    cis@rhel7: 3.5.1.1
-    cis@rhel8: 3.4.1.1
     cis@sle15: 3.5.1.1
-    disa: CCI-002314
+    cis@slmicro5: 3.5.1.1
+    disa: CCI-000382,CCI-000366,CCI-002314,CCI-002322
     nist: CM-6(a)
     nist@sle15: CM-7,CM-7.1(iii),CM-7(b),AC-17(1)
     ospp: FMT_SMF_EXT.1

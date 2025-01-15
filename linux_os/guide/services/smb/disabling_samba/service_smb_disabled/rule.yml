@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Disable Samba'
 
@@ -14,18 +13,16 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80277-7
     cce@rhel8: CCE-82759-2
     cce@rhel9: CCE-84201-3
     cce@sle12: CCE-92250-0
     cce@sle15: CCE-91370-7
+    cce@slmicro5: CCE-93892-8
 
 references:
-    cis@alinux2: 2.1.12
-    cis@alinux3: 2.2.7
-    cis@rhel7: 2.2.12
     cis@sle12: 2.2.13
     cis@sle15: 2.2.13
+    cis@slmicro5: 2.2.13
     disa: CCI-001436
 
 ocil_clause: |-
@@ -34,10 +31,11 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="smb") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled
     vars:
         servicename: smb
+        servicename@ubuntu2404: smbd
         packagename: samba

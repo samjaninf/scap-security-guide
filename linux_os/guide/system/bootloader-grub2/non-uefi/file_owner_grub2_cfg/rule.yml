@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Verify {{{ grub2_boot_path }}}/grub.cfg User Ownership'
 
@@ -15,28 +14,24 @@ rationale: 'Only root should be able to modify important boot parameters.'
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82026-6
     cce@rhel8: CCE-80805-5
     cce@rhel9: CCE-83845-8
+    cce@rhel10: CCE-89438-6
     cce@sle12: CCE-91624-7
     cce@sle15: CCE-85848-0
+    cce@slmicro5: CCE-94020-5
 
 references:
-    ccn@rhel9: A.6.SEC-RHEL2
     cis-csc: 12,13,14,15,16,18,3,5
-    cis@alinux2: 1.4.1
-    cis@alinux3: 1.5.2
-    cis@rhel7: 1.4.2
-    cis@rhel8: 1.4.2
-    cis@rhel9: 1.4.2
     cis@sle12: 1.5.2
     cis@sle15: 1.5.2
+    cis@slmicro5: 1.5.2
     cis@ubuntu2004: 1.5.2
     cis@ubuntu2204: 1.4.2
     cjis: 5.5.2.2
     cobit5: APO01.06,DSS05.04,DSS05.07,DSS06.02
     cui: 3.4.5
-    disa: CCI-000225
+    disa: CCI-000366
     hipaa: 164.308(a)(1)(ii)(B),164.308(a)(7)(i),164.308(a)(7)(ii)(A),164.310(a)(1),164.310(a)(2)(i),164.310(a)(2)(ii),164.310(a)(2)(iii),164.310(b),164.310(c),164.310(d)(1),164.310(d)(2)(iii)
     isa-62443-2009: 4.3.3.7.3
     isa-62443-2013: 'SR 2.1,SR 5.2'
@@ -44,14 +39,14 @@ references:
     nist: CM-6(a),AC-6(1)
     nist-csf: PR.AC-4,PR.DS-5
     pcidss: Req-7.1
-    pcidss4: "2.2.6"
+    srg: SRG-OS-000480-GPOS-00227
 
 ocil_clause: '{{{ ocil_clause_file_owner(file=grub2_boot_path ~ "/grub.cfg", owner="root") }}}'
 
 ocil: |-
     {{{ ocil_file_owner(file=grub2_boot_path ~ "/grub.cfg", owner="root") }}}
 
-platform: machine
+platform: not bootc
 
 template:
     name: file_owner

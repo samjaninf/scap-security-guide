@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8,rhel9
 
 title: 'Perform full reference count validation'
 
@@ -23,12 +22,9 @@ warnings:
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86421-5
     cce@rhel8: CCE-86422-3
     cce@rhel9: CCE-86423-1
-
-references:
-    anssi: BP28(R15)
+    cce@rhel10: CCE-88998-0
 
 ocil_clause: 'the kernel was not built with the required value'
 

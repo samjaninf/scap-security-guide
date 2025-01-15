@@ -20,3 +20,4 @@ fixtext: |-
 
     $ sudo systemctl disable --now ctrl-alt-del.target
     $ sudo systemctl mask --now ctrl-alt-del.target
+

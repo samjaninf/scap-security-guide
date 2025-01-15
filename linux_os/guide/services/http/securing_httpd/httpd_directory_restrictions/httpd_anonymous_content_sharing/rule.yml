@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Web Content Directories Must Not Be Shared Anonymously'
 
@@ -18,12 +17,6 @@ rationale: |-
     the web content or cause web server performance problems.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80555-6
-
-references:
-    stigid: WG210
 
 ocil_clause: 'it is not'
 

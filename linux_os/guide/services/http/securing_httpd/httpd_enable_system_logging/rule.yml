@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Enable HTTPD System Logging'
 
@@ -19,12 +18,6 @@ rationale: |-
     piped logging utility.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80549-9
-
-references:
-    stigid: WA00615
 
 ocil_clause: 'it is not'
 

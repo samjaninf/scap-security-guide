@@ -12,6 +12,8 @@ levels:
   - id: advanced
     inherits_from:
       - intermediate
+reference_type: ccn
+product: rhel9
 
 controls:
   - id: reload_dconf_db
@@ -322,7 +324,7 @@ controls:
       - sshd_idle_timeout_value=15_minutes
       - sshd_set_idle_timeout
       - sshd_set_keepalive
-      - var_sshd_set_keepalive=0
+      - var_sshd_set_keepalive=1
 
   - id: A.5.SEC-RHEL8
     title: Local and Remote Console Inactivity is Controlled
@@ -442,6 +444,7 @@ controls:
       - firewalld_loopback_traffic_restricted
       - firewalld_loopback_traffic_trusted
       - service_firewalld_enabled
+      - package_firewalld_installed
       - service_nftables_disabled
       - set_firewalld_default_zone
 
@@ -744,6 +747,7 @@ controls:
       - set_password_hashing_algorithm_passwordauth
       - set_password_hashing_algorithm_logindefs
       - var_password_hashing_algorithm=SHA512
+      - var_password_hashing_algorithm_pam=sha512
 
   - id: A.23.SEC-RHEL1
     title: The Installation And Use of Any Device Connected to the Equipment is Controlled

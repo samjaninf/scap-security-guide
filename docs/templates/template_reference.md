@@ -172,6 +172,17 @@
 
 -   Languages: Ansible, Bash, OVAL
 
+#### audit_rules_watch
+-   Check if there are file system watches configured in audit rules for the given path.
+
+-   Parameters:
+
+    -   **path** - path that should be part of the audit watch rule as a value
+        of `-w` argument, eg. `/etc/group`.
+
+-   Languages: Ansible, Bash, OVAL
+
+
 #### argument_value_in_line
 -   Checks that `argument=value` pair is present in (optionally) the
     line started with line_prefix (and, optionally, ending with
@@ -193,6 +204,20 @@
         argument-value pair should be present, optional.
 
 -   Languages: OVAL
+
+#### cis_banner
+-   Verify that the contents of a login banner in the given `filepath` complies
+    with CIS requirements.
+
+-   Parameters:
+
+    -   **filepath** - Path to the login banner file, eg. `/etc/motd`.
+
+    -   **banner_must_be_set** - If set to `"true"`, the rule will fail if no
+        banner is configured in that file. Otherwise, the rule will pass if
+        the banner isn't configured.
+
+- Languages: Ansible, Bash, OVAL
 
 #### coreos_kernel_option
 -   Checks that `argument=value` pair is present in the kernel arguments.
@@ -249,6 +274,8 @@
 - Parameters:
     - **filepath** - File path to be checked.
     - **exists** - If set to `true` the check will fail if the file doesn't exist and vice versa for `false`.
+    - **fileuid** - (optional) user ID (UID) of the file created by remediations
+    - **filemode** - (optional) file permissions of the file created by remediations, use in a hexadecimal format, eg. =`'0640'`
 
 - Languages: Ansible, Bash, OVAL
 
@@ -264,9 +291,6 @@
 
     -   **filepath_is_regex** - If set to `"true"` the OVAL will
         consider the value of **filepath** as a regular expression.
-
-    -   **missing_file_pass** - If set to `"true"` the OVAL check will
-        pass when file is absent. Default value is `"false"`.
 
     -   **file_regex** - Regular expression that matches file names in
         a directory specified by **filepath**. Can be set only if
@@ -305,9 +329,6 @@ they must be of the same length.
     -   **filepath_is_regex** - If set to `"true"` the OVAL will
         consider the value of **filepath** as a regular expression.
 
-    -   **missing_file_pass** - If set to `"true"` the OVAL check will
-        pass when file is absent. Default value is `"false"`.
-
     -   **file_regex** - Regular expression that matches file names in
         a directory specified by **filepath**. Can be set only if
         **filepath** parameter specifies a directory. Note: Applies to
@@ -341,9 +362,6 @@ they must be of the same length.
 
     -   **filepath_is_regex** - If set to `"true"` the OVAL will
         consider the value of **filepath** as a regular expression.
-
-    -   **missing_file_pass** - If set to `"true"` the OVAL check will
-        pass when file is absent. Default value is `"false"`.
 
     -   **file_regex** - Regular expression that matches file names in
         a directory specified by **filepath**. Can be set only if
@@ -396,7 +414,7 @@ they must be of the same length.
     -   **arg_variable** - the variable used as the value for the argument, eg. `'var_slub_debug_options'`
         This parameter is mutually exclusive with **arg_value**.
 
--   Languages: Ansible, Bash, OVAL, Blueprint
+-   Languages: Ansible, Bash, OVAL, Blueprint, Kickstart
 
 #### grub2_bootloader_argument_absent
 -   Ensures that a kernel command line argument is absent in GRUB 2 configuration.
@@ -475,7 +493,7 @@ The only way to remediate is to recompile and reinstall the kernel, so no remedi
 
     -   **min_size** - the minimum recommended partition size, in bytes
 
--   Languages: Anaconda, OVAL, Blueprint
+-   Languages: Anaconda, OVAL, Blueprint, Kickstart
 
 #### mount_option
 -   Checks if a given partition is mounted with a specific option such
@@ -555,7 +573,7 @@ The only way to remediate is to recompile and reinstall the kernel, so no remedi
         state uses operation "greater than or equal" to compare the
         collected package version with the version in the OVAL state.
 
--   Languages: Anaconda, Ansible, Bash, OVAL, Puppet, Blueprint
+-   Languages: Anaconda, Ansible, Bash, OVAL, Puppet, Blueprint, Kickstart, Bootc
 
 #### package_removed
 -   Checks if the given package is not installed.
@@ -564,7 +582,7 @@ The only way to remediate is to recompile and reinstall the kernel, so no remedi
 
     -   **pkgname** - name of the RPM or DEB package, eg. `tmux`
 
--   Languages: Anaconda, Ansible, Bash, OVAL, Puppet
+-   Languages: Anaconda, Ansible, Bash, OVAL, Puppet, Kickstart, Bootc
 
 #### key_value_pair_in_file
 Checks if a given key and value are configured in a file.
@@ -593,6 +611,30 @@ When the remediation is applied duplicate occurrences of `key` are removed.
 
     - **app** - optional. If not set the check will use the default text `The respective application or service`.
       If set, the `app` is used within sentences like: "`application` is configured correctly and configuration file exists"
+
+#### pam_account_password_faillock
+-   Checks if the pam_faillock is enabled in PAM and if the specified
+    parameter is correctly configured either in /etc/security/faillock.conf
+    or directly in /etc/pam.d/* files.
+
+    The allowed interval for the faillock parameter is defined by
+    template parameters `variable_lower_bound` and `variable_upper_bound`.
+    The boundaries are inclusive (lower <= parameter value <= upper) and
+    can be set as:
+    - `use_ext_variable`: use value in external XCCDF variable defined by `ext_variable`
+    - number: literal number
+    - undefined: no boundary
+
+-   Parameters:
+    -   **description** - Description of rule
+    -   **prm_name** - name of faillock parameter
+    -   **prm_regex_conf** - regex for faillock parameter in /etc/security/faillock.conf
+    -   **prm_regex_pamd** - regex for faillock parameter in /etc/pam.d/*
+    -   **variable_lower_bound** - lower boundary for allowed parameter value
+    -   **variable_upper_bound** - upper boundary for allowed parameter value
+    -   **ext_variable** - external XCCDG variable used to define interval boundaries and
+                           the value used in the remediation.
+
 
 #### pam_options
 -   Checks if the parameters or arguments of a given Linux-PAM (Pluggable
@@ -672,7 +714,7 @@ When the remediation is applied duplicate occurrences of `key` are removed.
         `var_selinuxuser_execheap` to turn on or off the SELinux
         boolean.
 
--   Languages: Ansible, Bash, OVAL
+-   Languages: Ansible, Bash, OVAL, SCE
 
 #### service_disabled
 -   Checks if a service is disabled. Uses either systemd or SysV init
@@ -691,7 +733,7 @@ When the remediation is applied duplicate occurrences of `key` are removed.
         If **daemonname** is not specified it means the name of the
         daemon is the same as the name of service.
 
--   Languages: Ansible, Bash, OVAL, Puppet, Ignition, Kubernetes, Blueprint
+-   Languages: Ansible, Bash, OVAL, Puppet, Ignition, Kubernetes, Blueprint, Kickstart, SCE
 
 #### service_enabled
 -   Checks if a system service is enabled. Uses either systemd or SysV
@@ -710,7 +752,7 @@ When the remediation is applied duplicate occurrences of `key` are removed.
         If **daemonname** is not specified it means the name of the
         daemon is the same as the name of service.
 
--   Languages: Ansible, Bash, OVAL, Puppet, Blueprint
+-   Languages: Ansible, Bash, OVAL, Puppet, Blueprint, Kickstart, SCE
 
 #### shell_lineinfile
 -   Checks shell variable assignments in files. Remediations will paste
@@ -768,7 +810,7 @@ When the remediation is applied duplicate occurrences of `key` are removed.
         package name is provided, socketname is used. Currently, the package name
         is used when running Automatus test scenarios.
 
-- languages: Ansible, Bash, OVAL
+- languages: Ansible, Bash, OVAL, SCE
 
 #### sshd_lineinfile
 -   Checks SSH server configuration items in `/etc/ssh/sshd_config` or
@@ -782,6 +824,14 @@ When the remediation is applied duplicate occurrences of `key` are removed.
 
     -   **value** - value of the SSH configuration option specified by
         **parameter**, eg. `"no"`.
+        This cannot be specified together with the **xccdf_variable** parameter.
+
+    - **xccdf_variable** - specifies an XCCDF variable to use as a value for the specified **parameter**.
+        This parameter conflicts with the **value** parameter.
+
+    - **datatype** - specifies the datatype of the **value** or **xccdf_variable**.
+        Possible options are **int** or **string**.
+        The datatype is utilized for creation of correct templated test scenarios.
 
     -   **missing_parameter_pass** - effective only in OVAL checks, if
         set to `"false"` and the parameter is not present in the
@@ -892,11 +942,48 @@ The selected value can be changed in the profile (consult the actual variable fo
     -   **sysctlval_regex** - if **operation** is `pattern match`, this
         parameter is used instead of **sysctlval**.
 
+    -   **check_runtime** - whether to generate checks for runtime configuration.
+        Default value: `true`.
+
     In case the **sysctl_remediate_drop_in_file** property is set to true in the product file,
     the remediation scripts will set the variable with correct value to a drop-in file in
     `/etc/sysctl.d/var_name.conf` file.
 
+-   Languages: Ansible, Bash, OVAL, SCE
+
+#### systemd_dropin_configuration
+- checks if a Systemd-style configuration exists either in the main file or in any file within specified dropin directory.
+    The remediation tries to modify already existing configuration.
+    If the correct section is found and the parameter exists, its value is changed to match the desired one.
+    If the section is found but the parameter does not exist, it is added to this section.
+    If none of inspected files contains the desired section a new file called complianceascode_hardening.conf within the dropin directory is created.
+- parameters:
+    - **master_cfg_file** - the main configuration file to check, e.g. /etc/systemd/journald.conf
+
+    - **dropin_dir** - the respective dropin directory, e.g. the /etc/systemd/journald.conf.d directory when keeping to the example mentioned above
+
+    - **section** - the section of the Systemd file
+
+    - **param** - the parameter to be configured
+
+    - **value** - the value of the parameter
+
+    - **no_quotes** - if set to "true", the value will not be enclosed in quotes
+
+    - **missing_parameter_pass** - effective only in OVAL checks, if
+        set to `"false"` and the parameter is not present in the
+        configuration file, the OVAL check will return false (default value: `"false"`).
+
 -   Languages: Ansible, Bash, OVAL
+
+#### systemd_mount_enabled
+-   Checks if a `systemd` mount unit is enabled
+
+-   Parameters:
+    - **mountname** - name of the systemd mount unit, without the `.mount` suffix, eg. `tmp`
+
+-   Languages: Anaconda, Ansible, Bash, OVAL
+
 
 #### timer_enabled
 -   Checks if a SystemD timer unit is enabled.
@@ -911,7 +998,7 @@ The selected value can be changed in the profile (consult the actual variable fo
         provided it is assumed that the name of the RPM package is the
         same as the name of the SystemD timer unit.
 
--   Languages: Ansible, Bash, OVAL
+-   Languages: Ansible, Bash, OVAL, SCE
 
 #### yamlfile_value
 -   Check if value(s) of certain type is (are) present in a YAML (or

@@ -17,15 +17,12 @@ rationale: |-
 
 severity: unknown
 
-platform: machine
 
-references:
-    anssi: BP28(R12)
 
 identifiers:
-    cce@rhel7: CCE-83376-4
     cce@rhel8: CCE-83387-1
     cce@rhel9: CCE-90846-7
+    cce@rhel10: CCE-88936-0
     cce@sle12: CCE-91486-1
     cce@sle15: CCE-91178-4
 

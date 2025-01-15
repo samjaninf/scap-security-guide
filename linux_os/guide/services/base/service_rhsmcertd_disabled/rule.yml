@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable Red Hat Subscription Manager Daemon (rhsmcertd)'
 
@@ -20,7 +19,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80270-2
     cce@rhel8: CCE-82387-2
 
 references:
@@ -38,7 +36,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="rhsmcertd") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

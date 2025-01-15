@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Disable the xserver_execmem SELinux Boolean'
 
@@ -14,11 +13,8 @@ rationale: ""
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82342-7
     cce@rhel8: CCE-83313-7
 
-references:
-    anssi: BP28(R67)
 
 {{{ complete_ocil_entry_sebool_disabled(sebool="xserver_execmem") }}}
 

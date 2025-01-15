@@ -17,28 +17,30 @@
 {{% endif %}}
 {{%- endmacro -%}}
 {{%- macro sysctl_match() -%}}
-    <ind:pattern operation="pattern match">^[\s]*{{{ SYSCTLVAR }}}[\s]*=[\s]*(.*)[\s]*$</ind:pattern>
+    <ind:pattern operation="pattern match">^[\s]*{{{ SYSCTLVAR }}}[\s]*=[\s]*(.*\S)[\s]*$</ind:pattern>
     <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
 {{%- endmacro -%}}
-{{%- if "P" in FLAGS -%}}
+{{%- if IPV6 == "false" -%}}
 
 <def-group>
   <definition class="compliance" id="{{{ rule_id }}}" version="3">
-    {{{ oval_metadata("The '" + SYSCTLVAR + "' kernel parameter should be set to the appropriate value in both system configuration and system runtime.") }}}
+    {{{ oval_metadata("The '" + SYSCTLVAR + "' kernel parameter should be set to the appropriate value in system configuration" + (" and system runtime." if CHECK_RUNTIME == "true" else ".")) }}}
     <criteria operator="AND">
       <extend_definition comment="{{{ SYSCTLVAR }}} configuration setting check"
                          definition_ref="{{{ rule_id }}}_static"/>
+{{% if CHECK_RUNTIME == "true" %}}
       <extend_definition comment="{{{ SYSCTLVAR }}} runtime setting check"
                          definition_ref="{{{ rule_id }}}_runtime"/>
+{{%- endif %}}
     </criteria>
   </definition>
 </def-group>
 
-{{%- elif "I" in FLAGS -%}}
+{{%- else -%}}
 
 <def-group>
   <definition class="compliance" id="{{{ rule_id }}}" version="4">
-    {{{ oval_metadata("The kernel '" + SYSCTLVAR + "' parameter should be set to the appropriate value in both system configuration and system runtime.") }}}
+    {{{ oval_metadata("The kernel '" + SYSCTLVAR + "' parameter should be set to the appropriate value in system configuration" + (" and system runtime." if CHECK_RUNTIME == "true" else ".")) }}}
     <criteria comment="IPv6 disabled or {{{ SYSCTLVAR }}} set correctly" operator="OR">
 {{% if product in ["ubuntu1604", "ubuntu1804"] %}}
       <extend_definition comment="is IPv6 enabled?"
@@ -50,16 +52,18 @@
       <criteria operator="AND">
         <extend_definition comment="{{{ SYSCTLVAR }}} configuration setting check"
                            definition_ref="{{{ rule_id }}}_static"/>
+{{% if CHECK_RUNTIME == "true" %}}
         <extend_definition comment="{{{ SYSCTLVAR }}} runtime setting check"
                            definition_ref="{{{ rule_id }}}_runtime"/>
+{{%- endif %}}
       </criteria>
     </criteria>
   </definition>
 </def-group>
 
 {{%- endif %}}
-{{%- if "R" in FLAGS -%}}
 
+{{% if CHECK_RUNTIME == "true" %}}
 <def-group>
   <definition class="compliance" id="{{{ rule_id }}}_runtime" version="3">
     {{{ oval_metadata("The kernel '" + SYSCTLVAR + "' parameter should be set to " + COMMENT_VALUE + " in the system runtime.") }}}
@@ -114,9 +118,8 @@
 {{% endfor %}}
 {{% endif %}}
 </def-group>
+{{% endif %}}
 
-{{%- endif -%}}
-{{%- if "S" in FLAGS -%}}
 
 <def-group>
   <definition class="compliance" id="{{{ rule_id }}}_static" version="3">
@@ -182,7 +185,7 @@
   <ind:textfilecontent54_object id="object_static_etc_lib_sysctls_{{{ rule_id }}}" version="1">
     <set>
       <object_reference>object_static_etc_sysctls_{{{ rule_id }}}</object_reference>
-{{% if product not in [ "ol7", "ol8", "ol9", "rhcos4", "rhel7", "rhel8", "rhel9"] %}}
+{{% if product not in [ "ol7", "ol8", "ol9", "rhcos4", "rhel8", "rhel9", "rhel10", "ubuntu2004", "ubuntu2204", "ubuntu2404"] %}}
       <object_reference>object_static_lib_sysctld_{{{ rule_id }}}</object_reference>
 {{% endif %}}
     </set>
@@ -229,7 +232,7 @@
     <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
     {{{ sysctl_match() }}}
   </ind:textfilecontent54_object>
-{{% if product not in [ "ol7", "ol8", "ol9", "rhcos4", "rhel7", "rhel8", "rhel9"] %}}
+{{% if product not in [ "ol7", "ol8", "ol9", "rhcos4", "ubuntu2004", "ubuntu2204", "ubuntu2404"] or 'rhel' in product %}}
   <ind:textfilecontent54_object id="object_static_lib_sysctld_{{{ rule_id }}}" version="1">
     <ind:path>/lib/sysctl.d</ind:path>
     <ind:filename operation="pattern match">^.*\.conf$</ind:filename>
@@ -263,4 +266,3 @@
 {{% endfor %}}
 {{% endif %}}
 </def-group>
-{{%- endif -%}}

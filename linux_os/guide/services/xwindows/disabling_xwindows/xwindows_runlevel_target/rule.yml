@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Disable X Windows Startup By Setting Default Target'
 
@@ -23,14 +22,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-27285-6
     cce@rhel8: CCE-83380-6
     cce@rhel9: CCE-84105-6
+    cce@rhel10: CCE-89266-1
 
 references:
     cis-csc: 12,15,8
-    cis@rhel7: 2.2.2
-    cis@rhel8: 2.2.2
     cobit5: APO13.01,DSS01.04,DSS05.02,DSS05.03
     disa: CCI-000366
     isa-62443-2009: 4.3.3.6.6
@@ -56,4 +53,4 @@ fixtext: |-
 
 srg_requirement: 'The graphical display manager must not be the default target on {{{ full_name }}} unless approved.'
 
-platform: machine
+platform: system_with_kernel

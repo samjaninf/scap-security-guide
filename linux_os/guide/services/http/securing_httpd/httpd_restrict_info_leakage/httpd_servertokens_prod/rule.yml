@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Set httpd ServerTokens Directive to Prod'
 
@@ -15,9 +14,6 @@ rationale: |-
     to plan an attack on the given system. This information disclosure should be restricted to a minimum.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80302-3
 
 references:
     cis-csc: 11,14,3,9

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhcos4,rhel8,rhel9
 
 title: 'Disable Kernel iwlmvm Module'
 
@@ -22,7 +21,7 @@ references:
 
 {{{ complete_ocil_entry_module_disable(module="iwlmvm") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: kernel_module_disabled

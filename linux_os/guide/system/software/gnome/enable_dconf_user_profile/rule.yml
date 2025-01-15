@@ -1,7 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux3,fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15,ubuntu2004,ubuntu2204
-
 title: 'Configure GNOME3 DConf User Profile'
 
 description: |-
@@ -15,6 +13,17 @@ description: |-
     should be set as follows:
     <pre>user-db:user
     system-db:gdm
+    </pre>
+    {{% elif 'ubuntu' in product %}}
+    To make sure that the gdm profile is configured correctly, the <tt>/etc/dconf/profile/gdm</tt>
+    should be set as follows:
+    <pre>user-db:user
+    system-db:gdm
+    </pre>
+    To make sure that the user profile is configured correctly, the <tt>/etc/dconf/profile/user</tt>
+    should be set as follows:
+    <pre>user-db:user
+    system-db:local
     </pre>
     {{% else %}}
     To make sure that the user profile is configured correctly, the <tt>/etc/dconf/profile/user</tt>
@@ -33,7 +42,6 @@ rationale: |-
 severity: high
 
 identifiers:
-    cce@rhel7: CCE-27446-4
     cce@rhel9: CCE-88767-9
     cce@sle12: CCE-83006-7
     cce@sle15: CCE-83267-5
@@ -56,6 +64,15 @@ ocil: |-
     The output should show the following:
     <pre>user-db:user
     system-db:gdm</pre>
+    {{% elif 'ubuntu' in product %}}
+    <pre>$ cat /etc/dconf/profile/gdm</pre>
+    The output should show the following:
+    <pre>user-db:user
+    system-db:gdm</pre>
+    <pre>$ cat /etc/dconf/profile/user</pre>
+    The output should show the following:
+    <pre>user-db:user
+    system-db:local
     {{% else %}}
     <pre>$ cat /etc/dconf/profile/user</pre>
     The output should show the following:
@@ -65,4 +82,4 @@ ocil: |-
     system-db:distro</pre>
     {{% endif %}}
 
-platform: machine
+platform: system_with_kernel

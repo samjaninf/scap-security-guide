@@ -19,3 +19,4 @@ fixtext: |-
     Edit the file /etc/dnf/dnf.conf by adding or editing the following line:
 
      clean_requirements_on_remove=1
+

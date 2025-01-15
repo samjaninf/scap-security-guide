@@ -15,10 +15,9 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-85921-5
     cce@rhel9: CCE-85941-3
+    cce@rhel10: CCE-89396-6
 
 references:
-    cis@rhel8: 4.2.2.2
-    cis@rhel9: 4.2.2.2
     cis@ubuntu2204: 4.2.1.2
     disa: CCI-001665
     nist: SC-24
@@ -34,11 +33,8 @@ fixtext: |-
 
 srg_requirement: '{{{ srg_requirement_service_enabled("systemd-journald") }}}'
 
-platform: machine
-
 template:
     name: service_enabled
     vars:
         servicename: systemd-journald
         packagename: systemd
-

@@ -18,16 +18,14 @@ class ResolvableProfile(Profile):
     def extend_by(self, extended_profile):
         self.update_with(extended_profile)
 
-    def resolve_selections_with_rules(self, rules_by_id):
-        selections = set()
+    def apply_filter(self, rules_by_id):
+        selections = []
         for rid in self.selected:
-            if rid not in rules_by_id:
-                continue
             rule = rules_by_id[rid]
             if not self.rule_filter(rule):
                 continue
-            selections.add(rid)
-        self.selected = list(selections)
+            selections.append(rid)
+        self.selected = selections
 
     def resolve(self, all_profiles, rules_by_id, controls_manager=None):
         if self.resolved:
@@ -35,8 +33,6 @@ class ResolvableProfile(Profile):
 
         if controls_manager:
             self.resolve_controls(controls_manager)
-
-        self.resolve_selections_with_rules(rules_by_id)
 
         if self.extends:
             if self.extends not in all_profiles:
@@ -62,9 +58,10 @@ class ResolvableProfile(Profile):
             if rid not in rules_by_id:
                 msg = (
                     "Rule {rid} is selected by {profile}, but the rule is not available. "
-                    "This may be caused by a discrepancy of prodtypes."
                     .format(rid=rid, profile=self.id_))
                 raise ValueError(msg)
+
+        self.apply_filter(rules_by_id)
 
         self.resolved = True
 

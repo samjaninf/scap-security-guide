@@ -1,4 +1,4 @@
-# platform = Red Hat Virtualization 4,multi_platform_fedora,multi_platform_ol,multi_platform_rhel,multi_platform_sle
+# platform = Red Hat Virtualization 4,multi_platform_fedora,multi_platform_ol,multi_platform_rhel,multi_platform_sle,multi_platform_slmicro
 # reboot = false
 # strategy = unknown
 # complexity = low
@@ -8,7 +8,7 @@
 - name: "Test for domain group"
   command: grep '\s*\[domain\/[^]]*]' /etc/sssd/sssd.conf
   register: test_grep_domain
-  ignore_errors: yes
+  failed_when: false
   changed_when: False
   check_mode: no
 

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Enable the auditadm_exec_content SELinux Boolean'
 
@@ -14,9 +13,9 @@ rationale: ""
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80424-5
     cce@rhel8: CCE-84297-1
     cce@rhel9: CCE-84090-0
+    cce@rhel10: CCE-89945-0
 
 references:
     cui: 80424-5

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,ol7,ol8,ol9,rhel7,rhel8,rhel9,uos20
 
 title: 'Disable ntpdate Service (ntpdate)'
 
@@ -21,7 +20,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80262-9
     cce@rhel8: CCE-80879-0
     cce@rhel9: CCE-84236-9
 
@@ -41,7 +39,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="ntpdate") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

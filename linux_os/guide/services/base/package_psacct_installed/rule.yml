@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Install the psacct package'
 
@@ -19,7 +18,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-82403-7
     cce@rhel8: CCE-82404-5
 
 references:

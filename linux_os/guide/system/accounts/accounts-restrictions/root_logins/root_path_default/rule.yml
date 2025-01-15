@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhel7,rhel8
 
 title: 'Root Path Must Be Vendor Default'
 
@@ -16,9 +15,6 @@ rationale: |-
     contain only absolute paths.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80210-8
 
 references:
     cis-csc: '18'

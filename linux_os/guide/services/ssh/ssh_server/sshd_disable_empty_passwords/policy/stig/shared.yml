@@ -4,14 +4,16 @@ srg_requirement: |-
 vuldiscussion: |-
     If an account has an empty password, anyone could log on and run commands with the privileges of that account. Accounts with empty passwords should never be used in operational environments.
 
-checktext: |-
-    Verify {{{ full_name }}} remote access using SSH prevents logging on with a blank password with the following command:
 
-    $ sudo grep -i PermitEmptyPasswords /etc/ssh/sshd_config
+
+checktext: |-
+    Verify that {{{ full_name }}} remote access using SSH prevents logging on with a blank password with the following command:
+
+    $ sudo /usr/sbin/sshd -dd 2&gt;&1 | awk '/filename/ {print $4}' | tr -d '\r' | tr '' ' ' | xargs sudo grep -iH '^\s*permitemptypasswords'
 
     PermitEmptyPassword no
 
-    If the "PermitEmptyPassword" keyword is set to "yes", is missing, or is commented out, this is a finding
+    If the "PermitEmptyPassword" keyword is set to "yes", is missing, or is commented out, this is a finding.
 
 fixtext: |-
     To configure the system to prevent SSH users from logging on with blank passwords edit the following line in "etc/ssh/sshd_config":

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Add noauto Option to /boot'
 
@@ -20,13 +19,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83344-2
     cce@rhel8: CCE-83345-9
 
-references:
-    anssi: BP28(R12)
 
-platform: machine
 
 template:
     name: mount_option

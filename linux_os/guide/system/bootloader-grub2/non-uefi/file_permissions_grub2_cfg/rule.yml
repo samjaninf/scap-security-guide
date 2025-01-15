@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Verify {{{ grub2_boot_path }}}/grub.cfg Permissions'
 
@@ -15,22 +14,18 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82039-9
     cce@rhel8: CCE-80814-7
     cce@rhel9: CCE-83846-6
+    cce@rhel10: CCE-89290-1
     cce@sle12: CCE-92216-1
     cce@sle15: CCE-91426-7
+    cce@slmicro5: CCE-94019-7
 
 references:
-    ccn@rhel9: A.6.SEC-RHEL2
     cis-csc: 12,13,14,15,16,18,3,5
-    cis@alinux2: 1.4.1
-    cis@alinux3: 1.5.2
-    cis@rhel7: 1.4.2
-    cis@rhel8: 1.4.2
-    cis@rhel9: 1.4.2
     cis@sle12: 1.5.2
     cis@sle15: 1.5.2
+    cis@slmicro5: 1.5.2
     cis@ubuntu2004: 1.5.2
     cis@ubuntu2204: 1.4.2
     cobit5: APO01.06,DSS05.04,DSS05.07,DSS06.02
@@ -51,7 +46,7 @@ ocil: |-
     If properly configured, the output should indicate the following
     permissions: <tt>-rw-------</tt>
 
-platform: machine
+platform: not bootc
 
 template:
     name: file_permissions

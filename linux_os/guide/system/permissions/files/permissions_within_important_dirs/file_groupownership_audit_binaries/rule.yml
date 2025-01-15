@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel8,rhel9,ubuntu2004,ubuntu2204
 
 title: 'Verify that audit tools are owned by group root'
 
@@ -14,9 +13,9 @@ description: |-
     /sbin/auditctl root
     /sbin/aureport root
     /sbin/ausearch root
-    /sbin/autrace root
+    {{% if product not in ["rhel10"] %}}/sbin/autrace root{{% endif %}}
     /sbin/auditd root
-    /sbin/audispd root
+    {{% if 'rhel' not in product %}}/sbin/audispd root{{% endif %}}
     /sbin/augenrules root
     </pre>
 
@@ -39,9 +38,9 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-86455-3
     cce@rhel9: CCE-86457-9
+    cce@rhel10: CCE-87965-0
 
 references:
-    cis@rhel9: 4.1.4.10
     cis@ubuntu2204: 4.1.4.10
     disa: CCI-001493,CCI-001494
     srg: SRG-OS-000256-GPiOS-00097,SRG-OS-000257-GPOS-00098
@@ -54,9 +53,9 @@ ocil: |-
     /sbin/auditctl root
     /sbin/aureport root
     /sbin/ausearch root
-    /sbin/autrace root
+    {{% if product not in ["rhel10"] %}}/sbin/autrace root{{% endif %}}
     /sbin/auditd root
-    /sbin/audispd root
+    {{% if 'rhel' not in product %}}/sbin/audispd root{{% endif %}}
     /sbin/augenrules root
     </pre>
 
@@ -76,8 +75,8 @@ template:
             - /sbin/auditctl
             - /sbin/aureport
             - /sbin/ausearch
-            - /sbin/autrace
+            {{% if product not in ["rhel10"] %}}- /sbin/autrace{{% endif %}}
             - /sbin/auditd
-            - /sbin/audispd
+            {{% if 'rhel' not in product %}}- /sbin/audispd{{% endif %}}
             - /sbin/augenrules
         gid_or_name: '0'

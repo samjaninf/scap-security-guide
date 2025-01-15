@@ -1,4 +1,3 @@
-prodtype: ocp4
 
 title: "Configure OAuth server so that tokens expire after a set period of inactivity"
 
@@ -52,6 +51,7 @@ rationale: |-
 references:
   nerc-cip: CIP-004-6 R2.2.3,CIP-007-3 R5.1,CIP-007-3 R5.2,CIP-007-3 R5.3.1,CIP-007-3 R5.3.2,CIP-007-3 R5.3.3
   nist: AC-2(5),SC-10
+  srg: SRG-APP-000190-CTR-000500
 
 identifiers:
     cce@ocp4: CCE-83511-6
@@ -61,7 +61,7 @@ ocil_clause: 'OAuth server inactivity timeout is not configured'
 ocil: |-
   To check if the OAuth server timeout is configured, run the following command:
   <pre>oc get oauth cluster -ojsonpath='{.spec.tokenConfig.accessTokenInactivityTimeout}'</pre>
-  the output should return <pre> {{{ xccdf_value("var_oauth_inactivity_timeout") }}} </pre>.
+  the output should return <pre>{{ .var_oauth_inactivity_timeout }}</pre>.
 
 severity: medium
 

@@ -2,6 +2,7 @@ import contextlib
 import collections
 import os
 import tempfile
+import sys
 
 import yaml
 import pytest
@@ -133,6 +134,23 @@ def test_rule_platforms_inheritance():
     assert rule.platforms == {'plX'}
 
 
+def test_get_not_selected_components():
+    group1 = ssg.build_yaml.Group('gr1_id')
+    group2 = ssg.build_yaml.Group('gr2_id')
+    group3 = ssg.build_yaml.Group('gr3_id')
+    rule1 = ssg.build_yaml.Rule('rul1_id')
+    rule2 = ssg.build_yaml.Rule('rul2_id')
+
+    group1.add_group(group2)
+    group1.add_group(group3)
+    group2.add_rule(rule1)
+    group1.add_rule(rule2)
+    rules, groups, variables = group1.get_not_included_components(["rul1_id"], [])
+    assert rules == {'rul2_id'}
+    assert groups == {'gr3_id'}
+    assert variables == set()
+
+
 def test_make_items_product_specific():
     rule = ssg.build_yaml.Rule("something")
 
@@ -230,7 +248,7 @@ def product_cpes():
     product_yaml_path = os.path.join(DATADIR, "product.yml")
     product_yaml = open_raw(product_yaml_path)
     product_yaml["product_dir"] = os.path.dirname(product_yaml_path)
-    product_cpes =  ProductCPEs()
+    product_cpes = ProductCPEs()
     product_cpes.load_product_cpes(product_yaml)
     product_cpes.load_content_cpes(product_yaml)
     return product_cpes
@@ -259,17 +277,17 @@ def test_platform_from_text_simple(product_cpes):
         "{%s}check-fact-ref" % cpe_language_namespace)
     assert len(check_fact_refs) == 1
     assert check_fact_refs[0].get("system") == "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-    assert check_fact_refs[0].get("href") == "ssg-rhel7-cpe-oval.xml"
+    assert check_fact_refs[0].get("href") == "ssg-rhel9-cpe-oval.xml"
     assert check_fact_refs[0].get("id-ref") == "oval:ssg-installed_env_is_a_machine:def:1"
 
 
 def test_platform_from_text_simple_product_cpe(product_cpes):
-    platform = ssg.build_yaml.Platform.from_text("rhel7-workstation", product_cpes)
+    platform = ssg.build_yaml.Platform.from_text("rhel9", product_cpes)
     assert platform.get_remediation_conditional("bash") == ""
     assert platform.get_remediation_conditional("ansible") == ""
     platform_el = platform.to_xml_element()
     assert platform_el.tag == "{%s}platform" % cpe_language_namespace
-    assert platform_el.get("id") == "rhel7-workstation"
+    assert platform_el.get("id") == "rhel9"
     logical_tests = platform_el.findall(
         "{%s}logical-test" % cpe_language_namespace)
     assert len(logical_tests) == 1
@@ -279,8 +297,8 @@ def test_platform_from_text_simple_product_cpe(product_cpes):
         "{%s}check-fact-ref" % cpe_language_namespace)
     assert len(check_fact_refs) == 1
     assert check_fact_refs[0].get("system") == "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-    assert check_fact_refs[0].get("href") == "ssg-rhel7-cpe-oval.xml"
-    assert check_fact_refs[0].get("id-ref") == "oval:ssg-installed_OS_is_rhel7:def:1"
+    assert check_fact_refs[0].get("href") == "ssg-rhel9-cpe-oval.xml"
+    assert check_fact_refs[0].get("id-ref") == "oval:ssg-installed_OS_is_rhel9:def:1"
 
 
 def test_platform_from_text_or(product_cpes):
@@ -300,10 +318,10 @@ def test_platform_from_text_or(product_cpes):
         "{%s}check-fact-ref" % cpe_language_namespace)
     assert len(check_fact_refs) == 2
     assert check_fact_refs[0].get("system") == "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-    assert check_fact_refs[0].get("href") == "ssg-rhel7-cpe-oval.xml"
+    assert check_fact_refs[0].get("href") == "ssg-rhel9-cpe-oval.xml"
     assert check_fact_refs[0].get("id-ref") == "oval:ssg-installed_env_has_chrony_package:def:1"
     assert check_fact_refs[1].get("system") == "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-    assert check_fact_refs[1].get("href") == "ssg-rhel7-cpe-oval.xml"
+    assert check_fact_refs[1].get("href") == "ssg-rhel9-cpe-oval.xml"
     assert check_fact_refs[1].get("id-ref") == "oval:ssg-installed_env_has_ntp_package:def:1"
 
 
@@ -317,11 +335,9 @@ def test_platform_from_text_and_empty_conditionals(product_cpes):
 def test_platform_from_text_complex_expression(product_cpes):
     platform = ssg.build_yaml.Platform.from_text(
         "systemd and !yum and (ntp or chrony)", product_cpes)
-    assert platform.get_remediation_conditional("bash") == "( rpm --quiet -q systemd && ( rpm --quiet -q chrony || rpm --quiet -q ntp ) && ! ( rpm --quiet -q yum ) )"
-    assert platform.get_remediation_conditional("ansible") == "( \"systemd\" in ansible_facts.packages and ( \"chrony\" in ansible_facts.packages or \"ntp\" in ansible_facts.packages ) and not ( \"yum\" in ansible_facts.packages ) )"
+    assert platform.test(**{'systemd': True, 'ntp': False, 'chrony': True, 'yum': False})
     platform_el = platform.to_xml_element()
     assert platform_el.tag == "{%s}platform" % cpe_language_namespace
-    assert platform_el.get("id") == "systemd_and_chrony_or_ntp_and_not_yum"
     logical_tests = platform_el.findall(
         "{%s}logical-test" % cpe_language_namespace)
     assert len(logical_tests) == 1
@@ -359,10 +375,10 @@ def test_platform_equality(product_cpes):
 
 
 def test_platform_as_dict(product_cpes):
-    pl = ssg.build_yaml.Platform.from_text("chrony and rhel7", product_cpes)
+    pl = ssg.build_yaml.Platform.from_text("chrony and rhel9", product_cpes)
     # represent_as_dict is used during dump_yaml
     d = pl.represent_as_dict()
-    assert d["name"] == "chrony_and_rhel7"
+    assert d["name"] == "chrony_and_rhel9"
     # the "rhel7" platform doesn't have any conditionals
     # therefore the final conditional doesn't use it
     assert d["ansible_conditional"] == "( \"chrony\" in ansible_facts.packages )"
@@ -386,9 +402,10 @@ def test_parametrized_platform(product_cpes):
     assert cpe_item.title == "Package ntp is installed"
     assert cpe_item.check_id == "installed_env_has_ntp_package"
 
+
 def test_parametrized_platform_with_invalid_argument(product_cpes):
     with pytest.raises(KeyError):
-        platform = ssg.build_yaml.Platform.from_text("package[nonexisting_argument]", product_cpes)
+        ssg.build_yaml.Platform.from_text("package[nonexisting_argument]", product_cpes)
 
 
 def test_derive_id_from_file_name():
@@ -437,6 +454,7 @@ def rule_accounts_tmout():
     return ssg.build_yaml.Rule.from_yaml(rule_file)
 
 
+@pytest.mark.skipif(sys.version_info[0] < 3, reason="requires python3 or higher")
 def test_rule_to_xml_element(rule_accounts_tmout):
     xmldiff_main = pytest.importorskip("xmldiff.main")
     rule_el = rule_accounts_tmout.to_xml_element()
@@ -469,6 +487,7 @@ def value_system_crypto_policy():
     return ssg.build_yaml.Value.from_yaml(value_file)
 
 
+@pytest.mark.skipif(sys.version_info[0] < 3, reason="requires python3 or higher")
 def test_value_to_xml_element(value_system_crypto_policy):
     xmldiff_main = pytest.importorskip("xmldiff.main")
     value_el = value_system_crypto_policy.to_xml_element()

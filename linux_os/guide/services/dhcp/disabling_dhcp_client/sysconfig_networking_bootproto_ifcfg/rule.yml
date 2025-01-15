@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable DHCP Client in ifcfg'
 
@@ -27,9 +26,6 @@ rationale: |-
     unacceptable burden in many circumstances.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80337-9
 
 references:
     cis-csc: 11,14,3,9

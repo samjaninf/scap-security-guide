@@ -19,3 +19,4 @@ fixtext: |-
     Run the following command, replacing "[DIRECTORY]" with any library directory not group-owned by "root".
 
     $ sudo chgrp root [DIRECTORY]
+

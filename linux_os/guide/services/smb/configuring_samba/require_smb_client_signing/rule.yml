@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Require Client SMB Packet Signing, if using smbclient'
 
@@ -19,9 +18,6 @@ rationale: |-
     transit.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80280-1
 
 ocil_clause: 'it is not'
 

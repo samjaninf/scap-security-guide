@@ -1,5 +1,7 @@
 documentation_complete: true
 
+hidden: true
+
 metadata:
     version: 5.4
     SMEs:
@@ -77,6 +79,7 @@ selections:
     - var_authselect_profile=sssd
     - enable_authselect
     - accounts_max_concurrent_login_sessions
+    - var_password_hashing_algorithm_pam=sha512
     - set_password_hashing_algorithm_systemauth
     - set_password_hashing_algorithm_passwordauth
     - set_password_hashing_algorithm_logindefs
@@ -103,7 +106,7 @@ selections:
     - dconf_gnome_screensaver_mode_blank
     - sshd_allow_only_protocol2
     - sshd_set_idle_timeout
-    - var_sshd_set_keepalive=0
+    - var_sshd_set_keepalive=1
     - sshd_set_keepalive_0
     - disable_host_auth
     - sshd_disable_root_login

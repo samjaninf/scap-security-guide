@@ -42,18 +42,13 @@ selections:
     - sshd_disable_root_login
     - libreswan_approved_tunnels
     - no_rsh_trust_files
-    - package_rsh-server_removed
     - package_talk_removed
     - package_talk-server_removed
     - package_telnet_removed
     - package_telnet-server_removed
-    - package_xinetd_removed
+    - package_cron_installed
     - service_crond_enabled
-    - service_rexec_disabled
-    - service_rlogin_disabled
     - service_telnet_disabled
-    - service_xinetd_disabled
-    - service_zebra_disabled
     - use_kerberos_security_all_exports
     - var_authselect_profile=sssd
     - enable_authselect
@@ -65,7 +60,7 @@ selections:
     - sshd_do_not_permit_user_env
     - sshd_enable_strictmodes
     - sshd_enable_warning_banner
-    - var_sshd_set_keepalive=0
+    - var_sshd_set_keepalive=1
     - encrypt_partitions
     - var_system_crypto_policy=fips
     - configure_crypto_policy

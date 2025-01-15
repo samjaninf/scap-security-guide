@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Enable Transport Layer Security (TLS) Encryption'
 
@@ -21,12 +20,6 @@ rationale: |-
     must be disabled.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80557-2
-
-references:
-    stigid: WG340
 
 ocil_clause: 'it is not'
 

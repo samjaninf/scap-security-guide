@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,sle12,sle15,ubuntu1804,ubuntu2004,ubuntu2204
 
 title: 'Add nodev Option to /var/tmp'
 
@@ -20,19 +19,13 @@ severity: medium
 
 identifiers:
     cce@rhcos4: CCE-82735-2
-    cce@rhel7: CCE-81052-3
     cce@rhel8: CCE-82068-8
     cce@rhel9: CCE-83864-9
+    cce@rhel10: CCE-89441-0
     cce@sle12: CCE-92305-2
     cce@sle15: CCE-92459-7
 
 references:
-    anssi: BP28(R12)
-    cis@alinux2: 1.1.8
-    cis@alinux3: 1.1.4.4
-    cis@rhel7: 1.1.13
-    cis@rhel8: 1.1.4.4
-    cis@rhel9: 1.1.4.4
     cis@sle12: 1.1.13
     cis@sle15: 1.1.13
     cis@ubuntu1804: 1.1.7
@@ -43,8 +36,7 @@ references:
     stigid@ol8: OL08-00-040132
     stigid@rhel8: RHEL-08-040132
 
-platforms:
-  - machine and mount[var-tmp]
+platform: mount[var-tmp]
 
 template:
     name: mount_option

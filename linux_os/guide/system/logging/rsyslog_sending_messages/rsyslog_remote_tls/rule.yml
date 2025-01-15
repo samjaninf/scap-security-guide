@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Configure TLS for rsyslog remote logging'
 
@@ -21,17 +20,15 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-89194-5
     cce@rhel8: CCE-82457-3
     cce@rhel9: CCE-83991-0
+    cce@rhel10: CCE-86592-3
     cce@sle12: CCE-91513-2
     cce@sle15: CCE-91200-6
 
 references:
-    anssi: BP28(R43)
     ism: 0988,1405
     nist: AU-9(3),CM-6(a)
-    ospp: FCS_TLSC_EXT.1,FTP_ITC_EXT.1.1,FIA_X509_EXT.1.1,FMT_SMF_EXT.1.1
     srg: SRG-OS-000480-GPOS-00227,SRG-OS-000120-GPOS-00061
 
 ocil_clause: 'omfwd is not configured with gtls and AuthMode'

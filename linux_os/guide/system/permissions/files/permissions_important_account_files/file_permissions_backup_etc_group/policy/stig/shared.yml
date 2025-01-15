@@ -1,10 +1,8 @@
 srg_requirement: |-
-    The {{{ full_name }}} /etc/group- file must have mode 0644 or less permissive to prevent unauthorized access.
+    {{{ full_name }}} /etc/group- file must have mode 0644 or less permissive to prevent unauthorized access.
 
 vuldiscussion: |-
-    The "/etc/group-" file is a backup file of "/etc/group", and as such,
-    it contains information regarding groups that are configured on the system.
-    Protection of this file is important for system security.
+    The "/etc/group-" file is a backup file of "/etc/group", and as such, contains information regarding groups that are configured on the system. Protection of this file is important for system security.
 
 checktext: |-
     Verify that the "/etc/group-" file has mode "0644" or less permissive with the following command:
@@ -19,3 +17,4 @@ fixtext: |-
     Change the mode of the file "/etc/group-" to "0644" by running the following command:
 
     $ sudo chmod 0644 /etc/group-
+

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8
 
 title: 'Install the McAfee Runtime Libraries and Linux Agent'
 
@@ -12,9 +11,6 @@ rationale: |-
     to run.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80367-6
 
 ocil_clause: 'the HBSS HIPS module is not installed'
 

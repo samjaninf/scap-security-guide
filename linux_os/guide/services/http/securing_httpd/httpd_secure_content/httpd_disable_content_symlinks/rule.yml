@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable Web Content Symbolic Links'
 
@@ -20,8 +19,6 @@ rationale: |-
 
 severity: high
 
-references:
-    stigid: WG360
 
 ocil_clause: 'it is not'
 

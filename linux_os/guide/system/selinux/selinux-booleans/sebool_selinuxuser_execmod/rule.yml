@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle15
 
 title: 'Enable the selinuxuser_execmod SELinux Boolean'
 
@@ -14,9 +13,9 @@ rationale: ""
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82313-8
     cce@rhel8: CCE-80950-9
     cce@rhel9: CCE-84086-8
+    cce@rhel10: CCE-86922-2
     cce@sle15: CCE-91423-4
 
 references:

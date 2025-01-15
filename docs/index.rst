@@ -22,8 +22,8 @@ ComplianceAsCode/content
 .. toctree::
     :maxdepth: 2
     :glob:
-    :caption: Testing Content Using SSG Test Suite
-    :name: Testing Content Using SSG Test Suite
+    :caption: Testing Content Using Automatus
+    :name: Testing Content Using Automatus
 
     tests/README
 
@@ -59,6 +59,14 @@ ComplianceAsCode/content
     :name: Python Modules Reference
 
     modules/*
+
+.. toctree::
+    :maxdepth: 4
+    :glob:
+    :caption: Python SSG Module API Reference
+    :name: SSG API Reference
+
+    api/modules
 
 .. toctree::
     :maxdepth: 2

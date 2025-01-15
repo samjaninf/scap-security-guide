@@ -1,6 +1,6 @@
 documentation_complete: true
 
-title: 'Canonical Ubuntu 20.04 LTS Security Technical Implementation Guide (STIG) V1R9'
+title: 'Canonical Ubuntu 20.04 LTS Security Technical Implementation Guide (STIG) V1R12'
 
 description: |-
     This Security Technical Implementation Guide is published as a tool to
@@ -13,6 +13,7 @@ selections:
     - account_temp_expire_date
 
     # UBTU-20-010002 The Ubuntu operating system must enable the graphical user logon banner to display the Standard Mandatory DoD Notice and Consent Banner before granting local access to the system via a graphical user logon.
+    - enable_dconf_user_profile
     - dconf_gnome_banner_enabled
 
     # UBTU-20-010003 The Ubuntu operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local access to the system via a graphical user logon.
@@ -74,6 +75,7 @@ selections:
 
     # UBTU-20-010038 The Ubuntu operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting any local or remote connection to the system.
     - banner_etc_issue_net
+    - remote_login_banner_text=dod_banners
     - sshd_enable_warning_banner_net
 
     # UBTU-20-010042 The Ubuntu operating system must use SSH to protect the confidentiality and integrity of transmitted information.
@@ -81,9 +83,11 @@ selections:
     - service_sshd_enabled
 
     # UBTU-20-010043 The Ubuntu operating system must configure the SSH daemon to use Message Authentication Codes (MACs) employing FIPS 140-2 approved cryptographic hashes to prevent the unauthorized disclosure of information and/or detect changes to information during transmission.
+    - sshd_approved_macs=stig
     - sshd_use_approved_macs_ordered_stig
 
     # UBTU-20-010044 The Ubuntu operating system must configure the SSH daemon to use FIPS 140-2 approved ciphers to prevent the unauthorized disclosure of information and/or detect changes to information during transmission.
+    - sshd_approved_ciphers=stig
     - sshd_use_approved_ciphers_ordered_stig
 
     # UBTU-20-010045 The Ubuntu operating system SSH server must be configured to use only FIPS-validated key exchange algorithms.
@@ -153,7 +157,14 @@ selections:
     - accounts_password_pam_unix_remember
 
     # UBTU-20-010072 The Ubuntu operating system must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts have been made.
-    - accounts_passwords_pam_tally2
+    - var_accounts_passwords_pam_faillock_deny=3
+    - var_accounts_passwords_pam_faillock_fail_interval=900
+    - var_accounts_passwords_pam_faillock_unlock_time=never
+    - accounts_passwords_pam_faillock_audit
+    - accounts_passwords_pam_faillock_silent
+    - accounts_passwords_pam_faillock_deny
+    - accounts_passwords_pam_faillock_interval
+    - accounts_passwords_pam_faillock_unlock_time
 
     # UBTU-20-010074 The Ubuntu operating system must be configured so that the script which runs each 30 days or less to check file integrity is the default one.
     - aide_periodic_cron_checking
@@ -515,6 +526,7 @@ selections:
 
     # UBTU-20-010434 The Ubuntu operating system must enable and run the uncomplicated firewall(ufw).
     - service_ufw_enabled
+    - check_ufw_active
 
     # UBTU-20-010435 The Ubuntu operating system must, for networked systems, compare internal information system clocks at least every 24 hours with a server which is synchronized to one of the redundant United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS).
     - var_time_service_set_maxpoll=36_hours
@@ -524,7 +536,8 @@ selections:
     # UBTU-20-010436 The Ubuntu operating system must synchronize internal information system clocks to the authoritative time source when the time difference is greater than one second.
     - chronyd_sync_clock
 
-    # UBTU-20-010437 The Ubuntu operating system must notify designated personnel if baseline configurations are changed in an unauthorized manner. The file integrity tool must notify the System Administrator when changes to the baseline configuration or anomalies in the oper
+    # UBTU-20-010451 The Ubuntu operating system must notify designated personnel if baseline configurations are changed in an unauthorized manner. The file integrity tool must notify the System Administrator when changes to the baseline configuration or anomalies in the oper
+    - aide_disable_silentreports
 
     # UBTU-20-010438 The Ubuntu operating system's Advance Package Tool (APT) must be configured to prevent the installation of patches, service packs, device drivers, or Ubuntu operating system components without verification they have been digitally signed using a certificate that is recognized and approved by the organization.
     - apt_conf_disallow_unauthenticated
@@ -545,10 +558,6 @@ selections:
     # UBTU-20-010443 The Ubuntu operating system must only allow the use of DoD PKI-established certificate authorities for verification of the establishment of protected sessions.
     - only_allow_dod_certs
 
-    # UBTU-20-010444 Ubuntu operating system must implement cryptographic mechanisms to prevent unauthorized modification of all information at rest.
-
-    # UBTU-20-010445 Ubuntu operating system must implement cryptographic mechanisms to prevent unauthorized disclosure of all information at rest.
-
     # UBTU-20-010446 The Ubuntu operating system must configure the uncomplicated firewall to rate-limit impacted network interfaces.
     - ufw_rate_limit
 
@@ -564,8 +573,6 @@ selections:
     # UBTU-20-010450 The Ubuntu operating system must use a file integrity tool to verify correct operation of all security functions.
     - package_aide_installed
     - aide_build_database
-
-    # UBTU-20-010451 The Ubuntu operating system must notify designated personnel if baseline configurations are changed in an unauthorized manner. The file integrity tool must notify the System Administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered.
 
     # UBTU-20-010453 The Ubuntu operating system must display the date and time of the last successful account logon upon logon.
     - display_login_attempts
@@ -589,13 +596,12 @@ selections:
 
     # UBTU-20-010460 The Ubuntu operating system must disable the x86 Ctrl-Alt-Delete key sequence.
     - disable_ctrlaltdel_reboot
-    - disable_ctrlaltdel_burstaction
-
-    # UBTU-20-010462 The Ubuntu operating system must not have accounts configured with blank or null passwords.
-    - no_empty_passwords_etc_shadow
 
     # UBTU-20-010461 The Ubuntu operating system must disable automatic mounting of Universal Serial Bus (USB) mass storage driver.
     - kernel_module_usb-storage_disabled
+
+    # UBTU-20-010462 The Ubuntu operating system must not have accounts configured with blank or null passwords.
+    - no_empty_passwords_etc_shadow
 
     # UBTU-20-010463 The Ubuntu operating system must not allow accounts configured with blank or null passwords.
     - no_empty_passwords

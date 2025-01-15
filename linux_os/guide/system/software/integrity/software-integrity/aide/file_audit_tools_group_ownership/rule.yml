@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux3,ol8,ol9,rhel8,rhel9
 
 title: Audit Tools Must Be Group-owned by Root
 
@@ -20,10 +19,10 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-86239-1
     cce@rhel9: CCE-86240-9
+    cce@rhel10: CCE-86839-8
 
 references:
-    cis@alinux3: 4.1.4.10
-    disa: CCI-001493,CCI-001494,CCI-001495
+    disa: CCI-001493
     nist: AU-9
     srg: SRG-OS-000256-GPOS-00097,SRG-OS-000257-GPOS-00098,SRG-OS-000258-GPOS-00099
     stigid@ol8: OL08-00-030640
@@ -67,5 +66,4 @@ template:
             - /sbin/rsyslogd
             - /sbin/augenrules
         gid_or_name: '0'
-        missing_file_pass: 'true'
 

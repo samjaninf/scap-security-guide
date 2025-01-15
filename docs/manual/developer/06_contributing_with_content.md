@@ -273,19 +273,19 @@ A rule may contain those reference-type attributes:
     <tr class="even">
     <td><p><a href="http://www.us-cert.gov/cas/techalerts">http://www.us-cert.gov/cas/techalerts</a></p></td>
     <td><p>No</p></td>
-    <td><p>US-CERT technical cyber security alerts –the identifier value SHOULD be a technical cyber security alert ID (e.g., “TA05-189A”)</p></td>
+    <td><p>US-CERT technical cybersecurity alerts –the identifier value SHOULD be a technical cybersecurity alert ID (e.g., “TA05-189A”)</p></td>
     </tr>
     </tbody>
     </table>
 
     When the rule is related to RHEL, it should have a CCE. A CEE (e.g.
-    <cce@rhel7>: CCE-80328-8) is used as a global identifier that maps
+    <cce@rhel9>: CCE-80328-8) is used as a global identifier that maps
     the rule to the product over the lifetime of a rule. There should
     only be one CCE mapped to a rule as a global identifier. Any other
     usage of CCE is no longer considered a best practice. CCEs are also
     product dependent which means that a different CCE must be used for
     each different product and product version. For example if
-    `cce@rhel7: 80328-8` exists in a rule, that CCE cannot be used for
+    `cce@rhel9: 80328-8` exists in a rule, that CCE cannot be used for
     another product or version (e.g. rhel9), and the CCE MUST be retired
     with the rule. Available CCEs that can be assigned to new rules are
     listed in the `shared/references/cce-rhel-avail.txt` file.
@@ -293,12 +293,14 @@ A rule may contain those reference-type attributes:
 -   `references`: This is related to the compliance document line items
     that the rule applies to. These can be attributes such as `stigid`,
     `srg`, `nist`, etc., whose keys may be modified with a product
-    (e.g., `stigid@rhel7`) to restrict what products a reference
+    (e.g., `stigid@rhel9`) to restrict what products a reference
     identifier applies to. Depending on the type of reference (e.g.
     catalog, ruleid, etc.) will depend on how many can be added to a
     single rule. In addition, certain references in a rule such as
     `stigid` or `cis` only apply to a certain product and product version; they
     cannot be used for multiple products and versions.
+    Some references are automatically added by controls files.
+    See the [Controls File Format](#auto_ref_controls_to_rules) for more details.
 
     <table>
     <colgroup>
@@ -437,15 +439,21 @@ remediation. A rule may be selected by any number of profiles, so when
 the scanner is scanning using a profile the rule is included in, the
 rule is taken into account. For example, the rule identified by
 `partition_for_tmp` defined in
-`shared/xccdf/system/software/disk_partitioning.xml` is included in the
-`RHEL7 C2S` profile in `rhel7/profiles/C2S.xml`.
+`linux_os/guide/system/software/disk_partitioning/partition_for_tmp/rule.yml` is included in the
+`RHEL9 OSPP` profile in `rhel9/profiles/ospp.yml`.
 
 Checks are connected to rules by the `oval` element and the filename in
-which it is found. Remediations (i.e. fixes) are assigned to rules based
-on their basename. Therefore, the rule `sshd_print_last_log` has a
+which it is found.
+For example, the rule `auditd_data_retention_space_left_percentage` oval check is located at
+`linux_os/guide/auditing/configure_auditd_data_retention/auditd_data_retention_space_left_percentage/oval/shared.xml`.
+
+
+Remediations (i.e. fixes) are assigned to rules based
+on their basename. Therefore, the rule `auditd_data_retention_space_left_percentage` has a
 `bash` fix associated as there is a `bash` script
-`shared/fixes/bash/sshd_print_last_log.sh`. As there is an Ansible
-playbook `shared/fixes/ansible/sshd_print_last_log.yml`, the rule has
+`linux_os/guide/auditing/configure_auditd_data_retention/auditd_data_retention_space_left_percentage/bash/shared.sh`.
+As there is an Ansible
+playbook `linux_os/guide/auditing/configure_auditd_data_retention/auditd_data_retention_space_left_percentage/ansible/shared.yml`, the rule has
 also an Ansible fix associated.
 
 #### Rule Deprecation
@@ -481,7 +489,7 @@ structure of a rule directory looks like the following example:
     linux_os/guide/system/group/rule_id/rule.yml
     linux_os/guide/system/group/rule_id/bash/ol7.sh
     linux_os/guide/system/group/rule_id/bash/shared.sh
-    linux_os/guide/system/group/rule_id/oval/rhel7.xml
+    linux_os/guide/system/group/rule_id/oval/rhel9.xml
     linux_os/guide/system/group/rule_id/oval/shared.xml
 
 To be considered a rule directory, it must be a directory contained in a
@@ -508,25 +516,29 @@ then contain the following subdirectories:
 
 - `blueprint` - for OSBuild blueprint content, ending in `.toml`
 
+- `kickstart` - For Kickstart remediation content, ending in `.cfg`
+
+- `bootc` - for remediation content used in the `oscap-im` tool internally, ending in `.bo`
+
 In each of these subdirectories, a file named `shared.ext` will apply to
 all products and be included in all builds, but `{{{ product }}}.ext`
 will only get included in the build for `{{{ product }}}` (e.g.,
-`rhel7.xml` above will only be included in the build of the `rhel7`
+`rhel9.xml` above will only be included in the build of the `rhel9`
 guide content and not in the `ol7` content). Additionally, we support
-the use of unversioned products here (e.g., `rhel` applies to `rhel7`,
-`rhel8`, and `rhel9`). Note that `.ext` must be substituted for the
+the use of unversioned products here (e.g., `rhel` applies to `rhel9`,
+`rhel8`, and `rhel10`). Note that `.ext` must be substituted for the
 correct extension for content of that type (e.g., `.sh` for `bash`
 content). Further, all of these directories are optional and will only
 be searched for content if present. Lastly, the product naming of
-content will not override the contents of `platform` or `prodtype`
-fields in the content itself (e.g., if `rhel7` is not present in the
-`rhel7.xml` OVAL check platform specifier, it will be included in the
+content will not override the contents of `platform` field in
+the content itself (e.g., if `rhel9` is not present in the `rhel9.xml`
+OVAL check platform specifier, it will be included in the
 build artifacts but later removed because it doesn't match the platform).
 This means that any shared (or templated) checks won't be searched if
 a product-specific file is present but has the wrong applicability;
 this includes shared checks being preferred above templated checks.
 
-Currently the build system supports both rule files (discussed above)
+Currently, the build system supports both rule files (discussed above)
 and rule directories. For example content in this format, please see
 rules in `linux_os/guide`.
 
@@ -542,31 +554,6 @@ For more information about these utilities, please see their help text.
 To interact with `rule.yml` files and the OVALs inside a rule directory,
 the following utilities are provided:
 
-#### `utils/mod_prodtype.py`
-
-This utility modifies the prodtype field of rules. It supports several
-commands:
-
--   `mod_prodtype.py <rule_id> list` - list the computed and actual
-    prodtype of the rule specified by `rule_id`.
-
--   `mod_prodtype.py <rule_id> add <product> [<product> ...]` - add
-    additional products to the prodtype of the rule specified by
-    `rule_id`.
-
--   `mod_prodtype.py <rule_id> remove <product> [<product> ...]` -
-    remove products to the prodtype of the rule specified by `rule_id`.
-
--   `mod_prodtype.py <rule_id> replace <replacement> [<replacement> ...]` -
-    do the specified replacement transformations. A replacement
-    transformation is of the form `match~replace` where `match` and
-    `replace` are a comma separated list of products. If all of the
-    products in `match` exist in the original `prodtype` of the rule,
-    they are removed and the products in `replace` are added.
-
-This utility requires an up to date JSON tree created by
-`rule_dir_json.py`.
-
 #### `utils/mod_checks.py`
 
 This utility modifies the `<affected>` element of an OVAL check. It
@@ -576,10 +563,10 @@ supports several commands on a given rule:
     products, and their actual platforms.
 
 -   `mod_checks.py <rule_id> delete <product>` - delete the OVAL for the
-    the specified product.
+    specified product.
 
 -   `mod_checks.py <rule_id> make_shared <product>` - moves the product
-    OVAL to the shared OVAL (e.g., `rhel7.xml` to `shared.xml`).
+    OVAL to the shared OVAL (e.g., `rhel9.xml` to `shared.xml`).
 
 -   `mod_checks.py <rule_id> diff <product> <product>` - Performs a diff
     between two OVALs (product can be `shared` to diff against the
@@ -597,10 +584,12 @@ OVAL with the following commands:
 
 -   `mod_checks.py <rule_id> replace <replacement> [<replacement ...]` -
     do the specified replacement against the platforms in the shared
-    OVAL. See the description of `replace` under `mod_prodtype.py` for
-    more information about the format of a replacement.
+    OVAL. A replacement transformation is of the form `match~replace`
+    where `match` and `replace` are a comma separated list of products.
+    If all of the platforms in `match` exist in the original `platform`
+    of the rule, they are removed and the platforms in `replace` are added.
 
-This utility requires an up to date JSON tree created by
+This utility requires an up-to-date JSON tree created by
 `rule_dir_json.py`.
 
 #### `utils/mod_fixes.py`
@@ -616,7 +605,7 @@ remediation language:
     for the specified product.
 
 -   `mod_fixes.py <rule_id> <lang> make_shared <product>` - moves the
-    product fix to the shared fix (e.g., `rhel7.sh` to `shared.sh`).
+    product fix to the shared fix (e.g., `rhel9.sh` to `shared.sh`).
 
 -   `mod_fixes.py <rule_id> <lang> diff <product> <product>` - Performs
     a diff between two fixes (product can be `shared` to diff against
@@ -634,25 +623,28 @@ fixes with the following commands:
 
 -   `mod_fixes.py <rule_id> <lang> replace <replacement> [<replacement ...]` -
     do the specified replacement against the platforms in the shared
-    fix. See the description of `replace` under `mod_prodtype.py` for
+    fix. See the description of `replace` under `mod_checks.py` for
     more information about the format of a replacement.
 
 This utility requires an up-to-date JSON tree created by
 `rule_dir_json.py`.
 
-#### `utils/add_platform_rule.py`
+#### `utils/add_kubernetes_rule.py`
 
 This utility can be used to bootstrap and test Kubernetes/OpenShift
 application checks. See the help output for more detailed usage examples
 of each of the supported subcommands:
 
--   `utils/add_platform_rule.py create --rule=<rule_name> <options>` -
-    creates files for a new rule.
+-   `utils/add_kubernetes_rule.py create platform --rule=<rule_name> <options>` -
+    creates files for a new platform rule.
 
--   `utils/add_platform_rule.py test --rule=<rule_name> <options>` -
+-   `utils/add_kubernetes_rule.py create node --rule=<rule_name> <options>` -
+    creates files for a new node rule.
+
+-   `utils/add_kubernetes_rule.py test --rule=<rule_name> <options>` -
     tests a rule against local files using an oscap container.
 
--   `utils/add_platform_rule.py cluster-test --rule=<rule_name> <options>`
+-   `utils/add_kubernetes_rule.py cluster-test --rule=<rule_name> <options>`
     - tests a rule against a running OCP4 cluster using
     compliance-operator.
 
@@ -833,6 +825,13 @@ are unique to SCE:
    it is not necessary. Additionally, OCIL checks, if any is present in the
    `rule.yml`, are added as a top-level OR-operator `<complex-check />` with
    the results of this `<complex-check />`.
+ - `environment`: can be `normal`, `bootc`, `any`.
+   The default value that is used when this key is not set is `any`.
+   This key specifies the environment in which the SCE check can run in.
+   This way you can restrict some SCE checks to run or not run in Image mode.
+   If set to `bootc`, the SCE check code will be modified to not run outside of the bootable image build process.
+   If set to `normal`, the SCE check code will be modified to not run during the bootable image build process.
+   If set to `any`, the SCE check code will not be modified and therefore will run in any environment.
 
 For an example of SCE content, consider the check:
 
@@ -882,10 +881,10 @@ machine, so that previously non-passing rules can pass. There can be
 multiple versions of the same remediation meant to be executed by
 different applications, more specifically Ansible, Bash, Anaconda,
 Puppet, Ignition and Kubernetes. By default all remediation languages
-are built and included in the DataStream.
+are built and included in the data stream.
 
 But each product can specify its own set of remediation to include in
-the DataStream via a CMake Variable in the product's `CMakeLists.txt`.
+the data stream via a CMake Variable in the product's `CMakeLists.txt`.
 See example below, from OCP4 product, `ocp4/CMakeLists.txt`:
 
     set(PRODUCT_REMEDIATION_LANGUAGES "ignition;kubernetes")
@@ -997,7 +996,7 @@ enabled in grub:
         regexp: selinux=0
 
 The Ansible remediation will get included by our build system to the
-SCAP datastream in the `fix` element of respective rule.
+SCAP data stream in the `fix` element of respective rule.
 
 The build system generates an Ansible Playbook from the remediation for
 all profiles. The generated Playbook is located in
@@ -1033,7 +1032,7 @@ of supported platforms.
 Following, you can see an example of a bash remediation that sets the
 maximum number of days a password may be used:
 
-    # platform = Red Hat Enterprise Linux 7
+    # platform = Red Hat Enterprise Linux 10
     {{{ bash_instantiate_variables("var_accounts_maximum_age_login_defs) }}}
 
     grep -q ^PASS_MAX_DAYS /etc/login.defs && \
@@ -1117,8 +1116,8 @@ accordingly. The general form is the following:
         name: template_name
         vars:
             param_name: value # these parameters are individual for each template
-            param_name@rhel7: value1
-            param_name@rhel8: value2
+            param_name@rhel9: value1
+            param_name@rhel10: value2
         backends: # optional
             ansible: "off"
             bash: "on" # on is implicit value
@@ -1156,7 +1155,7 @@ you can see reference of all available templates [here](../../templates/template
 
 ## Applicability of content
 
-All profiles and rules included in a products' DataStream are applicable
+All profiles and rules included in a products' data stream are applicable
 by default. For example, all profiles and rules included in a `rhel8` DS
 will apply and evaluate in a RHEL 8 host.
 

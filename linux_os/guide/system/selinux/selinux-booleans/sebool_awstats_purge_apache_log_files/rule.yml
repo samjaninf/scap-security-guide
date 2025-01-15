@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8,rhel9
 
 title: 'Disable the awstats_purge_apache_log_files SELinux Boolean'
 
@@ -12,9 +11,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80428-6
 
 references:
     cui: 3.7.2

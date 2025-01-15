@@ -1,7 +1,5 @@
 documentation_complete: true
 
-prodtype: debian10,debian11,ubuntu1604,ubuntu1804,ubuntu2004,ubuntu2204
-
 title: 'Disable unauthenticated repositories in APT configuration'
 
 description: 'Unauthenticated repositories should not be used for updates.'
@@ -14,5 +12,7 @@ rationale: |-
 severity: unknown
 
 references:
-    anssi: BP28(R15)
+    disa: CCI-003992
+    srg: SRG-OS-000366-GPOS-00153
     stigid@ubuntu2004: UBTU-20-010438
+    stigid@ubuntu2204: UBTU-22-214010

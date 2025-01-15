@@ -34,14 +34,13 @@ RULES_JSON = os.path.join(SSG_ROOT, "build", "rule_dirs.json")
 BUILD_CONFIG = os.path.join(SSG_ROOT, "build", "build_config.yml")
 OUTPUT = os.path.join(SSG_ROOT, 'build',
                       f'{datetime.datetime.now().strftime("%s")}_stig_export.csv')
-SRG_PATH = os.path.join(SSG_ROOT, 'shared', 'references', 'disa-os-srg-v2r3.xml')
+SRG_PATH = os.path.join(SSG_ROOT, 'shared', 'references', 'disa-os-srg-v3r1.xml')
 NS = {'scap': ssg.constants.datastream_namespace,
       'xccdf-1.2': ssg.constants.XCCDF12_NS,
       'xccdf-1.1': ssg.constants.XCCDF11_NS}
 
 
-def get_iacontrol(srg_str: str) -> str:
-    srgs = srg_str.split(',')
+def get_iacontrol(srgs: list) -> str:
     result = list()
     for srg in srgs:
         mapping = get_iacontrol_mapping(srg)
@@ -283,8 +282,14 @@ def create_base_row(item: ssg.controls.Control, srgs: dict,
         exit(4)
     srg = srgs[srg_id]
 
-    row['SRGID'] = rule_object.references.get('srg', srg_id)
-    row['CCI'] = rule_object.references.get('disa', srg['cci'])
+    if 'srg' in rule_object.references:
+        row['SRGID'] = ','.join(rule_object.references['srg'])
+    else:
+        row['SRGID'] = srg_id
+    if 'disa' in rule_object.references:
+        row['CCI'] = ','.join(rule_object.references['disa'])
+    else:
+        row['CCI'] = srg['cci']
     row['SRG Requirement'] = srg['title']
     row['SRG VulDiscussion'] = html_plain_text(srg['vuln_discussion'])
     row['SRG Check'] = html_plain_text(srg['check'])

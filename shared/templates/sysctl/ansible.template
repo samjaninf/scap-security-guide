@@ -5,21 +5,21 @@
 # disruption = medium
 
 - name: List /etc/sysctl.d/*.conf files
-{{% if product in ["sle12","sle15"] %}}
+{{% if product in ["sle12", "sle15", "slmicro5"] %}}
   find:
     paths:
       - "/run/sysctl.d/"
       - "/etc/sysctl.d/"
       - "/usr/local/lib/sysctl.d/"
-      - "/lib/sysctl.d/"      
-{{% else %}}      
+      - "/lib/sysctl.d/"
+{{% else %}}
   find:
     paths:
       - "/etc/sysctl.d/"
       - "/run/sysctl.d/"
       - "/usr/local/lib/sysctl.d/"
 {{% endif %}}
-{{% if product not in [ "ol7", "ol8", "ol9", "rhcos4", "rhel7", "rhel8", "rhel9", "sle12", "sle15"] %}}
+{{% if product not in [ "ol7", "ol8", "ol9", "rhcos4", "rhel8", "rhel9", "rhel10", "sle12", "sle15", "slmicro5", "ubuntu2004", "ubuntu2204", "ubuntu2404"] %}}
       - "/usr/lib/sysctl.d/"
 {{% endif %}}
     contains: '^[\s]*{{{ SYSCTLVAR }}}.*$'

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,sle15
 
 title: 'Configure Kernel to Rate Limit Sending of Duplicate TCP Acknowledgments'
 
@@ -33,8 +32,8 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82893-9
     cce@rhel9: CCE-86394-4
+    cce@rhel10: CCE-86242-5
 
 references:
     disa: CCI-002385

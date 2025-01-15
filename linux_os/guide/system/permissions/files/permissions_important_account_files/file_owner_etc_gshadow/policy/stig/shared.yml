@@ -1,9 +1,8 @@
 srg_requirement: |-
-    The {{{ full_name }}} /etc/gshadow file must be owned by root.
+    {{{ full_name }}} /etc/gshadow file must be owned by root.
 
 vuldiscussion: |-
-    The "/etc/gshadow" file contains group password hashes. Protection of this file
-    is critical for system security.
+    The "/etc/gshadow" file contains group password hashes. Protection of this file is critical for system security.
 
 checktext: |-
     Verify the ownership of the "/etc/gshadow" file with the following command:
@@ -16,4 +15,6 @@ checktext: |-
 
 fixtext: |-
     Change the owner of the file /etc/gshadow to root by running the following command:
+
     $ sudo chown root /etc/gshadow
+

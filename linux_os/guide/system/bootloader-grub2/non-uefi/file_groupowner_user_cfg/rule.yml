@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhel7,rhel8,rhel9,rhv4
 
 title: 'Verify {{{ grub2_boot_path }}}/user.cfg Group Ownership'
 
@@ -17,16 +16,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86008-0
     cce@rhel8: CCE-86009-8
     cce@rhel9: CCE-86010-6
+    cce@rhel10: CCE-86797-8
 
 references:
-    ccn@rhel9: A.6.SEC-RHEL2
     cis-csc: 12,13,14,15,16,18,3,5
-    cis@rhel7: 1.4.2
-    cis@rhel8: 1.4.2
-    cis@rhel9: 1.4.2
     cjis: 5.5.2.2
     cobit5: APO01.06,DSS05.04,DSS05.07,DSS06.02
     cui: 3.4.5
@@ -49,7 +44,7 @@ fixtext: '{{{ fixtext_file_group_owner(grub2_boot_path ~ "/user.cfg", "root") }}
 
 srg_requirement: '{{{ srg_requirement_file_group_owner(grub2_boot_path ~ "/user.cfg", "root") }}}'
 
-platform: machine
+platform: not bootc
 
 template:
     name: file_groupowner

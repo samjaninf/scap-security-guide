@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9
 
 title: 'Remove the FreeRadius Server Package'
 
@@ -21,7 +20,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-82751-9
     cce@rhel8: CCE-82752-7
 
 ocil_clause: 'the package is installed'

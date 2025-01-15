@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhcos4,rhel8,rhel9,rhv4
 
 title: "Enable Dracut FIPS Module"
 
@@ -22,9 +21,10 @@ identifiers:
     cce@rhcos4: CCE-82548-9
     cce@rhel8: CCE-82155-3
     cce@rhel9: CCE-86547-7
+    cce@rhel10: CCE-88066-6
 
 references:
-    disa: CCI-000068,CCI-000803,CCI-002450
+    disa: CCI-002450,CCI-000068,CCI-002418,CCI-000877
     ism: "1446"
     nerc-cip: CIP-003-8 R4.2,CIP-007-3 R5.1
     nist: SC-12(2),SC-12(3),IA-7,SC-13,CM-6(a),SC-12

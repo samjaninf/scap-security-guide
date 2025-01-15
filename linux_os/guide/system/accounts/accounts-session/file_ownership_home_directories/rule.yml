@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,rhel7,rhel8,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'All Interactive User Home Directories Must Be Owned By The Primary User'
 
@@ -22,17 +21,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80531-7
     cce@rhel8: CCE-86131-0
+    cce@rhel10: CCE-88344-7
     cce@sle12: CCE-92291-4
     cce@sle15: CCE-91404-4
 
 references:
-    cis@alinux2: 6.2.9
-    cis@alinux3: 6.2.5
-    cis@rhel7: 6.2.12
-    cis@rhel8: 6.2.10
-    cis@rhel9: 6.2.11
     cis@sle12: 6.2.7
     cis@sle15: 6.2.7
     cis@ubuntu2004: 6.2.6
@@ -40,7 +34,6 @@ references:
     disa: CCI-000366
     srg: SRG-OS-000480-GPOS-00227
     stigid@ol7: OL07-00-020640
-    stigid@rhel7: RHEL-07-020640
 
 ocil_clause: 'the user ownership is incorrect'
 

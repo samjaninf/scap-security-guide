@@ -1,5 +1,6 @@
 documentation_complete: true
 
+
 title: 'Specify Additional Remote NTP Servers'
 
 description: |-
@@ -18,6 +19,7 @@ rationale: |-
 severity: unknown
 
 identifiers:
+    cce@rhel8: CCE-86488-4
     cce@sle12: CCE-91660-1
     cce@sle15: CCE-91297-2
 
@@ -30,4 +32,3 @@ references:
     nist: CM-6(a),AU-8(1)(a),AU-8(2)
     nist-csf: PR.PT-1
     pcidss: Req-10.4.3
-    pcidss4: "10.6.2"

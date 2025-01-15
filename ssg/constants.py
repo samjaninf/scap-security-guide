@@ -11,7 +11,8 @@ SSG_PROJECT_NAME = "SCAP Security Guide Project"
 SSG_BENCHMARK_LATEST_URI = "https://github.com/ComplianceAsCode/content/releases/latest"
 
 SSG_REF_URIS = {
-    'anssi': 'http://www.ssi.gouv.fr/administration/bonnes-pratiques/',
+    'anssi': 'https://cyber.gouv.fr/sites/default/files/document/linux_configuration-en-v2.pdf',
+    'bsi': 'https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Grundschutz/International/bsi_it_gs_comp_2022.pdf',
     'nist': 'http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf',
     'nist-csf': 'https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf',
     'isa-62443-2013': 'https://www.isa.org/products/ansi-isa-62443-3-3-99-03-03-2013-security-for-indu',
@@ -20,7 +21,6 @@ SSG_REF_URIS = {
     'cis-csc': 'https://www.cisecurity.org/controls/',
     'cjis': 'https://www.fbi.gov/file-repository/cjis-security-policy-v5_5_20160601-2-1.pdf',
     'cui': 'http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171.pdf',
-    'cnss': 'http://www.cnss.gov/Assets/pdf/CNSSI-1253.pdf',
     'dcid': 'not_officially_available',
     'disa': 'https://public.cyber.mil/stigs/cci/',
     'pcidss': 'https://www.pcisecuritystandards.org/documents/PCI_DSS_v3-2-1.pdf',
@@ -28,11 +28,12 @@ SSG_REF_URIS = {
     'ospp': 'https://www.niap-ccevs.org/Profile/PP.cfm',
     'hipaa': 'https://www.gpo.gov/fdsys/pkg/CFR-2007-title45-vol1/pdf/CFR-2007-title45-vol1-chapA-subchapC.pdf',
     'ism': 'https://www.cyber.gov.au/acsc/view-all-content/ism',
-    'iso27001-2013': 'https://www.iso.org/standard/54534.html',
+    'iso27001-2013': 'https://www.iso.org/contents/data/standard/05/45/54534.html',
     'nerc-cip': 'https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx',
     'stigid': 'https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=operating-systems%2Cunix-linux',
     'os-srg': 'https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=operating-systems%2Cgeneral-purpose-os',
     'app-srg': 'https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=application-servers',
+    'app-srg-ctr': 'https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=container-platform',
     'stigref': 'https://public.cyber.mil/stigs/srg-stig-tools/',
 }
 
@@ -41,22 +42,25 @@ product_directories = [
     'alinux3',
     'anolis8',
     'anolis23',
+    'al2023',
     'chromium',
-    'debian10', 'debian11',
+    'debian11', 'debian12',
     'example',
     'eks',
     'fedora',
     'firefox',
     'macos1015',
+    'kylinserver10',
     'ocp4',
     'rhcos4',
-    'ol7', 'ol8', 'ol9',
+    'ol7', 'ol8', 'ol9', 'ol10',
+    'openeuler2203',
     'opensuse',
-    'rhel7', 'rhel8', 'rhel9',
+    'openembedded',
+    'rhel8', 'rhel9', 'rhel10',
     'rhv4',
-    'sle12', 'sle15',
-    'ubuntu1604', 'ubuntu1804', 'ubuntu2004', 'ubuntu2204',
-    'uos20',
+    'sle12', 'sle15', 'slmicro5',
+    'ubuntu1604', 'ubuntu1804', 'ubuntu2004', 'ubuntu2204', 'ubuntu2404'
 ]
 
 JINJA_MACROS_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(
@@ -68,6 +72,7 @@ datastream_namespace = "http://scap.nist.gov/schema/scap/source/1.2"
 dc_namespace = "http://purl.org/dc/elements/1.1/"
 ocil_namespace = "http://scap.nist.gov/schema/ocil/2.0"
 cpe_language_namespace = "http://cpe.mitre.org/language/2.0"
+cpe_dictionary_namespace = "http://cpe.mitre.org/dictionary/2.0"
 oval_footer = "</oval_definitions>"
 oval_namespace = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 xlink_namespace = "http://www.w3.org/1999/xlink"
@@ -83,12 +88,16 @@ kubernetes_system = "urn:xccdf:fix:script:kubernetes"
 blueprint_system = "urn:redhat:osbuild:blueprint"
 puppet_system = "urn:xccdf:fix:script:puppet"
 anaconda_system = "urn:redhat:anaconda:pre"
+kickstart_system = "urn:xccdf:fix:script:kickstart"
+bootc_system = "urn:xccdf:fix:script:bootc"
 cce_uri = "https://ncp.nist.gov/cce"
 stig_ns = "https://public.cyber.mil/stigs/srg-stig-tools/"
+ccn_ns = "https://www.ccn-cert.cni.es/pdf/guias/series-ccn-stic/guias-de-acceso-publico-ccn-stic/6768-ccn-stic-610a22-perfilado-de-seguridad-red-hat-enterprise-linux-9-0/file.html"
 cis_ns = "https://www.cisecurity.org/benchmark/red_hat_linux/"
 hipaa_ns = "https://www.gpo.gov/fdsys/pkg/CFR-2007-title45-vol1/pdf/CFR-2007-title45-vol1-chapA-subchapC.pdf"
-anssi_ns = "http://www.ssi.gouv.fr/administration/bonnes-pratiques/"
+anssi_ns = "https://cyber.gouv.fr/sites/default/files/document/linux_configuration-en-v2.pdf"
 ospp_ns = "https://www.niap-ccevs.org/Profile/PP.cfm"
+pcidss4_ns = "https://docs-prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-v4_0.pdf"
 cui_ns = 'http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171.pdf'
 stig_refs = 'https://public.cyber.mil/stigs/'
 disa_cciuri = "https://public.cyber.mil/stigs/cci/"
@@ -113,8 +122,6 @@ ansible_version_requirement_pre_task_name = \
     "Verify Ansible meets SCAP-Security-Guide version requirements."
 standard_profiles = ['standard', 'pci-dss', 'desktop', 'server']
 xslt_ns = "http://www.w3.org/1999/XSL/Transform"
-generic_stig_ns = "https://public.cyber.mil/stigs/downloads/" + \
-                  "?_dl_facet_stigs=operating-systems%2Cunix-linux"
 SCE_SYSTEM = "http://open-scap.org/page/SCE"
 
 
@@ -135,9 +142,9 @@ PREFIX_TO_NS = {
     "xccdf-1.2": XCCDF12_NS,
     "html": xhtml_namespace,
     "xlink": xlink_namespace,
-    "cpe-dict": "http://cpe.mitre.org/dictionary/2.0",
+    "cpe-dict": cpe_dictionary_namespace,
     "cat": cat_namespace,
-    "cpe-lang": "http://cpe.mitre.org/language/2.0",
+    "cpe-lang": cpe_language_namespace,
     "sce": sce_namespace,
 }
 
@@ -149,6 +156,8 @@ FIX_TYPE_TO_SYSTEM = {
     "blueprint": blueprint_system,
     "puppet": puppet_system,
     "anaconda": anaconda_system,
+    "kickstart": kickstart_system,
+    "bootc": bootc_system,
 }
 
 for prefix, url_part in OVAL_SUB_NS.items():
@@ -196,33 +205,38 @@ FULL_NAME_TO_PRODUCT_MAPPING = {
     "Alibaba Cloud Linux 3": "alinux3",
     "Anolis OS 8": "anolis8",
     "Anolis OS 23": "anolis23",
+    "Amazon Linux 2023": "al2023",
     "Chromium": "chromium",
-    "Debian 10": "debian10",
     "Debian 11": "debian11",
+    "Debian 12": "debian12",
     "Example": "example",
     "Amazon Elastic Kubernetes Service": "eks",
     "Fedora": "fedora",
     "Firefox": "firefox",
     "Apple macOS 10.15": "macos1015",
+    "Kylin Server 10": "kylinserver10",
     "Red Hat OpenShift Container Platform 4": "ocp4",
     "Red Hat Enterprise Linux CoreOS 4": "rhcos4",
     "Oracle Linux 7": "ol7",
     "Oracle Linux 8": "ol8",
     "Oracle Linux 9": "ol9",
+    "Oracle Linux 10": "ol10",
+    "openEuler 2203": "openeuler2203",
     "openSUSE": "opensuse",
-    "Red Hat Enterprise Linux 7": "rhel7",
     "Red Hat Enterprise Linux 8": "rhel8",
     "Red Hat Enterprise Linux 9": "rhel9",
+    "Red Hat Enterprise Linux 10": "rhel10",
     "Red Hat Virtualization 4": "rhv4",
     "SUSE Linux Enterprise 12": "sle12",
     "SUSE Linux Enterprise 15": "sle15",
+    "SUSE Linux Enterprise Micro 5": "slmicro5",
     "Ubuntu 16.04": "ubuntu1604",
     "Ubuntu 18.04": "ubuntu1804",
     "Ubuntu 20.04": "ubuntu2004",
     "Ubuntu 22.04": "ubuntu2204",
-    "UnionTech OS Server 20": "uos20",
+    "Ubuntu 24.04": "ubuntu2404",
     "OpenEmbedded": "openembedded",
-    "Not Applicable" : "example"
+    "Not Applicable": "example",
 }
 
 
@@ -242,7 +256,7 @@ Reference = collections.namedtuple("Reference", ("id", "name", "url", "regex_wit
 REFERENCES = dict(
     anssi=Reference(
         id="anssi", name="ANSSI", url=anssi_ns,
-        regex_with_groups=r"BP28\(R(\d+)\)"),
+        regex_with_groups=r"R(\d+)"),
     ccn=Reference(
         id="ccn", name="CCN", url="",
         regex_with_groups=r"A\.(\d+)\.SEC-(\w+)(\d+)"),
@@ -272,36 +286,38 @@ REFERENCES = dict(
 
 
 MULTI_PLATFORM_LIST = ["rhel", "fedora", "rhv", "debian", "ubuntu",
+                       "openeuler", "kylinserver",
                        "opensuse", "sle", "ol", "ocp", "rhcos",
-                       "example", "eks", "alinux", "uos", "anolis", "openembedded"]
+                       "example", "eks", "alinux", "anolis", "openembedded", "al",
+                       "slmicro"]
 
 MULTI_PLATFORM_MAPPING = {
     "multi_platform_alinux": ["alinux2", "alinux3"],
     "multi_platform_anolis": ["anolis8", "anolis23"],
-    "multi_platform_debian": ["debian10", "debian11"],
+    "multi_platform_debian": ["debian11", "debian12"],
     "multi_platform_example": ["example"],
     "multi_platform_eks": ["eks"],
     "multi_platform_fedora": ["fedora"],
+    "multi_platform_kylinserver": ["kylinserver10"],
+    "multi_platform_openeuler": ["openeuler2203"],
     "multi_platform_opensuse": ["opensuse"],
-    "multi_platform_ol": ["ol7", "ol8", "ol9"],
+    "multi_platform_ol": ["ol7", "ol8", "ol9", "ol10"],
     "multi_platform_ocp": ["ocp4"],
     "multi_platform_rhcos": ["rhcos4"],
-    "multi_platform_rhel": ["rhel7", "rhel8", "rhel9"],
+    "multi_platform_rhel": ["rhel8", "rhel9", "rhel10"],
     "multi_platform_rhv": ["rhv4"],
     "multi_platform_sle": ["sle12", "sle15"],
-    "multi_platform_ubuntu": ["ubuntu1604", "ubuntu1804", "ubuntu2004", "ubuntu2204"],
-    "multi_platform_uos": ["uos20"],
+    "multi_platform_slmicro": ["slmicro5"],
+    "multi_platform_ubuntu": ["ubuntu1604", "ubuntu1804", "ubuntu2004",
+                              "ubuntu2204", "ubuntu2404"],
     "multi_platform_openembedded": ["openembedded"],
+    "multi_platform_al": ["al2023"],
 }
 
 RHEL_CENTOS_CPE_MAPPING = {
-    "cpe:/o:redhat:enterprise_linux:7": "cpe:/o:centos:centos:7",
     "cpe:/o:redhat:enterprise_linux:8": "cpe:/o:centos:centos:8",
     "cpe:/o:redhat:enterprise_linux:9": "cpe:/o:centos:centos:9",
-}
-
-RHEL_SL_CPE_MAPPING = {
-    "cpe:/o:redhat:enterprise_linux:7": "cpe:/o:scientificlinux:scientificlinux:7",
+    "cpe:/o:redhat:enterprise_linux:10": "cpe:/o:centos:centos:10",
 }
 
 CENTOS_NOTICE = \
@@ -327,46 +343,6 @@ CENTOS_NOTICE = \
     "</ul>\n" \
     "\n" \
     "<p>Members of the <i>CentOS</i> community are invited to participate in " \
-    "<a href=\"http://open-scap.org\">OpenSCAP</a> and " \
-    "<a href=\"https://github.com/ComplianceAsCode/content\">" \
-    "SCAP Security Guide</a> development. Bug reports and patches " \
-    "can be sent to GitHub: " \
-    "<a href=\"https://github.com/ComplianceAsCode/content\">" \
-    "https://github.com/ComplianceAsCode/content</a>. " \
-    "The mailing list is at " \
-    "<a href=\"https://fedorahosted.org/mailman/listinfo/scap-security-guide\">" \
-    "https://fedorahosted.org/mailman/listinfo/scap-security-guide</a>" \
-    ".</p>" \
-    "</div>"
-
-SL_NOTICE = \
-    "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n" \
-    "<p>This benchmark is a direct port of a <i>SCAP Security Guide </i> " \
-    "benchmark developed for <i>Red Hat Enterprise Linux</i>. It has been " \
-    "modified through an automated process to remove specific dependencies " \
-    "on <i>Red Hat Enterprise Linux</i> and to function with <i>Scientifc Linux</i>. " \
-    "The result is a generally useful <i>SCAP Security Guide</i> benchmark " \
-    "with the following caveats:</p>\n" \
-    "<ul>\n" \
-    "<li><i>Scientifc Linux</i> is not an exact copy of " \
-    "<i>Red Hat Enterprise Linux</i>. Scientific Linux is a Linux distribution " \
-    "produced by <i>Fermi National Accelerator Laboratory</i>. It is a free and " \
-    "open source operating system based on <i>Red Hat Enterprise Linux</i> and aims " \
-    "to be \"as close to the commercial enterprise distribution as we can get it.\" " \
-    "There may be configuration differences that produce false positives and/or " \
-    "false negatives. If this occurs please file a bug report.</li>\n" \
-    "\n" \
-    "<li><i>Scientifc Linux</i> is derived from the free and open source software " \
-    "made available by Red Hat, but it is not produced, maintained or supported by <i>Red Hat</i>. " \
-    "<i>Scientifc Linux</i> has its own build system, compiler options, patchsets, " \
-    "and is a community supported, non-commercial operating system. " \
-    "<i>Scientifc Linux</i> does not inherit " \
-    "certifications or evaluations from <i>Red Hat Enterprise Linux</i>. As " \
-    "such, some configuration rules (such as those requiring " \
-    "<i>FIPS 140-2</i> encryption) will continue to fail on <i>Scientifc Linux</i>.</li>\n" \
-    "</ul>\n" \
-    "\n" \
-    "<p>Members of the <i>Scientifc Linux</i> community are invited to participate in " \
     "<a href=\"http://open-scap.org\">OpenSCAP</a> and " \
     "<a href=\"https://github.com/ComplianceAsCode/content\">" \
     "SCAP Security Guide</a> development. Bug reports and patches " \
@@ -447,20 +423,23 @@ MAKEFILE_ID_TO_PRODUCT_MAP = {
     'fedora': 'Fedora',
     'firefox': 'Mozilla Firefox',
     'macos': 'Apple macOS',
+    'kylinserver': 'Kylin Server',
     'rhel': 'Red Hat Enterprise Linux',
     'rhv': 'Red Hat Virtualization',
     'debian': 'Debian',
     'ubuntu': 'Ubuntu',
-    'uos': 'UnionTech OS Server',
     'eap': 'JBoss Enterprise Application Platform',
     'fuse': 'JBoss Fuse',
+    'openeuler': 'openEuler',
     'opensuse': 'openSUSE',
     'sle': 'SUSE Linux Enterprise',
+    'slmicro': 'SUSE Linux Enterprise Micro',
     'example': 'Example',
     'ol': 'Oracle Linux',
     'ocp': 'Red Hat OpenShift Container Platform',
     'rhcos': 'Red Hat Enterprise Linux CoreOS',
     'eks': 'Amazon Elastic Kubernetes Service',
+    'al': 'Amazon Linux',
     'openembedded': 'OpenEmbedded',
 }
 
@@ -475,8 +454,10 @@ DEFAULT_FAILLOCK_PATH = '/var/run/faillock'
 DEFAULT_SSH_DISTRIBUTED_CONFIG = 'false'
 DEFAULT_PRODUCT = 'example'
 DEFAULT_CHRONY_CONF_PATH = '/etc/chrony.conf'
+DEFAULT_CHRONY_D_PATH = '/etc/chrony.d/'
 DEFAULT_AUDISP_CONF_PATH = '/etc/audit'
 DEFAULT_SYSCTL_REMEDIATE_DROP_IN_FILE = 'false'
+DEFAULT_BOOTABLE_CONTAINERS_SUPPORTED = 'false'
 
 
 # Constants for OVAL object model
@@ -498,3 +479,22 @@ class OvalNamespaces:
 
 
 OVAL_NAMESPACES = OvalNamespaces()
+
+DERIVATIVES_PRODUCT_MAPPING = {
+    "centos8": "rhel8",
+    "cs9": "rhel9",
+    "cs10": "rhel10",
+}
+
+BENCHMARKS = {
+    "apple_os",
+    "applications",
+    "linux_os/guide",
+    "products/chromium/guide",
+    "products/firefox/guide",
+}
+
+
+SSG_IDENT_URIS = {
+    'cce': cce_uri
+}

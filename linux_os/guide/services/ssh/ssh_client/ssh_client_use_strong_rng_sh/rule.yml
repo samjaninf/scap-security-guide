@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol8,rhel8
 
 title: 'SSH client uses strong entropy to seed (Bash-like shells)'
 
@@ -22,9 +21,9 @@ severity: medium
 
 identifiers:
     cce@rhel8: CCE-83346-7
+    cce@rhel10: CCE-86267-2
 
 references:
-    ospp: FCS_CKM.1.1
     srg: SRG-OS-000480-GPOS-00227
 
 ocil_clause: 'SSH client is not configured to use 32 bytes of entropy or more'

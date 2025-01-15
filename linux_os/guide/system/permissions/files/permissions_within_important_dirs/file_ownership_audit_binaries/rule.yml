@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel8,rhel9,ubuntu2004,ubuntu2204
 
 title: 'Verify that audit tools are owned by root'
 
@@ -14,9 +13,9 @@ description: |-
     /sbin/auditctl root
     /sbin/aureport root
     /sbin/ausearch root
-    /sbin/autrace root
+    {{% if product not in ["rhel10"] %}}/sbin/autrace root{{% endif %}}
     /sbin/auditd root
-    /sbin/audispd root
+    {{% if 'rhel' not in product %}}/sbin/audispd root{{% endif %}}
     /sbin/augenrules root
     </pre>
 
@@ -28,7 +27,7 @@ rationale: |-
     Protecting audit information also includes identifying and protecting the
     tools used to view and manipulate log data. Therefore, protecting audit
     tools is necessary to prevent unauthorized operation on audit information.
- 
+
     Operating systems providing tools to interface with audit information
     will leverage user permissions and roles identifying the user accessing the
     tools and the corresponding rights the user enjoys to make access decisions
@@ -39,13 +38,14 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-86453-8
     cce@rhel9: CCE-86454-6
+    cce@rhel10: CCE-89400-6
 
 references:
-    cis@rhel9: 4.1.4.9
     cis@ubuntu2204: 4.1.4.9
     disa: CCI-001493,CCI-001494
     srg: SRG-OS-000256-GPiOS-00097,SRG-OS-000257-GPOS-00098
     stigid@ubuntu2004: UBTU-20-010200
+    stigid@ubuntu2204: UBTU-22-232110
 
 ocil: |-
     Verify it by running the following command:
@@ -54,9 +54,9 @@ ocil: |-
     /sbin/auditctl root
     /sbin/aureport root
     /sbin/ausearch root
-    /sbin/autrace root
+    {{% if product not in ["rhel10"] %}}/sbin/autrace root{{% endif %}}
     /sbin/auditd root
-    /sbin/audispd root
+    {{% if 'rhel' not in product %}}/sbin/audispd root{{% endif %}}
     /sbin/augenrules root
     </pre>
 
@@ -76,8 +76,8 @@ template:
             - /sbin/auditctl
             - /sbin/aureport
             - /sbin/ausearch
-            - /sbin/autrace
+            {{% if product not in ["rhel10"] %}}- /sbin/autrace{{% endif %}}
             - /sbin/auditd
-            - /sbin/audispd
+            {{% if 'rhel' not in product %}}- /sbin/audispd{{% endif %}}
             - /sbin/augenrules
         fileuid: '0'

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,ol7,ol8,ol9,rhel7,rhel8,rhel9,uos20
 
 title: 'Disable Odd Job Daemon (oddjobd)'
 
@@ -20,7 +19,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80263-7
     cce@rhel8: CCE-80880-8
     cce@rhel9: CCE-84229-4
 
@@ -40,7 +38,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="oddjobd") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

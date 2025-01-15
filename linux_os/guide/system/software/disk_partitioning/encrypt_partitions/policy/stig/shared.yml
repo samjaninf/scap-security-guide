@@ -9,7 +9,7 @@ vuldiscussion: |-
 checktext: |-
     Verify {{{ full_name }}} prevents unauthorized disclosure or modification of all information requiring at-rest protection by using disk encryption.
 
-    If there is a documented and approved reason for not having data-at-rest encryption, this requirement is Not Applicable.
+    Note: If there is a documented and approved reason for not having data-at-rest encryption, this requirement is Not Applicable.
 
     Verify all system partitions are encrypted with the following command:
 
@@ -23,4 +23,6 @@ fixtext: |-
     Configure {{{ full_name }}} to prevent unauthorized modification of all information at rest by using disk encryption.
 
     Encrypting a partition in an already installed system is more difficult, because existing partitions will need to be resized and changed.
+
     To encrypt an entire partition, dedicate a partition for encryption in the partition layout.
+

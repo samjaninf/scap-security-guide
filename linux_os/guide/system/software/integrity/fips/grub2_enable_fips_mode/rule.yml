@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,rhcos4,rhel7
 
 title: 'Enable FIPS Mode in GRUB2'
 
@@ -33,7 +32,7 @@ platforms:
     - grub2
 
 identifiers:
-    cce@rhel7: CCE-80359-3
+    cce@rhel10: CCE-86191-4
 
 references:
     cis-csc: 12,15,8
@@ -49,7 +48,6 @@ references:
     nist-csf: PR.AC-3,PR.PT-4
     srg: SRG-OS-000033-GPOS-00014,SRG-OS-000185-GPOS-00079,SRG-OS-000396-GPOS-00176,SRG-OS-000405-GPOS-00184,SRG-OS-000478-GPOS-00223
     stigid@ol7: OL07-00-021350
-    stigid@rhel7: RHEL-07-021350
 
 ocil_clause: 'FIPS is not configured or enabled in grub'
 

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhel7,rhel8,rhel9
 
 title: 'Disable Geolocation in GNOME3'
 
@@ -32,7 +31,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80117-5
     cce@rhel9: CCE-85903-3
 
 ocil_clause: 'geolocation is enabled and not disabled'

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15
 
 title: Configure Accepting Router Preference in Router Advertisements on All IPv6 Interfaces
 
@@ -11,18 +10,15 @@ rationale: An illicit router advertisement message could result in a man-in-the-
 severity: unknown
 
 identifiers:
-    cce@rhel7: CCE-84287-2
     cce@rhel8: CCE-84288-0
     cce@rhel9: CCE-84111-4
+    cce@rhel10: CCE-90302-1
     cce@sle12: CCE-91519-9
     cce@sle15: CCE-91204-8
 
-references:
-      anssi: BP28(R22)
-
 {{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv6.conf.all.accept_ra_rtr_pref", value="0") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

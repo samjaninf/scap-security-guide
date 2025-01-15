@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7
 
 title: 'Use direct-lvm with the Device Mapper Storage Driver'
 
@@ -19,8 +18,5 @@ rationale: |-
 severity: low
 
 platform: machine  # The check uses service_... extended definition, which doesnt support offline mode
-
-identifiers:
-    cce@rhel7: CCE-80441-9
 
 platform: machine

@@ -14,7 +14,8 @@ description: |-
 selections:
     -  pcidss_3:all:base
     -  var_multiple_time_servers=suse
-    -  var_multiple_time_pools=suse      
+    -  var_multiple_time_pools=suse
+    -  var_accounts_tmout=15_min
     -  account_unique_id
     -  coredump_disable_backtraces
     -  coredump_disable_storage
@@ -34,7 +35,7 @@ selections:
     -  file_owner_backup_etc_passwd
     -  file_owner_backup_etc_shadow
     -  file_owner_cron_allow
-    -  file_permissions_at_allo
+    -  file_permissions_at_allow
     -  file_permissions_backup_etc_group
     -  file_permissions_backup_etc_passwd
     -  file_permissions_backup_etc_shadow
@@ -94,3 +95,13 @@ selections:
     -  '!use_pam_wheel_for_su'
     -  use_pam_wheel_group_for_su
     -  var_pam_wheel_group_for_su=cis
+    # Following rules once had a prodtype incompatible with the sle12 product
+    - '!set_firewalld_default_zone'
+    - '!accounts_password_pam_dcredit'
+    - '!audit_rules_login_events'
+    - '!accounts_password_pam_lcredit'
+    - '!accounts_passwords_pam_faillock_deny'
+    - '!ensure_firewall_rules_for_open_ports'
+    - '!accounts_passwords_pam_faillock_unlock_time'
+    - '!accounts_password_pam_ucredit'
+    - '!accounts_password_pam_minlen'

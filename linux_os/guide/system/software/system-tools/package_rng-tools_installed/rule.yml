@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4
 
 title: 'Install rng-tools Package'
 
@@ -14,9 +13,9 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-82969-7
     cce@rhel8: CCE-82968-9
     cce@rhel9: CCE-83504-1
+    cce@rhel10: CCE-88468-4
 
 references:
     disa: CCI-000366
@@ -32,7 +31,7 @@ fixtext: '{{{ fixtext_package_installed("rng-tools") }}}'
 
 srg_requirement: '{{{ srg_requirement_package_installed("rng-tools") }}}'
 
-platform: machine
+platform: system_with_kernel and not runtime_kernel_fips_enabled
 
 template:
     name: package_installed

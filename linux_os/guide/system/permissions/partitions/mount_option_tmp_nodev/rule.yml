@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,sle12,sle15,ubuntu1804,ubuntu2004,ubuntu2204
 
 title: 'Add nodev Option to /tmp'
 
@@ -19,20 +18,14 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80149-8
     cce@rhel8: CCE-82623-0
     cce@rhel9: CCE-83869-8
+    cce@rhel10: CCE-90522-4
     cce@sle12: CCE-92301-1
     cce@sle15: CCE-92455-5
 
 references:
-    anssi: BP28(R12)
     cis-csc: 11,13,14,3,8,9
-    cis@alinux2: 1.1.3
-    cis@alinux3: 1.1.2.2
-    cis@rhel7: 1.1.4
-    cis@rhel8: 1.1.2.2
-    cis@rhel9: 1.1.2.2
     cis@sle12: 1.1.4
     cis@sle15: 1.1.4
     cis@ubuntu1804: 1.1.3
@@ -50,7 +43,7 @@ references:
     stigid@ol8: OL08-00-040123
     stigid@rhel8: RHEL-08-040123
 
-platform: machine and mount[tmp]
+platform: mount[tmp]
 
 template:
     name: mount_option

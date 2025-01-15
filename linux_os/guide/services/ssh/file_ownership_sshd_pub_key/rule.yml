@@ -13,14 +13,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86128-6
     cce@rhel8: CCE-86129-4
     cce@rhel9: CCE-86130-2
-
-references:
-    cis@rhel7: 5.3.3
-    cis@rhel8: 5.2.3
-    cis@rhel9: 5.2.3
+    cce@rhel10: CCE-87297-8
 
 ocil_clause: '{{{ ocil_clause_file_owner(file="/etc/ssh/*.pub", owner="root") }}}'
 
@@ -35,4 +30,8 @@ template:
         file_regex:
             - ^.*\.pub$
         fileuid: '0'
-        missing_file_pass: 'true'
+
+warnings:
+    - general: |-
+        Remediation is not possible at bootable container build time because SSH host
+        keys are generated post-deployment.

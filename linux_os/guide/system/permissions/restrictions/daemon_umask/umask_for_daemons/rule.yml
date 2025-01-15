@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Set Daemon Umask'
 
@@ -19,9 +18,6 @@ rationale: |-
     being created with insecure permissions.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-27068-6
 
 references:
     cis-csc: 12,13,14,15,16,18,3,5

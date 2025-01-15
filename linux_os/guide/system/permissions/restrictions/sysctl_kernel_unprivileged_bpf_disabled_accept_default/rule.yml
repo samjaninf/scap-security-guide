@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel9
 
 title: 'Disable Access to Network bpf() Syscall From Unprivileged Processes'
 
@@ -29,6 +28,7 @@ severity: medium
 
 identifiers:
     cce@rhel9: CCE-87712-6
+    cce@rhel10: CCE-88627-5
 
 references:
     disa: CCI-000366
@@ -68,7 +68,7 @@ fixtext: |-
 
 srg_requirement: '{{{ full_name }}} must disable access to network bpf syscall from unprivileged processes.'
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

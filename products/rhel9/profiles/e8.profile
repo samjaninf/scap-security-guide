@@ -23,15 +23,12 @@ selections:
   ### Remove obsolete packages
   - package_talk_removed
   - package_talk-server_removed
-  - package_xinetd_removed
-  - service_xinetd_disabled
   - package_ypbind_removed
   - package_telnet_removed
   - service_telnet_disabled
   - package_telnet-server_removed
   - package_rsh_removed
   - package_rsh-server_removed
-  - service_zebra_disabled
   - package_quagga_removed
   - service_avahi-daemon_disabled
   - package_squid_removed
@@ -98,6 +95,7 @@ selections:
   ### Audit
   - package_rsyslog_installed
   - service_rsyslog_enabled
+  - package_audit_installed
   - service_auditd_enabled
   - var_auditd_flush=incremental_async
   - auditd_data_retention_flush

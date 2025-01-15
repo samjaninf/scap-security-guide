@@ -24,6 +24,7 @@ import ssg_test_suite.rule
 import ssg_test_suite.combined
 import ssg_test_suite.template
 from ssg_test_suite import xml_operations
+from ssg.constants import DERIVATIVES_PRODUCT_MAPPING
 
 
 def parse_args():
@@ -49,12 +50,12 @@ def parse_args():
 
     common_parser.add_argument(
         "--datastream", dest="datastream", metavar="DATASTREAM",
-        help="Path to the Source DataStream on this machine which is going to be tested. "
+        help="Path to the Source data stream on this machine which is going to be tested. "
         "If not supplied, autodetection is attempted by looking into the build directory.")
 
     common_parser.add_argument(
         "--product", dest="product", metavar="PRODUCT", default=None,
-        help="Product to interpret tests as being run under; autodetected from datastream "
+        help="Product to interpret tests as being run under; autodetected from data stream "
         "if it follows the ssg-<product>-ds*.xml naming convention.")
 
     benchmarks = common_parser.add_mutually_exclusive_group()
@@ -73,15 +74,15 @@ def parse_args():
             help="DEPRECATED: Use --remove-platforms instead; "
             "Find all CPEs that are present in local OpenSCAP's CPE dictionary "
             "that match the provided regex, "
-            "and add them as platforms to all datastream benchmarks. "
+            "and add them as platforms to all data stream benchmarks. "
             "If the regex doesn't match anything, it will be treated "
             "as a literal CPE, and added as a platform. "
             "For example, use 'cpe:/o:fedoraproject:fedora:30' or 'enterprise_linux'.")
     common_parser.add_argument(
-            "--add-product-to-fips-certified",
-            default=None,
-            help="Add installed_OS_is_$product extend_definition to the "
-            "installed_OS_is_FIPS_certified OVAL criteria definition.")
+        "--remove-fips-certified",
+        action="store_true",
+        help="Remove dependencies on rule installed_OS_is_FIPS_certified from "
+        "all OVAL definitions that depend on it.")
     common_parser.add_argument(
             "--remove-platforms",
             default=False,
@@ -91,10 +92,10 @@ def parse_args():
             "Although more low level platforms such as packages or container/machine "
             "CPE are still applicable.")
     common_parser.add_argument(
-            "--remove-machine-only",
+            "--make-applicable-in-containers",
             default=False,
             action="store_true",
-            help="Removes machine-only platform constraint from rules "
+            help="Removes platform constraints from rules "
             "to enable testing these rules on container backends.")
     common_parser.add_argument(
             "--remove-ocp4-only",
@@ -155,7 +156,7 @@ def parse_args():
                                            epilog=textwrap.dedent("""\
                     In case that tested profile contains rules which might prevent root ssh access
                     to the testing VM consider unselecting these rules. To unselect certain rules
-                    from a datastream use `ds_unselect_rules.sh` script. List of such rules already
+                    from a data stream use `ds_unselect_rules.sh` script. List of such rules already
                     exists, see `unselect_rules_list` file.
                     Example usage:
                         ./ds_unselect_rules.sh ../build/ssg-fedora-ds.xml unselect_rules_list
@@ -331,7 +332,7 @@ def get_logging_dir(options):
 
 
 def _print_available_benchmarks(xccdf_ids, n_xccdf_ids):
-    logging.info("The DataStream contains {0} Benchmarks".format(n_xccdf_ids))
+    logging.info("The data stream contains {0} Benchmarks".format(n_xccdf_ids))
     for i in range(0, n_xccdf_ids):
         logging.info("{0} - {1}".format(i, xccdf_ids[i]))
 
@@ -341,7 +342,7 @@ def auto_select_xccdf_id(datastream, bench_number):
     n_xccdf_ids = len(xccdf_ids)
 
     if n_xccdf_ids == 0:
-        msg = ("The provided DataStream doesn't contain any Benchmark")
+        msg = ("The provided data stream doesn't contain any Benchmark")
         raise RuntimeError(msg)
 
     if bench_number < 0 or bench_number >= n_xccdf_ids:
@@ -373,13 +374,26 @@ def get_unique_datastream():
     datastreams = get_datastreams()
     if len(datastreams) == 1:
         return datastreams[0]
-    msg = ("Autodetection of the datastream file is possible only when there is "
+    msg = ("Autodetection of the data stream file is possible only when there is "
            "a single one in the build dir, but")
     if not datastreams:
         raise RuntimeError(msg + " there is none.")
     raise RuntimeError(
         msg + " there are {0} of them. Use the --datastream option to select "
         "e.g. {1}".format(len(datastreams), datastreams))
+
+
+def get_product_id(ds_filename):
+    product_regex = re.compile(r'^.*ssg-([a-zA-Z0-9]*)-(ds|ds-1\.2)\.xml$')
+    match = product_regex.match(ds_filename)
+    if not match:
+        msg = "Unable to detect product without explicit --product: "
+        msg += "data stream {0} lacks product name".format(ds_filename)
+        raise RuntimeError(msg)
+    product = match.group(1)
+    if product in DERIVATIVES_PRODUCT_MAPPING:
+        product = DERIVATIVES_PRODUCT_MAPPING[product]
+    return product
 
 
 @contextlib.contextmanager
@@ -407,13 +421,7 @@ def normalize_passed_arguments(options):
         options.datastream = get_unique_datastream()
 
     if not options.product and options.datastream:
-        product_regex = re.compile(r'^.*ssg-([a-zA-Z0-9]*)-(ds|ds-1\.2)\.xml$')
-        match = product_regex.match(options.datastream)
-        if not match:
-            msg = "Unable to detect product without explicit --product: "
-            msg += "datastream {0} lacks product name".format(options.datastream)
-            raise RuntimeError(msg)
-        options.product = match.group(1)
+        options.product = get_product_id(options.datastream)
 
     if options.xccdf_id is None:
         options.xccdf_id = auto_select_xccdf_id(options.datastream,
@@ -493,16 +501,14 @@ def main():
         with xml_operations.datastream_root(stashed_datastream, stashed_datastream) as root:
             if options.remove_platforms:
                 xml_operations.remove_platforms(root)
-            if options.remove_machine_only:
-                xml_operations.remove_machine_platform(root)
-                xml_operations.remove_machine_remediation_condition(root)
+            if options.make_applicable_in_containers:
+                xml_operations.make_applicable_in_containers(root)
             if options.remove_ocp4_only:
                 xml_operations.remove_ocp4_platforms(root)
             if options.add_platform:
                 xml_operations.add_platform_to_benchmark(root, options.add_platform)
-            if options.add_product_to_fips_certified:
-                xml_operations.add_product_to_fips_certified(
-                    root, options.add_product_to_fips_certified)
+            if options.remove_fips_certified:
+                xml_operations.remove_fips_certified(root)
 
         options.func(options)
 

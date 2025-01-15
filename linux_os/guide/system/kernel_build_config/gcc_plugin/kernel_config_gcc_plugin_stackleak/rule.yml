@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel9
 
 title: 'Poison kernel stack before returning from syscalls'
 
@@ -29,9 +28,7 @@ severity: medium
 
 identifiers:
     cce@rhel9: CCE-87128-5
-
-references:
-    anssi: BP28(R21)
+    cce@rhel10: CCE-87622-7
 
 ocil_clause: 'the kernel was not built with the required value'
 

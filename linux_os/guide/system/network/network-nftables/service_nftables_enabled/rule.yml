@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8,sle15,ubuntu2004,ubuntu2204
 
 title: 'Verify nftables Service is Enabled'
 
@@ -17,14 +16,13 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86723-4
     cce@rhel8: CCE-86725-9
     cce@sle15: CCE-92560-2
+    cce@slmicro5: CCE-93983-5
 
 references:
-    cis@rhel7: 3.5.2.10
-    cis@rhel8: 3.4.2.10
     cis@sle15: 3.5.2.9
+    cis@slmicro5: 3.5.2.9
     cis@ubuntu2004: 3.5.2.9
     cis@ubuntu2204: 3.5.2.9
 
@@ -36,7 +34,7 @@ ocil: |-
 fixtext: |-
     {{{ fixtext_service_enabled("nftables") }}}
 
-platform: machine and package[nftables] and service_disabled[firewalld]
+platform: system_with_kernel and package[nftables] and service_disabled[firewalld]
 
 template:
     name: service_enabled

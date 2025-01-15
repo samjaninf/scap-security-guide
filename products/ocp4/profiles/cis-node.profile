@@ -11,10 +11,12 @@ metadata:
         - jhrozek
         - rhmdnd
         - Vincent056
+        - yuumasato
+    version: 1.5.0
 
 description: |-
     This profile defines a baseline that aligns to the Center for Internet Security®
-    Red Hat OpenShift Container Platform 4 Benchmark™, V1.4.
+    Red Hat OpenShift Container Platform 4 Benchmark™, V1.5.
 
     This profile includes Center for Internet Security®
     Red Hat OpenShift Container Platform 4 CIS Benchmarks™ content.
@@ -22,9 +24,6 @@ description: |-
     Note that this part of the profile is meant to run on the Operating System that
     Red Hat OpenShift Container Platform 4 runs on top of.
 
-    This profile is applicable to OpenShift versions 4.10 and greater.
+    This profile is applicable to OpenShift versions 4.12 and greater.
 
-filter_rules: '"ocp4-node" in platforms or "ocp4-master-node" in platforms or "ocp4-node-on-sdn" in platforms or "ocp4-node-on-ovn" in platforms'
-
-selections:
-    - cis_ocp_1_4_0:all
+extends: cis-node-1-5

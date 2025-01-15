@@ -1,6 +1,6 @@
 description: 'This profile contains configuration checks that align to the
 
-    DISA STIG with GUI for Red Hat Enterprise Linux 8 V1R11.
+    DISA STIG with GUI for Red Hat Enterprise Linux 8 V2R1.
 
 
     In addition to being applicable to Red Hat Enterprise Linux 8, DISA recognizes
@@ -32,14 +32,17 @@ description: 'This profile contains configuration checks that align to the
 
     standard DISA STIG for Red Hat Enterprise Linux 8 profile.'
 extends: null
+hidden: ''
 metadata:
-    version: V1R11
+    version: V2R1
     SMEs:
     - mab879
     - ggbecker
 reference: https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=operating-systems%2Cunix-linux
 selections:
 - account_disable_post_pw_expiration
+- account_password_pam_faillock_password_auth
+- account_password_pam_faillock_system_auth
 - account_password_selinux_faillock_dir
 - account_temp_expire_date
 - account_unique_id
@@ -61,8 +64,6 @@ selections:
 - accounts_password_pam_minclass
 - accounts_password_pam_minlen
 - accounts_password_pam_ocredit
-- accounts_password_pam_pwhistory_remember_password_auth
-- accounts_password_pam_pwhistory_remember_system_auth
 - accounts_password_pam_pwquality_password_auth
 - accounts_password_pam_pwquality_system_auth
 - accounts_password_pam_retry
@@ -87,7 +88,6 @@ selections:
 - accounts_user_interactive_home_directory_exists
 - accounts_users_home_files_groupownership
 - accounts_users_home_files_permissions
-- agent_mfetpd_running
 - aide_build_database
 - aide_check_audit_tools
 - aide_scan_notification
@@ -175,8 +175,8 @@ selections:
 - chronyd_no_chronyc_network
 - chronyd_or_ntpd_set_maxpoll
 - chronyd_server_directive
+- chronyd_specify_remote_server
 - clean_components_post_updating
-- configure_bashrc_tmux
 - configure_bind_crypto_policy
 - configure_crypto_policy
 - configure_firewalld_ports
@@ -186,10 +186,8 @@ selections:
 - configure_openssl_crypto_policy
 - configure_openssl_tls_crypto_policy
 - configure_ssh_crypto_policy
-- configure_tmux_lock_after_time
-- configure_tmux_lock_command
-- configure_tmux_lock_keybinding
 - configure_usbguard_auditbackend
+- configured_firewalld_default_deny
 - coredump_disable_backtraces
 - coredump_disable_storage
 - dconf_gnome_banner_enabled
@@ -200,6 +198,7 @@ selections:
 - dconf_gnome_screensaver_idle_delay
 - dconf_gnome_screensaver_lock_delay
 - dconf_gnome_screensaver_lock_enabled
+- dconf_gnome_screensaver_lock_locked
 - dconf_gnome_screensaver_user_locks
 - dconf_gnome_session_idle_user_locks
 - dir_group_ownership_library_dirs
@@ -238,7 +237,7 @@ selections:
 - file_ownership_binary_dirs
 - file_ownership_library_dirs
 - file_ownership_var_log_audit_stig
-- file_permission_user_init_files
+- file_permission_user_init_files_root
 - file_permissions_binary_dirs
 - file_permissions_etc_audit_auditd
 - file_permissions_etc_audit_rulesd
@@ -250,6 +249,7 @@ selections:
 - file_permissions_var_log
 - file_permissions_var_log_audit
 - file_permissions_var_log_messages
+- firewalld-backend
 - gnome_gdm_disable_automatic_login
 - grub2_admin_username
 - grub2_audit_argument
@@ -276,7 +276,7 @@ selections:
 - kernel_module_sctp_disabled
 - kernel_module_tipc_disabled
 - kernel_module_usb-storage_disabled
-- logind_session_timeout
+- kernel_module_uvcvideo_disabled
 - mount_option_boot_efi_nosuid
 - mount_option_boot_nosuid
 - mount_option_dev_shm_nodev
@@ -309,7 +309,6 @@ selections:
 - no_empty_passwords_etc_shadow
 - no_files_unowned_by_user
 - no_host_based_files
-- no_tmux_in_shells
 - no_user_host_based_files
 - package_abrt-addon-ccpp_removed
 - package_abrt-addon-kerneloops_removed
@@ -326,7 +325,6 @@ selections:
 - package_krb5-workstation_removed
 - package_libreport-plugin-logger_removed
 - package_mailx_installed
-- package_mcafeetp_installed
 - package_opensc_installed
 - package_openssh-server_installed
 - package_policycoreutils_installed
@@ -339,7 +337,6 @@ selections:
 - package_sendmail_removed
 - package_telnet-server_removed
 - package_tftp-server_removed
-- package_tmux_installed
 - package_tuned_removed
 - package_usbguard_installed
 - package_vsftpd_removed
@@ -375,6 +372,7 @@ selections:
 - service_sshd_enabled
 - service_systemd-coredump_disabled
 - service_usbguard_enabled
+- set_firewalld_default_zone
 - set_password_hashing_algorithm_logindefs
 - set_password_hashing_algorithm_passwordauth
 - set_password_hashing_algorithm_systemauth
@@ -435,7 +433,6 @@ selections:
 - sysctl_net_ipv6_conf_default_accept_ra
 - sysctl_net_ipv6_conf_default_accept_redirects
 - sysctl_net_ipv6_conf_default_accept_source_route
-- sysctl_user_max_user_namespaces
 - tftpd_uses_secure_mode
 - usbguard_generate_policy
 - wireless_disable_interfaces
@@ -445,6 +442,7 @@ selections:
 - var_password_pam_difok=8
 - var_password_pam_maxrepeat=3
 - var_password_hashing_algorithm=SHA512
+- var_password_hashing_algorithm_pam=sha512
 - var_password_pam_maxclassrepeat=4
 - var_password_pam_minclass=4
 - var_accounts_minimum_age_login_defs=1
@@ -481,18 +479,22 @@ selections:
 - var_auditd_disk_error_action=rhel8
 - var_auditd_max_log_file_action=syslog
 - var_auditd_disk_full_action=rhel8
-- var_auditd_name_format=stig
 - var_sssd_certificate_verification_digest_function=sha1
 - login_banner_text=dod_banners
 - var_authselect_profile=sssd
+- var_multiple_time_servers=stig
 - var_system_crypto_policy=fips
 - var_sudo_timestamp_timeout=always_prompt
 - var_slub_debug_options=P
+- var_user_initialization_files_regex=all_dotfiles
 - var_screensaver_lock_delay=5_seconds
+- var_logind_session_timeout=10_minutes
+- var_auditd_name_format=stig
 unselected_groups: []
 platforms: !!set {}
 cpe_names: !!set {}
 platform: null
 filter_rules: ''
+policies: []
 title: DISA STIG with GUI for Red Hat Enterprise Linux 8
 documentation_complete: true

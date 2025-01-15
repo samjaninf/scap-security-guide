@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8,rhel9
 
 title: 'Require Client SMB Packet Signing, if using mount.cifs'
 
@@ -19,9 +18,6 @@ rationale: |-
     attacks which modify SMB packets in transit.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80281-9
 
 ocil_clause: 'it does not'
 

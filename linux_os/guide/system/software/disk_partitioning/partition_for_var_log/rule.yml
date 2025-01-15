@@ -15,20 +15,14 @@ severity: low
 
 identifiers:
     cce@rhcos4: CCE-82737-8
-    cce@rhel7: CCE-82034-0
     cce@rhel8: CCE-80853-5
     cce@rhel9: CCE-90848-3
+    cce@rhel10: CCE-88355-3
     cce@sle12: CCE-91489-5
     cce@sle15: CCE-91181-8
 
 references:
-    anssi: BP28(R12),BP28(R47)
     cis-csc: 1,12,14,15,16,3,5,6,8
-    cis@alinux2: 1.1.11
-    cis@alinux3: 1.1.5.1
-    cis@rhel7: 1.1.15
-    cis@rhel8: 1.1.5.1
-    cis@rhel9: 1.1.5.1
     cis@sle12: 1.1.15
     cis@sle15: 1.1.15
     cis@ubuntu1804: 1.1.10
@@ -52,7 +46,6 @@ fixtext: '{{{ fixtext_separate_partition(part="/var/log") }}}'
 
 srg_requirement: '{{{ srg_requirement_separate_partition("/var/log") }}}'
 
-platform: machine
 
 # (jhrozek): at the moment, the mount probe checks the /proc filesystem
 # even if openscap looks at a chroot, which doesn't allow to check for
@@ -62,5 +55,5 @@ template:
     name: mount
     vars:
         mountpoint: /var/log
-        min_size: 5368709120
+        min_size: 1073741824
 {{% endif %}}

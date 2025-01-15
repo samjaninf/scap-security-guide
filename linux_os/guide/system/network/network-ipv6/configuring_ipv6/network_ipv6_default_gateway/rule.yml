@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhel7,rhel8
 
 title: 'Manually Assign IPv6 Router Address'
 
@@ -15,9 +14,6 @@ description: |-
 rationale: ""
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80186-0
 
 references:
     disa: CCI-000366

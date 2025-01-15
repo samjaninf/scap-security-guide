@@ -16,20 +16,17 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86550-1
     cce@rhel8: CCE-86551-9
     cce@rhel9: CCE-86552-7
+    cce@rhel10: CCE-87290-3
     cce@sle12: CCE-92281-5
     cce@sle15: CCE-91397-0
+    cce@slmicro5: CCE-93881-1
 
 references:
-    cis@alinux2: 5.2.15
-    cis@alinux3: 5.2.14
-    cis@rhel7: 5.3.17
-    cis@rhel8: 5.2.19
-    cis@rhel9: 5.2.19
     cis@sle12: 5.2.17
     cis@sle15: 5.2.17
+    cis@slmicro5: 5.2.17
     cis@ubuntu2004: 5.2.16
     cis@ubuntu2204: 5.2.21
 
@@ -42,3 +39,12 @@ ocil: |-
     <pre>LoginGraceTime {{{ xccdf_value("var_sshd_set_login_grace_time") }}}</pre>
     If the option is set to a number greater than <tt>0</tt>, then the unauthenticated session will be disconnected
     after the configured number seconds.
+
+template:
+    name: sshd_lineinfile
+    vars:
+        parameter: LoginGraceTime
+        xccdf_variable: var_sshd_set_login_grace_time
+        datatype: int
+        backends:
+            oval: "off"

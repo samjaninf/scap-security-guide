@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ocp4
 
 title: 'Ensure Eviction threshold Settings Are Set - evictionHard: nodefs.inodesFree'
 
@@ -39,6 +38,7 @@ description: |-
   <p>
   This rule pertains to the <tt>nodefs.inodesFree</tt> setting of the <tt>evictionHard</tt>
   section.
+  {{{ kubernetes_variable_instruction(field_name="nodefs.inodesFree", variable_name="var_kubelet_evictionhard_nodefs_inodesfree") }}}
   </p>
 
 rationale: |-

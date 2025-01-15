@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhcos4,rhel7,rhel8,rhv4,sle12,sle15
 
 title: 'Specify Additional Remote NTP Servers'
 
@@ -87,12 +86,12 @@ rationale: |-
 
 severity: medium
 
-platform: machine  # The check uses service_... extended definition, which doesnt support offline mode
+platform: package[chrony] or package[ntp]
 
 identifiers:
     cce@rhcos4: CCE-82685-9
-    cce@rhel7: CCE-27012-4
     cce@rhel8: CCE-80764-4
+    cce@rhel10: CCE-90499-5
     cce@sle12: CCE-91630-4
     cce@sle15: CCE-85834-0
 
@@ -106,4 +105,3 @@ references:
     nist: CM-6(a),AU-8(1)(a),AU-8(2),AU-12(1)
     nist-csf: PR.PT-1
     pcidss: Req-10.4.3
-    pcidss4: "10.6.2"

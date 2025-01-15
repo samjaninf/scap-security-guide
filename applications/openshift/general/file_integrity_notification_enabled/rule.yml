@@ -1,4 +1,3 @@
-prodtype: ocp4
 
 title: Ensure the notification is enabled for file integrity operator
 
@@ -46,5 +45,3 @@ template:
     values:
       - value: ".*"
         operation: "pattern match"
-
-

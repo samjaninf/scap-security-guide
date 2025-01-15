@@ -13,3 +13,31 @@ description: |-
 
 selections:
     - anssi:all:high
+    # Following rules once had a prodtype incompatible with the ol8 product
+    - '!accounts_passwords_pam_tally2_deny_root'
+    - '!timer_logrotate_enabled'
+    - '!ensure_redhat_gpgkey_installed'
+    - '!aide_periodic_checking_systemd_timer'
+    - '!audit_rules_privileged_commands_rmmod'
+    - '!grub2_mds_argument'
+    - '!audit_rules_privileged_commands_modprobe'
+    - '!package_dracut-fips-aesni_installed'
+    - '!cracklib_accounts_password_pam_lcredit'
+    - '!sysctl_fs_protected_regular'
+    - '!cracklib_accounts_password_pam_ocredit'
+    - '!audit_rules_privileged_commands_insmod'
+    - '!chronyd_configure_pool_and_server'
+    - '!accounts_passwords_pam_tally2'
+    - '!cracklib_accounts_password_pam_ucredit'
+    - '!accounts_passwords_pam_tally2_unlock_time'
+    - '!cracklib_accounts_password_pam_minlen'
+    - '!sysctl_fs_protected_fifos'
+    - '!cracklib_accounts_password_pam_dcredit'
+    - '!grub2_page_alloc_shuffle_argument'
+    - '!package_kea_removed'
+    # disable R45: Enable AppArmor security profiles
+    - '!apparmor_configured'
+    - '!all_apparmor_profiles_enforced'
+    - '!grub2_enable_apparmor'
+    - '!package_apparmor_installed'
+    - '!package_pam_apparmor_installed'

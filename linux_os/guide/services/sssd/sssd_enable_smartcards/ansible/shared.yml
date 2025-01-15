@@ -6,7 +6,7 @@
 - name: "Test for domain group"
   command: grep '^\s*\[domain\/[^]]*]' /etc/sssd/sssd.conf
   register: test_grep_domain
-  ignore_errors: yes
+  failed_when: false
   changed_when: False
   check_mode: no
 
@@ -34,6 +34,19 @@
     create: yes
     mode: 0600
 
+- name: Find all the conf files inside /etc/sssd/conf.d/
+  find:
+    paths: "/etc/sssd/conf.d/"
+    patterns: "*.conf"
+  register: sssd_conf_d_files
+
+- name: Fix pam_cert_auth configuration in /etc/sssd/conf.d/
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '[^#]*pam_cert_auth.*'
+    replace: 'pam_cert_auth = True'
+  with_items: "{{ sssd_conf_d_files.files }}"
+
 {{% if product in ["fedora", "ol8", "ol9", "rhel8", "rhel9"] %}}
 - name: '{{{ rule_title }}} - Check if system relies on authselect'
   ansible.builtin.stat:
@@ -49,7 +62,7 @@
 - name: '{{{ rule_title }}} - Remediate by directly editing PAM files'
   block:
     {{{ ansible_ensure_pam_module_option('/etc/pam.d/smartcard-auth', 'auth', 'sufficient', 'pam_sss.so', 'allow_missing_name', '', '') | indent(4) }}}
-    {{{ ansible_ensure_pam_module_option('/etc/pam.d/system-auth', 'auth', '\[success=done authinfo_unavail=ignore ignore=ignore default=die\]', 'pam_sss.so', 'try_cert_auth', '', '') | indent(4) }}}
+    {{{ ansible_ensure_pam_module_option('/etc/pam.d/system-auth', 'auth', '[success=done authinfo_unavail=ignore ignore=ignore default=die]', 'pam_sss.so', 'try_cert_auth', '', '') | indent(4) }}}
   when:
     - not result_authselect_present.stat.exists
 {{% endif %}}

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Set httpd ServerSignature Directive to Off'
 
@@ -16,9 +15,6 @@ rationale: |-
     to plan an attack on the given system. This information disclosure should be restricted to a minimum.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80303-1
 
 references:
     cis-csc: 11,14,3,9

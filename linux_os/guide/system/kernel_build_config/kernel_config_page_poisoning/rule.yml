@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel8,rhel9
 
 title: 'Enable poison of pages after freeing'
 
@@ -23,9 +22,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-88426-2
     cce@rhel9: CCE-88427-0
-
-references:
-    anssi: BP28(R17)
+    cce@rhel10: CCE-87544-3
 
 ocil_clause: 'the kernel was not built with the required value'
 
@@ -37,4 +34,3 @@ template:
     vars:
         config: CONFIG_PAGE_POISONING
         value: 'y'
-

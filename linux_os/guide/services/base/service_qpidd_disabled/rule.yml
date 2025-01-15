@@ -1,7 +1,6 @@
 documentation_complete: true
 
 # package is unlikely to appear on a RHEL9 system, don't extend to RHEL10
-prodtype: alinux2,alinux3,anolis23,anolis8,ol7,ol8,ol9,rhel7,rhel8,rhel9,uos20
 
 title: 'Disable Apache Qpid (qpidd)'
 
@@ -22,7 +21,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80266-0
     cce@rhel8: CCE-80882-4
     cce@rhel9: CCE-84231-0
 
@@ -42,7 +40,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="qpidd") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

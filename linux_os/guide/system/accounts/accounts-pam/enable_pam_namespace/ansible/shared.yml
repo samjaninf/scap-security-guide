@@ -1,4 +1,4 @@
-# platform = multi_platform_fedora,Red Hat Enterprise Linux 7,Red Hat Enterprise Linux 8,multi_platform_ol,multi_platform_sle
+# platform = multi_platform_fedora,multi_platform_ol,multi_platform_rhel,multi_platform_sle
 # reboot = false
 # strategy = restrict
 # complexity = low
@@ -8,5 +8,6 @@
   msg="Make changes to /etc/pam.d/login",
   path="/etc/pam.d/login",
   regex="^\s*session\s+required\s+pam_namespace.so\s*$",
+  insensitive=false,
   new_line="session    required     pam_namespace.so"
 ) }}}

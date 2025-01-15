@@ -1,8 +1,5 @@
 documentation_complete: true
 
-# Set prodtypes if needed, otherwise let the rule to be applicable for all products by omitting the prodtype declaration
-# prodtype: fedora
-
 title: "Don't target root user in the sudoers file"
 
 description: |-
@@ -18,9 +15,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83597-5
     cce@rhel8: CCE-83598-3
     cce@rhel9: CCE-83531-4
+    cce@rhel10: CCE-90532-3
     cce@sle12: CCE-91503-3
     cce@sle15: CCE-91194-1
 

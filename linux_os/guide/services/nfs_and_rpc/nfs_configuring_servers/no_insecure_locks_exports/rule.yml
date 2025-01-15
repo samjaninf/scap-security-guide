@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Ensure Insecure File Locking is Not Allowed'
 
@@ -21,9 +20,6 @@ rationale: |-
     viewed or edited by an unauthorized user.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80243-9
 
 references:
     disa: CCI-000764

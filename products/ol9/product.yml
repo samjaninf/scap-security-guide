@@ -17,6 +17,8 @@ pkg_manager: "yum"
 
 init_system: "systemd"
 
+dconf_gdm_dir: "local.d"
+
 faillock_path: "/var/log/faillock"
 
 pkg_release: "629e59ec"
@@ -40,7 +42,7 @@ cpes:
   - ol9:
       name: "cpe:/o:oracle:linux:9"
       title: "Oracle Linux 9"
-      check_id: installed_OS_is_ol9_family
+      check_id: installed_OS_is_ol9
 
 # Mapping of CPE platform to package
 platform_package_overrides:
@@ -48,3 +50,4 @@ platform_package_overrides:
 
 reference_uris:
   cis: ''
+  ccn: 'https://www.ccn-cert.cni.es/es/guias-de-acceso-publico-ccn-stic/6669-ccn-stic-620-guia-de-aplicaciones-de-perfilado-de-seguridad-para-oracle-linux/file.html'

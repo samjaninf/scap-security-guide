@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4
 
 title: 'Configure the Firewalld Ports'
 
@@ -33,13 +32,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80447-6
     cce@rhel8: CCE-84300-3
     cce@rhel9: CCE-86041-1
+    cce@rhel10: CCE-87091-5
 
 references:
     cis-csc: 11,12,14,15,3,8,9
-    cis@rhel9: 3.4.2.5
     cobit5: APO13.01,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.04,DSS05.02,DSS05.03,DSS05.05,DSS06.06
     disa: CCI-000382,CCI-002314
     isa-62443-2009: 4.3.3.5.1,4.3.3.5.2,4.3.3.5.3,4.3.3.5.4,4.3.3.5.5,4.3.3.5.6,4.3.3.5.7,4.3.3.5.8,4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9,4.3.3.7.1,4.3.3.7.2,4.3.3.7.3,4.3.3.7.4,4.3.4.3.2,4.3.4.3.3
@@ -51,7 +49,6 @@ references:
     srg: SRG-OS-000096-GPOS-00050,SRG-OS-000297-GPOS-00115
     stigid@ol7: OL07-00-040100
     stigid@ol8: OL08-00-040030
-    stigid@rhel7: RHEL-07-040100
     stigid@rhel8: RHEL-08-040030
 
 ocil_clause: 'there are additional ports, protocols, or services that are not in the PPSM CLSA, or there are ports, protocols, or services that are prohibited by the PPSM Category Assurance List (CAL), or there are no firewall rules configured'

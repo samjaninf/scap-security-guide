@@ -1,10 +1,10 @@
 utils package
 =============
 
-utils.add\_platform\_rule module
+utils.add\_kubernetes\_rule module
 --------------------------------
 
-.. automodule:: utils.add_platform_rule
+.. automodule:: utils.add_kubernetes_rule
    :members:
    :undoc-members:
    :show-inheritance:
@@ -85,14 +85,6 @@ utils.mod\_fixes module
 -----------------------
 
 .. automodule:: utils.mod_fixes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-utils.mod\_prodtype module
---------------------------
-
-.. automodule:: utils.mod_prodtype
    :members:
    :undoc-members:
    :show-inheritance:

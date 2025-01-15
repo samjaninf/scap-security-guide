@@ -1,17 +1,9 @@
 # platform = multi_platform_all
 
-service_file="/usr/lib/systemd/system/rescue.service"
-
-{{% if product in ["fedora", "ol8", "ol9", "rhel8", "rhel9", "sle12", "sle15"] -%}}
-sulogin="/usr/lib/systemd/systemd-sulogin-shell rescue"
-{{%- elif product in ["rhel7"] -%}}
-sulogin='/bin/sh -c "/usr/sbin/sulogin; /usr/bin/systemctl --fail --no-block default"'
+{{% if product in ["fedora", "ol8", "ol9", "sle12", "sle15", "slmicro5"] or 'rhel' in product -%}}
+{{% set sulogin="-/usr/lib/systemd/systemd-sulogin-shell rescue" %}}
 {{%- else -%}}
-sulogin='/bin/sh -c "/sbin/sulogin; /usr/bin/systemctl --fail --no-block default"'
+{{% set sulogin='-/bin/sh -c "/sbin/sulogin; /usr/bin/systemctl --fail --no-block default"'  %}}
 {{%- endif %}}
 
-if grep "^ExecStart=.*" "$service_file" ; then
-    sed -i "s%^ExecStart=.*%ExecStart=-$sulogin%" "$service_file"
-else
-    echo "ExecStart=-$sulogin" >> "$service_file"
-fi
+{{{ bash_ensure_ini_config("/etc/systemd/system/rescue.service.d/10-oscap.conf", "Service", "ExecStart", sulogin) }}}

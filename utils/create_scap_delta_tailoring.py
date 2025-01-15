@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import time
 import json
 import os
 import re
@@ -12,7 +13,6 @@ import ssg.build_yaml
 import ssg.constants
 import ssg.rules
 import ssg.yaml
-import ssg.build_yaml
 import ssg.environment
 
 SSG_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -38,6 +38,7 @@ def get_profile(product, profile_name):
     for profile in profiles:
         if profile.attrib['id'] == profile_name_fqdn:
             return profile
+    raise ValueError("Profile %s was not found." % profile_name_fqdn)
 
 
 get_profile.__annotations__ = {'product': str, 'profile_name': str, 'return': ET.Element}
@@ -102,6 +103,20 @@ get_platform_rules.__annotations__ = {'product': str, 'json_path': str, 'resolve
                                       'build_root': str, 'return': list}
 
 
+def _open_rule_obj(resolved_rules_dir, rule, product, env_yaml):
+    if resolved_rules_dir:
+        return rule
+    try:
+        rule_obj = handle_rule_yaml(
+            product, rule['id'], rule['dir'], rule['guide'], env_yaml)
+    except ssg.yaml.DocumentationNotComplete:
+        msg = 'Rule %s throw DocumentationNotComplete' % rule['id']
+        sys.stderr.write(msg)
+        # Happens on non-debug build when a rule is "documentation-incomplete"
+        return None
+    return rule_obj
+
+
 def get_implemented_stigs(product, root_path, build_config_yaml_path,
                           reference_str, json_path, resolved_rules_dir,
                           build_root):
@@ -114,19 +129,13 @@ def get_implemented_stigs(product, root_path, build_config_yaml_path,
 
     known_rules = dict()
     for rule in platform_rules:
-        if resolved_rules_dir:
-            rule_obj = rule
-        else:
-            try:
-                rule_obj = handle_rule_yaml(product, rule['id'],
-                                            rule['dir'], rule['guide'], env_yaml)
-            except ssg.yaml.DocumentationNotComplete:
-                sys.stderr.write('Rule %s throw DocumentationNotComplete' % rule['id'])
-                # Happens on non-debug build when a rule is "documentation-incomplete"
-                continue
-
-        if reference_str in rule_obj['references'].keys():
-            ref = rule_obj['references'][reference_str]
+        rule_obj = _open_rule_obj(resolved_rules_dir, rule, product, env_yaml)
+        if not rule_obj:
+            continue
+        if reference_str not in rule_obj['references'].keys():
+            continue
+        refs = rule_obj['references'][reference_str]
+        for ref in refs:
             if ref in known_rules:
                 known_rules[ref].append(rule['id'])
             else:
@@ -156,20 +165,26 @@ def setup_tailoring_profile(profile_id, profile_root):
 setup_tailoring_profile.__annotations__ = {'profile_id': str, 'profile_root': ET.Element}
 
 
+def _get_datetime():
+    return datetime.datetime.fromtimestamp(
+        int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))).isoformat()
+
+
 def create_tailoring(args):
     benchmark_root = ET.parse(args.manual).getroot()
     known_rules = get_implemented_stigs(args.product, args.root, args.build_config_yaml,
                                         args.reference, args.json, args.resolved_rules_dir,
                                         args.build_root)
     needed_rules = filter_out_implemented_rules(known_rules, NS, benchmark_root)
+    needed_rule_names_set = set(rulename for ruleset in needed_rules.values() for rulename in ruleset)
     profile_root = get_profile(args.product, args.profile)
     selections = profile_root.findall('xccdf-1.2:select', NS)
     tailoring_profile = setup_tailoring_profile(args.profile_id, profile_root)
     for selection in selections:
         if selection.attrib['idref'].startswith(ssg.constants.OSCAP_RULE):
             cac_rule_id = selection.attrib['idref'].replace(ssg.constants.OSCAP_RULE, '')
-            desired_value = str([cac_rule_id] in list(needed_rules.values())).lower()
-            if not selection.get('selected') == desired_value:
+            desired_value = str(cac_rule_id in needed_rule_names_set).lower()
+            if selection.get('selected') != desired_value:
                 selection.set('selected', desired_value)
                 tailoring_profile.append(selection)
                 if not args.quiet:
@@ -178,7 +193,7 @@ def create_tailoring(args):
 
     tailoring_root = ET.Element('xccdf-1.2:Tailoring')
     version = ET.SubElement(tailoring_root, 'xccdf-1.2:version',
-                            attrib={'time': datetime.datetime.utcnow().isoformat()})
+                            attrib={'time': _get_datetime()})
     version.text = '1'
     tailoring_root.set('id', args.tailoring_id)
     tailoring_root.append(tailoring_profile)

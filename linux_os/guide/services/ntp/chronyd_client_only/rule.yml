@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhcos4,rhel8,rhel9
 
 title: 'Disable chrony daemon from acting as server'
 
@@ -16,15 +15,16 @@ rationale: |-
 
 severity: low
 
-platform: machine  # The check uses service_... extended definition, which doesn't support offline mode
+platform: package[chrony]
 
 identifiers:
     cce@rhcos4: CCE-82465-6
     cce@rhel8: CCE-82988-7
     cce@rhel9: CCE-87543-5
+    cce@rhel10: CCE-89002-0
 
 references:
-    disa: CCI-000381
+    disa: CCI-000382,CCI-000381
     nist: AU-8(1),AU-12(1)
     ospp: FMT_SMF_EXT.1
     srg: SRG-OS-000096-GPOS-00050,SRG-OS-000095-GPOS-00049

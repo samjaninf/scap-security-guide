@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Ensure only owner and members of group owner of /usr/bin/sudo can execute it'
 
@@ -14,11 +13,8 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83571-0
     cce@rhel8: CCE-83574-4
 
-references:
-  anssi: BP28(R57)
 
 ocil_clause: '{{{ ocil_clause_file_permissions(file="/usr/bin/sudo", perms="---s--x---") }}}'
 

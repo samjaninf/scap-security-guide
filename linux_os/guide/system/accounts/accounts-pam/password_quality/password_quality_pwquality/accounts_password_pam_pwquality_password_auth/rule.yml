@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhel7,rhel8,rhel9,rhv4
 
 title: 'Ensure PAM password complexity module is enabled in password-auth'
 
@@ -17,12 +16,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-85876-1
     cce@rhel8: CCE-85877-9
     cce@rhel9: CCE-85878-7
+    cce@rhel10: CCE-89505-2
 
 references:
-    disa: CCI-000366
+    disa: CCI-004066
     srg: SRG-OS-000069-GPOS-00037,SRG-OS-000070-GPOS-00038,SRG-OS-000480-GPOS-00227
     stigid@ol8: OL08-00-020100
     stigid@rhel8: RHEL-08-020100

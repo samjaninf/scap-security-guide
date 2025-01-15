@@ -2,10 +2,16 @@ if(ENABLE_PYTHON_COVERAGE)
     set(PYTEST_COVERAGE_OPTIONS --cov-append --cov-report=xml --cov "${CMAKE_SOURCE_DIR}/ssg")
 endif()
 
-macro(ssg_python_unit_tests PYTHON_COMPONENT_ID RELATIVE_PYTHONPATH)
+macro(ssg_python_unit_tests PYTHON_COMPONENT_ID RELATIVE_PYTHONPATH IGNORE_SUBDIR)
+    if(NOT "${IGNORE_SUBDIR}" STREQUAL "")
+        set(IGNORE "${CMAKE_SOURCE_DIR}/tests/unit/${PYTHON_COMPONENT_ID}/${IGNORE_SUBDIR}")
+        set(TEST_COMMAND "${PYTHON_EXECUTABLE}" -m pytest "--ignore=${IGNORE}" ${PYTEST_COVERAGE_OPTIONS} "${CMAKE_SOURCE_DIR}/tests/unit/${PYTHON_COMPONENT_ID}")
+    else()
+        set(TEST_COMMAND "${PYTHON_EXECUTABLE}" -m pytest ${PYTEST_COVERAGE_OPTIONS} "${CMAKE_SOURCE_DIR}/tests/unit/${PYTHON_COMPONENT_ID}")
+    endif()
     add_test(
         NAME "python-unit-${PYTHON_COMPONENT_ID}"
-        COMMAND "${PYTHON_EXECUTABLE}" -m pytest ${PYTEST_COVERAGE_OPTIONS} "${CMAKE_SOURCE_DIR}/tests/unit/${PYTHON_COMPONENT_ID}"
+        COMMAND ${TEST_COMMAND}
     )
     set_tests_properties("python-unit-${PYTHON_COMPONENT_ID}" PROPERTIES ENVIRONMENT
         "PYTHONPATH=${CMAKE_SOURCE_DIR}/${RELATIVE_PYTHONPATH}:$ENV{PYTHONPATH}"
@@ -14,10 +20,12 @@ macro(ssg_python_unit_tests PYTHON_COMPONENT_ID RELATIVE_PYTHONPATH)
 endmacro()
 
 if(PY_PYTEST)
-    ssg_python_unit_tests("build-scripts" "build-scripts")
-    ssg_python_unit_tests("utils" "utils")
-    ssg_python_unit_tests("ssg-module" ".")
-    ssg_python_unit_tests("ssg_test_suite" "tests")
+    ssg_python_unit_tests("utils" "utils" "oscal/")
+    ssg_python_unit_tests("ssg-module" "." "")
+    ssg_python_unit_tests("ssg_test_suite" "tests" "")
+    if(PYTHON_VERSION_MAJOR GREATER 2 AND PYTHON_VERSION_MINOR GREATER 7 AND PY_TRESTLE AND PY_LXML)
+        ssg_python_unit_tests("utils/oscal" "utils/oscal" "")
+    endif()
 endif()
 
 add_test(
@@ -84,19 +92,26 @@ set_tests_properties("fix_rules" PROPERTIES LABELS quick)
 set_tests_properties("fix_rules" PROPERTIES DEPENDS "test-rule-dir-json")
 set_tests_properties("fix_rules" PROPERTIES FIXTURES_REQUIRED "rule-dir-json")
 
-macro(mypy_test SCRIPT)
+macro(mypy_test SCRIPT FOLLOW_IMPORTS)
     if(PY_MYPY)
         add_test(
             NAME "test-mypy-${SCRIPT}"
-            COMMAND env "${PYTHON_EXECUTABLE}" -m mypy "${CMAKE_SOURCE_DIR}/${SCRIPT}"
+            COMMAND env "${PYTHON_EXECUTABLE}" -m mypy "${CMAKE_SOURCE_DIR}/${SCRIPT}" "--follow-imports=${FOLLOW_IMPORTS}"
         )
         set_tests_properties("test-mypy-${SCRIPT}" PROPERTIES LABELS quick)
         set_tests_properties("test-mypy-${SCRIPT}" PROPERTIES LABELS mypy)
     endif()
 endmacro()
 
-mypy_test("utils/import_srg_spreadsheet.py")
-mypy_test("utils/check_eof.py")
+mypy_test("utils/import_srg_spreadsheet.py" "skip")
+mypy_test("utils/check_eof.py" "normal")
+mypy_test("utils/import_disa_stig.py" "skip")
+mypy_test("tests/cces-removed.py" "normal")
+mypy_test("utils/build_control_from_reference.py" "skip")
+
+if(PYTHON_VERSION_MAJOR GREATER 2 AND PYTHON_VERSION_MINOR GREATER 7 AND PY_TRESTLE AND PY_LXML)
+    mypy_test("utils/oscal/" "skip")
+endif()
 
 if(PYTHON_VERSION_MAJOR GREATER 2 AND PY_OPENPYXL AND PY_PANDAS AND SSG_PRODUCT_RHEL9)
     add_test(
@@ -203,43 +218,48 @@ if(PYTHON_VERSION_MAJOR GREATER 2 AND PYTHON_VERSION_MINOR GREATER 6)
     if(PY_PROMETHEUS_CLIENT)
         add_test(
             NAME "test-controleval-prometheus-metrics"
-            COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/controleval_metrics.py" "--controls-dir" "${CMAKE_SOURCE_DIR}/tests/unit/ssg-module/data/controls_dir" "prometheus" "--products" "fedora" "ol9" "rhel7" "rhel8" "rhel9" "sle15"
+            COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/controleval_metrics.py" "--controls-dir" "${CMAKE_SOURCE_DIR}/tests/unit/ssg-module/data/controls_dir" "prometheus" "--products" "fedora" "ol9" "rhel8" "rhel9" "rhel10" "sle15"
         )
         set_tests_properties("test-controleval-prometheus-metrics" PROPERTIES LABELS quick)
     endif()
 endif()
 
 macro(ssg_refcheck_test PRODUCT PROFILE KEY)
-    add_test(
+    # If you pass comma separated list as the fourth argument those rules will be excluded from the check.
+    set(extra_args ${ARGN})
+    list(LENGTH extra_args extra_args_length)
+    if(${extra_args_length} EQUAL 1)
+        list(GET extra_args 0 excludes)
+        add_test(
+            NAME "refchecker-${PRODUCT}-${PROFILE}"
+            COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/refchecker.py" --json "${CMAKE_SOURCE_DIR}/build/rule_dirs.json" --build-config-yaml "${CMAKE_BINARY_DIR}/build_config.yml" "--exclude" "${excludes}" "${PRODUCT}" "${PROFILE}" "${KEY}"
+        )
+    else()
+        add_test(
         NAME "refchecker-${PRODUCT}-${PROFILE}"
         COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/refchecker.py" --json "${CMAKE_SOURCE_DIR}/build/rule_dirs.json" --build-config-yaml "${CMAKE_BINARY_DIR}/build_config.yml" "${PRODUCT}" "${PROFILE}" "${KEY}"
-    )
+        )
+    endif()
     set_tests_properties("refchecker-${PRODUCT}-${PROFILE}" PROPERTIES FIXTURES_REQUIRED "rule-dir-json")
     set_tests_properties("refchecker-${PRODUCT}-${PROFILE}" PROPERTIES DEPENDS "test-rule-dir-json")
     set_tests_properties("refchecker-${PRODUCT}-${PROFILE}" PROPERTIES LABELS quick)
 endmacro()
 
+macro(stig_srg_mapping_test PRODUCT)
+    add_test(
+        NAME "stig-srg-mapping-${PRODUCT}"
+        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/stig_srg_mapping.py" --prefix "SRG-OS" --build-root "${CMAKE_BINARY_DIR}" --root "${CMAKE_SOURCE_DIR}" ${PRODUCT}
+    )
+    set_tests_properties("stig-srg-mapping-${PRODUCT}" PROPERTIES LABELS quick)
+endmacro()
+
+
 if(PYTHON_VERSION_MAJOR GREATER 2 AND SSG_PRODUCT_RHEL9)
-    ssg_refcheck_test("rhel9" "cis_workstation_l1" "cis")
-    ssg_refcheck_test("rhel9" "cis_workstation_l2" "cis")
-    ssg_refcheck_test("rhel9" "cis_server_l1" "cis")
-    ssg_refcheck_test("rhel9" "cis" "cis")
-    ssg_refcheck_test("rhel9" "ccn_basic" "ccn")
-    ssg_refcheck_test("rhel9" "ccn_advanced" "ccn")
+    stig_srg_mapping_test("rhel9")
 endif()
 
 if(PYTHON_VERSION_MAJOR GREATER 2 AND SSG_PRODUCT_RHEL8)
-    ssg_refcheck_test("rhel8" "cis_workstation_l1" "cis")
-    ssg_refcheck_test("rhel8" "cis_workstation_l2" "cis")
-    ssg_refcheck_test("rhel8" "cis_server_l1" "cis")
-    ssg_refcheck_test("rhel8" "cis" "cis")
-endif()
-
-if(PYTHON_VERSION_MAJOR GREATER 2 AND SSG_PRODUCT_RHEL7)
-    ssg_refcheck_test("rhel7" "cis_workstation_l1" "cis")
-    ssg_refcheck_test("rhel7" "cis_workstation_l2" "cis")
-    ssg_refcheck_test("rhel7" "cis_server_l1" "cis")
-    ssg_refcheck_test("rhel7" "cis" "cis")
+    stig_srg_mapping_test("rhel8")
 endif()
 
 macro(ssg_controlrefcheck_test PRODUCT CONTROL KEY)
@@ -254,21 +274,19 @@ macro(ssg_controlrefcheck_test PRODUCT CONTROL KEY)
     endif()
 endmacro()
 
-if(SSG_PRODUCT_RHEL7)
-    ssg_controlrefcheck_test("rhel7" "cis_rhel7" "cis")
-endif()
 if(SSG_PRODUCT_RHEL8)
     ssg_controlrefcheck_test("rhel8" "cis_rhel8" "cis")
 endif()
 if(SSG_PRODUCT_RHEL9)
     ssg_controlrefcheck_test("rhel9" "cis_rhel9" "cis")
+    ssg_controlrefcheck_test("rhel9" "stig_rhel9" "stigid")
 endif()
 
 
 if(PYTHON_VERSION_MAJOR GREATER 2)
     add_test(
         NAME "test-check-eof"
-        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/check_eof.py" "${CMAKE_SOURCE_DIR}/ssg" "${CMAKE_SOURCE_DIR}/linux_os" "${CMAKE_SOURCE_DIR}/utils" "${CMAKE_SOURCE_DIR}/tests" "${CMAKE_SOURCE_DIR}/products" "${CMAKE_SOURCE_DIR}/shared" "${CMAKE_SOURCE_DIR}/docs" "${CMAKE_SOURCE_DIR}/apple_os" "${CMAKE_SOURCE_DIR}/applications" "${CMAKE_SOURCE_DIR}/build-scripts" "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_SOURCE_DIR}/Dockerfiles" "${CMAKE_SOURCE_DIR}/tests" "${CMAKE_SOURCE_DIR}/controls"
+        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/check_eof.py" "${CMAKE_SOURCE_DIR}/ssg" "${CMAKE_SOURCE_DIR}/linux_os" "${CMAKE_SOURCE_DIR}/utils" "${CMAKE_SOURCE_DIR}/tests" "${CMAKE_SOURCE_DIR}/products" "${CMAKE_SOURCE_DIR}/shared" "${CMAKE_SOURCE_DIR}/docs" "${CMAKE_SOURCE_DIR}/apple_os" "${CMAKE_SOURCE_DIR}/applications" "${CMAKE_SOURCE_DIR}/build-scripts" "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_SOURCE_DIR}/Dockerfiles" "${CMAKE_SOURCE_DIR}/tests" "${CMAKE_SOURCE_DIR}/controls" "${CMAKE_SOURCE_DIR}/.github"
     )
 endif()
 
@@ -288,15 +306,74 @@ if(PYTHON_VERSION_MAJOR GREATER 2)
     set_tests_properties("install-vm" PROPERTIES LABELS quick)
 endif()
 
-if(SSG_PRODUCT_RHEL9)
 add_test(
     NAME "automatus-sanity"
     COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tests/automatus.py" "--help"
 )
 set_tests_properties("automatus-sanity" PROPERTIES LABELS quick)
 
+
+if(SSG_PRODUCT_RHEL9)
 add_test(
     NAME "components"
     COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_components.py" --build-dir "${CMAKE_BINARY_DIR}" --source-dir "${CMAKE_SOURCE_DIR}" --product "rhel9"
 )
+set_tests_properties("components" PROPERTIES LABELS quick)
+endif()
+
+macro(cce_avail_check TEST_NAME_SUFFIX PRODUCTS CCE_LIST_PATH)
+    if(PYTHON_VERSION_MAJOR GREATER 2)
+        add_test(
+            NAME "cce_avail_check-${TEST_NAME_SUFFIX}"
+            COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/cces-removed.py" --root  "${CMAKE_SOURCE_DIR}" --json "${CMAKE_SOURCE_DIR}/build/rule_dirs.json" --products "${PRODUCTS}" --cce-list "${CCE_LIST_PATH}"
+        )
+        set_tests_properties("cce_avail_check-${TEST_NAME_SUFFIX}" PROPERTIES FIXTURES_REQUIRED "rule-dir-json")
+        set_tests_properties("cce_avail_check-${TEST_NAME_SUFFIX}" PROPERTIES DEPENDS "test-rule-dir-json")
+        set_tests_properties("cce_avail_check-${TEST_NAME_SUFFIX}" PROPERTIES LABELS quick)
+    endif()
+endmacro()
+
+cce_avail_check("redhat-all" "ocp4,rhel8,rhel9,rhel10" "${CMAKE_SOURCE_DIR}/shared/references/cce-redhat-avail.txt")
+cce_avail_check("sle12" "sle12" "${CMAKE_SOURCE_DIR}/shared/references/cce-sle12-avail.txt")
+cce_avail_check("sle15" "sle15" "${CMAKE_SOURCE_DIR}/shared/references/cce-sle15-avail.txt")
+
+if(PYTHON_VERSION_MAJOR GREATER 2 AND PYTHON_VERSION_MINOR GREATER 6)
+    add_test(
+        NAME "utils-import_disa_stig_sanity"
+        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/import_disa_stig.py" "--help"
+        set_tests_properties("utils-import_disa_stig_sanity" PROPERTIES LABELS quick)
+    )
+endif()
+
+
+if(PYTHON_VERSION_MAJOR GREATER 2 AND PY_GITHUB)
+    add_test(
+        NAME "utils-ansible-playbook-to-role-help"
+        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/ansible_playbook_to_role.py" "--help"
+    )
+    set_tests_properties("utils-ansible-playbook-to-role-help" PROPERTIES LABELS quick)
+    if(SSG_PRODUCT_RHEL9)
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/roles")
+        add_test(
+            NAME "utils-ansible-playbook-to-role-rhel9"
+            COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/ansible_playbook_to_role.py" "--dry-run" "${CMAKE_BINARY_DIR}/roles" "--product" "rhel9" "--build-playbooks-dir" "${CMAKE_BINARY_DIR}/ansible"
+        )
+    endif()
+endif()
+
+if(PYTHON_VERSION_MAJOR GREATER 2 AND PYTHON_VERSION_MINOR GREATER 6)
+    add_test(
+        NAME "utils-build_control_from_reference_sanity"
+        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/utils/build_control_from_reference.py" "--product" "rhel10" "--reference" "ospp" "--root" "${CMAKE_SOURCE_DIR}" "--output" "${CMAKE_SOURCE_DIR}/build/rhel10_ospp_control.yml" "--json" "${CMAKE_SOURCE_DIR}/build/rule_dirs.json"
+    )
+    set_tests_properties("utils-build_control_from_reference_sanity" PROPERTIES FIXTURES_REQUIRED "rule-dir-json")
+    set_tests_properties("utils-build_control_from_reference_sanity" PROPERTIES DEPENDS "test-rule-dir-json")
+endif()
+
+if(PYTHON_VERSION_MAJOR GREATER 2 AND PYTHON_VERSION_MINOR GREATER 9)
+    add_test(
+        NAME "validate_automatus_metadata"
+        COMMAND env "PYTHONPATH=$ENV{PYTHONPATH}" "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/validate_automatus_metadata.py" "--root" "${CMAKE_SOURCE_DIR}"
+    )
+mypy_test("tests/validate_automatus_metadata.py" "normal")
 endif()

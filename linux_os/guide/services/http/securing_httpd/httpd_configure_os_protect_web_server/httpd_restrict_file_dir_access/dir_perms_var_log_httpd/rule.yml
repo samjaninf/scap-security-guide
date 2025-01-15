@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Set Permissions on the /var/log/httpd/ Directory'
 
@@ -20,9 +19,6 @@ rationale: |-
     these files.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80322-1
 
 references:
     cis-csc: 11,14,3,9

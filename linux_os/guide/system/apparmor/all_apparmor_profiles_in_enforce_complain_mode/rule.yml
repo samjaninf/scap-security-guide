@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: sle12,sle15,ubuntu2004,ubuntu2204
 
 title:  'All AppArmor Profiles are in enforce or complain mode'
 
@@ -37,3 +36,5 @@ references:
     cis@sle15: 1.7.1.3
     cis@ubuntu2004: 1.7.1.3
     cis@ubuntu2204: 1.6.1.3
+
+platform: machine and package[apparmor]

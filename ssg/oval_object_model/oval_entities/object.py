@@ -24,8 +24,15 @@ def load_object(oval_object_xml_el):
 
 
 class ObjectOVAL(OVALEntity):
-    def __init__(self, tag, id_, properties):
-        super(ObjectOVAL, self).__init__(tag, id_, properties)
 
     def get_xml_element(self):
         return super(ObjectOVAL, self).get_xml_element()
+
+    def get_variable_references(self):
+        return self._get_references("var_ref")
+
+    def get_state_references(self):
+        return self._get_references("filter")
+
+    def get_object_references(self):
+        return self._get_references("object_reference")

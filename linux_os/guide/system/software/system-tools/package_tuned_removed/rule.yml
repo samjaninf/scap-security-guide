@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9
 
 title: 'Uninstall tuned Package'
 
@@ -16,12 +15,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82905-1
     cce@rhel8: CCE-82904-4
     cce@rhel9: CCE-83521-5
+    cce@rhel10: CCE-87654-0
 
 references:
-    disa: CCI-000366
+    disa: CCI-000366,CCI-000381
     srg: SRG-OS-000095-GPOS-00049,SRG-OS-000480-GPOS-00227
     stigid@ol8: OL08-00-040390
     stigid@rhel8: RHEL-08-040390

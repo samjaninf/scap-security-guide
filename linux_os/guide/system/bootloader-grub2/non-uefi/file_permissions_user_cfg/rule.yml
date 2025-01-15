@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Verify {{{ grub2_boot_path }}}/user.cfg Permissions'
 
@@ -15,16 +14,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86023-9
     cce@rhel8: CCE-86024-7
     cce@rhel9: CCE-86025-4
+    cce@rhel10: CCE-90099-3
 
 references:
-    ccn@rhel9: A.6.SEC-RHEL2
     cis-csc: 12,13,14,15,16,18,3,5
-    cis@rhel7: 1.4.2
-    cis@rhel8: 1.4.2
-    cis@rhel9: 1.4.2
     cobit5: APO01.06,DSS05.04,DSS05.07,DSS06.02
     cui: 3.4.5
     disa: CCI-000225
@@ -40,7 +35,7 @@ ocil_clause: '{{{ ocil_clause_file_permissions(file=grub2_boot_path ~ "/user.cfg
 ocil: |-
     {{{ ocil_file_permissions(file=grub2_boot_path ~ "/user.cfg", perms="-rw-------") }}}
 
-platform: machine
+platform: not bootc
 
 template:
     name: file_permissions

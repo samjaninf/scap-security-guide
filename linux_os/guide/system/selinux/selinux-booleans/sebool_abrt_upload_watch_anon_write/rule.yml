@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhv4
 
 title: 'Disable the abrt_upload_watch_anon_write SELinux Boolean'
 
@@ -13,9 +12,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80421-1
 
 references:
     cui: 3.7.2

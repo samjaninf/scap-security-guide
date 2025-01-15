@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Configure Logging'
 
@@ -17,9 +16,6 @@ rationale: |-
     outlined in the Logging and Auditing section
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80336-1
 
 references:
     cis-csc: 1,12,13,14,15,16,2,3,5,6,7,8,9

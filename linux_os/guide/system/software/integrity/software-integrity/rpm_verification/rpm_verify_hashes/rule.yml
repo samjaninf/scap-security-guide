@@ -1,28 +1,26 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15,uos20
 
 title: 'Verify File Hashes with RPM'
 
 description: |-
-    Without cryptographic integrity protections, system
-    executables and files can be altered by unauthorized users without
-    detection.
-    The RPM package management system can check the hashes of
-    installed software packages, including many that are important to system
-    security.
-    To verify that the cryptographic hash of system files and commands matches vendor
-    values, run the following command to list which files on the system
-    have hashes that differ from what is expected by the RPM database:
+    Without cryptographic integrity protections, system executables and files can be altered by
+    unauthorized users without detection. The RPM package management system can check the hashes
+    of installed software packages, including many that are important to system security.
+
+    To verify that the cryptographic hash of system files and commands matches vendor values, run
+    the following command to list which files on the system have hashes that differ from what is
+    expected by the RPM database:
     <pre>$ rpm -Va --noconfig | grep '^..5'</pre>
-    A "c" in the second column indicates that a file is a configuration file, which
-    may appropriately be expected to change. If the file was not expected to
-    change, investigate the cause of the change using audit logs or other means.
-    The package can then be reinstalled to restore the file.
-    Run the following command to determine which package owns the file:
+
+    If the file was not expected to change, investigate the cause of the change using audit logs
+    or other means. The package can then be reinstalled to restore the file. Run the following
+    command to determine which package owns the file:
     <pre>$ rpm -qf <i>FILENAME</i></pre>
+
     The package can be reinstalled from a {{{ pkg_manager }}} repository using the command:
     <pre>$ sudo {{{ pkg_manager }}} reinstall <i>PACKAGENAME</i></pre>
+
     Alternatively, the package can be reinstalled from trusted media using the command:
     <pre>$ sudo rpm -Uvh <i>PACKAGENAME</i></pre>
 
@@ -34,16 +32,14 @@ rationale: |-
 severity: high
 
 identifiers:
-    cce@rhel7: CCE-27157-7
     cce@rhel8: CCE-80857-6
     cce@rhel9: CCE-90841-8
+    cce@rhel10: CCE-89944-3
     cce@sle12: CCE-91632-0
     cce@sle15: CCE-85788-8
 
 references:
     cis-csc: 11,2,3,9
-    cis@rhel7: 6.1.1
-    cis@rhel8: 6.1.1
     cjis: 5.10.4.1
     cobit5: APO01.06,BAI03.05,BAI06.01,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS06.02
     cui: 3.3.8,3.4.1
@@ -55,17 +51,15 @@ references:
     nist: CM-6(d),CM-6(c),SI-7,SI-7(1),SI-7(6),AU-9(3)
     nist-csf: PR.DS-6,PR.DS-8,PR.IP-1
     pcidss: Req-11.5
-    pcidss4: "11.5.2"
     srg: SRG-OS-000480-GPOS-00227
     stigid@ol7: OL07-00-010020
-    stigid@rhel7: RHEL-07-010020
 
 ocil_clause: 'there is output'
 
 ocil: |-
-    The following command will list which files on the system
-    have file hashes different from what is expected by the RPM database.
-    <pre>$ rpm -Va --noconfig | awk '$1 ~ /..5/ &amp;&amp; $2 != "c"'</pre>
+    The following command will list which files on the system have file hashes different from what
+    is expected by the RPM database.
+    <pre>$ rpm -Va --noconfig | awk '$1 ~ /..5/'</pre>
 
 fixtext: |-
     Run the following command to determine which package owns the file:
@@ -81,3 +75,13 @@ fixtext: |-
     $ sudo rpm -Uvh [PATH TO RPM]
 
 srg_requirement: '{{{ full_name }}} must be configured so that the cryptographic hash of system files and commands matches vendor values.'
+
+warnings:
+    - general: |-
+        This rule can take a long time to perform the check and might consume a considerable
+        amount of resources depending on the number of packages present on the system. It is not a
+        problem in most cases, but especially systems with a large number of installed packages
+        can be affected.
+        {{% if "rhel" in product %}}
+        See <code>https://access.redhat.com/articles/6999111</code>.
+        {{% endif %}}
