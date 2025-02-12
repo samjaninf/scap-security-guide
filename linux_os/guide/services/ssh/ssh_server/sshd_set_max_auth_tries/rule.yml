@@ -15,25 +15,21 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82354-2
     cce@rhel8: CCE-83500-9
     cce@rhel9: CCE-90810-3
+    cce@rhel10: CCE-90071-2
     cce@sle12: CCE-92202-1
     cce@sle15: CCE-91332-7
+    cce@slmicro5: CCE-93880-3
 
 references:
-    cis@alinux2: 5.2.7
-    cis@alinux3: 5.2.7
     cis@debian11: 9.3.5
-    cis@rhel7: 5.3.7
-    cis@rhel8: 5.2.16
-    cis@rhel9: 5.2.16
     cis@sle12: 5.2.7
     cis@sle15: 5.2.7
+    cis@slmicro5: 5.2.7
     cis@ubuntu2004: 5.2.6
     cis@ubuntu2204: 5.2.18
     ism: 0421,0422,0431,0974,1173,1401,1504,1505,1546,1557,1558,1559,1560,1561
-    pcidss4: "2.2.6"
 
 ocil_clause: 'it is commented out or not configured properly'
 
@@ -42,3 +38,12 @@ ocil: |-
     <pre>$ sudo grep MaxAuthTries /etc/ssh/sshd_config</pre>
     If properly configured, output should be:
     <pre>MaxAuthTries {{{ xccdf_value("sshd_max_auth_tries_value") }}}</pre>
+
+template:
+    name: sshd_lineinfile
+    vars:
+        parameter: MaxAuthTries
+        xccdf_variable: sshd_max_auth_tries_value
+        datatype: int
+        backends:
+            oval: "off"

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,ubuntu2204
 
 title: 'Disable GNOME3 Automount Opening'
 
@@ -28,19 +27,16 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83692-4
     cce@rhel8: CCE-83693-2
     cce@rhel9: CCE-90128-0
+    cce@rhel10: CCE-86628-5
 
 references:
-    ccn@rhel9: A.11.SEC-RHEL12
     cis-csc: 12,16
-    cis@rhel8: 1.8.5
-    cis@rhel9: 1.8.6,1.8.7
     cis@ubuntu2204: 1.8.6
     cobit5: APO13.01,DSS01.04,DSS05.03,DSS05.04,DSS05.05,DSS05.07,DSS06.03
     cui: 3.1.7
-    disa: CCI-000366,CCI-000778,CCI-001958
+    disa: CCI-000778,CCI-000366,CCI-001958
     isa-62443-2009: 4.3.3.2.2,4.3.3.5.2,4.3.3.6.6,4.3.3.7.2,4.3.3.7.4
     isa-62443-2013: 'SR 1.1,SR 1.13,SR 1.2,SR 1.4,SR 1.5,SR 1.9,SR 2.1,SR 2.6'
     iso27001-2013: A.11.2.6,A.13.1.1,A.13.2.1,A.6.2.1,A.6.2.2,A.7.1.1,A.9.2.1
@@ -48,7 +44,6 @@ references:
     nist-csf: PR.AC-3,PR.AC-6
     srg: SRG-OS-000114-GPOS-00059,SRG-OS-000378-GPOS-00163,SRG-OS-000480-GPOS-00227
     stigid@ol7: OL07-00-020111
-    stigid@rhel7: RHEL-07-020111
 
 ocil_clause: 'GNOME automounting is not disabled'
 

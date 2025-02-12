@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Limit CPU consumption of the Perf system'
 
@@ -14,18 +13,15 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83369-9
     cce@rhel8: CCE-83373-1
     cce@rhel9: CCE-83969-6
+    cce@rhel10: CCE-87824-9
     cce@sle12: CCE-91567-8
     cce@sle15: CCE-91257-6
 
-references:
-    anssi: BP28(R23)
-
 {{{ complete_ocil_entry_sysctl_option_value(sysctl="kernel.perf_cpu_time_max_percent", value="1") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

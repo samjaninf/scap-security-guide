@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Configure mountd to use static port'
 
@@ -17,5 +16,3 @@ rationale: |-
 
 severity: unknown
 
-identifiers:
-    cce@rhel7: CCE-80235-5

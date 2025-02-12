@@ -14,7 +14,7 @@ rationale: |-
     process audit logs as required. Without this notification, the security personnel may be
     unaware of an impending failure of the audit capability, and system operation may be adversely
     affected.
-    
+
     Audit processing failures include software/hardware errors, failures in the audit capturing
     mechanisms, and audit storage capacity being reached or exceeded.
 
@@ -23,6 +23,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-89063-2
     cce@rhel9: CCE-89064-0
+    cce@rhel10: CCE-89448-5
 
 references:
     disa: CCI-000139

@@ -13,3 +13,21 @@ description: |-
 
 selections:
     - anssi:all:intermediary
+    - var_password_hashing_algorithm=SHA512
+    - var_password_pam_unix_rounds=65536
+    # Following rules once had a prodtype incompatible with the ol8 product
+    - '!cracklib_accounts_password_pam_minlen'
+    - '!accounts_passwords_pam_tally2_deny_root'
+    - '!grub2_mds_argument'
+    - '!sysctl_fs_protected_fifos'
+    - '!accounts_passwords_pam_tally2'
+    - '!cracklib_accounts_password_pam_ucredit'
+    - '!cracklib_accounts_password_pam_dcredit'
+    - '!cracklib_accounts_password_pam_lcredit'
+    - '!sysctl_fs_protected_regular'
+    - '!cracklib_accounts_password_pam_ocredit'
+    - '!grub2_page_alloc_shuffle_argument'
+    - '!accounts_passwords_pam_tally2_unlock_time'
+    - '!ensure_redhat_gpgkey_installed'
+    - '!ensure_almalinux_gpgkey_installed'
+    - '!package_kea_removed'

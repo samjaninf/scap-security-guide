@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhcos4,rhel7,rhel8,rhel9
 
 title: 'Disable CAN Support'
 
@@ -18,12 +17,12 @@ severity: medium
 
 identifiers:
     cce@rhcos4: CCE-82519-0
-    cce@rhel7: CCE-82164-5
     cce@rhel8: CCE-82059-7
     cce@rhel9: CCE-84134-6
+    cce@rhel10: CCE-89282-8
 
 references:
-    disa: CCI-000381,CCI-000366
+    disa: CCI-000381
     nist: AC-18
     ospp: FMT_SMF_EXT.1
     srg: SRG-OS-000095-GPOS-00049,SRG-OS-000480-GPOS-00227

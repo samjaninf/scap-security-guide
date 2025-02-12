@@ -1,4 +1,4 @@
-# platform = multi_platform_rhel,multi_platform_fedora,multi_platform_rhv,multi_platform_ol
+# platform = multi_platform_rhel,multi_platform_fedora,multi_platform_rhv,multi_platform_ol,multi_platform_almalinux
 # reboot = false
 # strategy = restrict
 # complexity = high
@@ -19,6 +19,6 @@
   when: (files_with_incorrect_ownership.stdout_lines | length > 0)
 
 - name: "Correct file ownership with RPM"
-  command: "rpm --setugids '{{ item }}'"
+  command: "rpm --restore '{{ item }}'"
   with_items: "{{ list_of_packages.results | map(attribute='stdout_lines') | list | unique }}"
   when: (files_with_incorrect_ownership.stdout_lines | length > 0)

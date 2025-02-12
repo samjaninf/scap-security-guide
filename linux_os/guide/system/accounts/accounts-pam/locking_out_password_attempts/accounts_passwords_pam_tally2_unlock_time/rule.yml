@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: sle12,sle15
 
 title: 'Set Lockout Time for Failed Password Attempts using pam_tally2'
 
@@ -16,14 +15,16 @@ rationale: |-
 severity: medium
 
 identifiers:
+    cce@rhel10: CCE-88162-3
     cce@sle12: CCE-91598-3
     cce@sle15: CCE-91282-4
+    cce@slmicro5: CCE-94050-2
 
 references:
-    anssi: BP28(R18)
     cis-csc: 1,12,15,16
     cis@sle12: 5.3.2
-    cis@sle15: 5.3.2 
+    cis@sle15: 5.3.2
+    cis@slmicro5: 5.3.2
     cobit5: DSS05.04,DSS05.10,DSS06.10
     disa: CCI-002238,CCI-000044
     isa-62443-2009: 4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9
@@ -32,9 +33,7 @@ references:
     iso27001-2013: A.18.1.4,A.9.2.1,A.9.2.4,A.9.3.1,A.9.4.2,A.9.4.3
     nist: CM-6(a),AC-7(b),IA-5(c)
     nist-csf: PR.AC-7
-    ospp: FMT_MOF_EXT.1
     pcidss: Req-8.1.7
-    pcidss4: "8.3.4"
     srg: SRG-OS-000329-GPOS-00128,SRG-OS-000021-GPOS-00005
 
 ocil_clause: 'unlock_time is less than the expected value'

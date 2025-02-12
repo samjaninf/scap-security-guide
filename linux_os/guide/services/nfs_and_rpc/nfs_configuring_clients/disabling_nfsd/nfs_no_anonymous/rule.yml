@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Specify UID and GID for Anonymous NFS Connections'
 
@@ -20,9 +19,6 @@ rationale: |-
     to a local account which has no permissions on the system.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80236-3
 
 ocil_clause: 'anonuid or anongid are not set to a value greater than UID_MAX (for anonuid) and GID_MAX (for anongid)'
 

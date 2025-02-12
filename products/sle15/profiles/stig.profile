@@ -1,7 +1,7 @@
 documentation_complete: true
 
 metadata:
-    version: V1R4
+    version: V2R3
     SMEs:
         - abergmann
 
@@ -11,13 +11,13 @@ title: 'DISA STIG for SUSE Linux Enterprise 15'
 
 description: |-
     This profile contains configuration checks that align to the
-    DISA STIG for SUSE Linux Enterprise 15 V1R4.
+    DISA STIG for SUSE Linux Enterprise 15 V2R3.
 
 
 selections:
     - var_account_disable_post_pw_expiration=35
     - var_accounts_fail_delay=4
-    - var_accounts_tmout=15_min
+    - var_accounts_tmout=10_min
     - inactivity_timeout_value=15_minutes
     - var_password_pam_dcredit=1
     - var_password_pam_lcredit=1
@@ -59,7 +59,6 @@ selections:
     - accounts_passwords_pam_faildelay_delay
     - accounts_passwords_pam_tally2
     - var_password_pam_tally2=3
-    - accounts_password_pam_unix_remember
     - accounts_tmout
     - accounts_umask_etc_login_defs
     - accounts_user_dot_no_world_writable_programs
@@ -68,8 +67,10 @@ selections:
     - accounts_user_interactive_home_directory_exists
     - account_temp_expire_date
     - account_unique_id
+    - agent_mfetpd_running
     - aide_build_database
     - aide_check_audit_tools
+    - aide_periodic_cron_checking
     - aide_scan_notification
     - aide_verify_acls
     - aide_verify_ext_attributes
@@ -191,7 +192,6 @@ selections:
     - encrypt_partitions
     - ensure_gpgcheck_globally_activated
     - ensure_rtc_utc_configuration
-    - file_etc_security_opasswd
     - file_groupownership_home_directories
     - file_groupownership_system_commands_dirs
     - file_ownership_binary_dirs
@@ -250,6 +250,7 @@ selections:
     - service_sshd_enabled
     - set_password_hashing_algorithm_logindefs
     - set_password_hashing_algorithm_systemauth
+    - var_password_hashing_min_rounds_login_defs=100000
     - set_password_hashing_min_rounds_logindefs
     - smartcard_configure_ca
     - smartcard_configure_cert_checking

@@ -14,25 +14,22 @@ rationale: 'Unique usernames allow for accountability on the system.'
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80208-2
     cce@rhel8: CCE-80674-5
     cce@rhel9: CCE-83628-8
+    cce@rhel10: CCE-90323-7
     cce@sle12: CCE-91550-4
     cce@sle15: CCE-85845-6
+    cce@slmicro5: CCE-94045-2
 
 references:
-    cis@alinux2: 6.2.18
-    cis@rhel7: 6.2.5
-    cis@rhel8: 6.2.5
-    cis@rhel9: 6.2.6
     cis@sle12: 6.2.16
     cis@sle15: 6.2.16
+    cis@slmicro5: 6.2.16
     cis@ubuntu2004: 6.2.15
     cis@ubuntu2204: 6.2.7
     cjis: 5.5.2
     disa: CCI-000770,CCI-000804
     pcidss: Req-8.1.1
-    pcidss4: "8.2.1"
 
 ocil_clause: 'a line is returned'
 

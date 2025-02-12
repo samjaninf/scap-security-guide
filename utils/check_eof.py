@@ -8,15 +8,15 @@ import sys
 EXTENSIONS = ['adoc', 'anaconda', 'conf', 'html', 'json', 'md', 'pp', 'profile', 'py', 'rb',
               'rst', 'rules', 'sh', 'template', 'toml', 'var', 'xml', 'yaml', 'yml']
 
-EXCLUSIONS = ['/shared/references/', '/logs/', '/tests/data/utils/']
+EXCLUSIONS = ['/shared/references/', '/logs/', '/tests/data/utils/', '/tests/.mypy_cache/']
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Print and fix files that don't end "
                                                  "in a new line")
-    parser.add_argument("paths", type=str, nargs="+")
+    parser.add_argument("paths", type=str, nargs="+", help="Paths to check")
     parser.add_argument("--fix", action="store_true",
-                        help='If set the program will add a new file to end of files that are '
+                        help='If set the program will add a new line to end of files that are '
                              'missing it.')
     return parser.parse_args()
 
@@ -34,19 +34,19 @@ def get_all_files(paths: list) -> list:
         p = pathlib.Path(path)
         if not p.exists():
             sys.stderr.write(f"The path {p.absolute()} does not exist!\n")
-            exit(3)
+            continue
         files.extend(get_files(p))
     return files
 
 
-def should_skip_file(file: pathlib.Path):
+def should_skip_file(file: pathlib.Path) -> bool:
     for exclude in EXCLUSIONS:
         if exclude in str(file.absolute()):
             return True
     return False
 
 
-def is_file_readable(file: pathlib.Path, f: typing.BinaryIO) -> bool:
+def is_file_not_readable(file: pathlib.Path, f: typing.BinaryIO) -> bool:
     return not f.seekable() or file.stat().st_size < 2
 
 
@@ -56,7 +56,7 @@ def get_files_with_no_newline(files: list) -> list:
         if should_skip_file(file):
             continue
         with open(file.absolute(), 'rb') as f:
-            if is_file_readable(file, f):
+            if is_file_not_readable(file, f):
                 continue
             f.seek(-1, os.SEEK_END)
             data = f.read(1)
@@ -65,12 +65,12 @@ def get_files_with_no_newline(files: list) -> list:
     return bad_files
 
 
-def fix_file(file: pathlib.Path):
+def fix_file(file: pathlib.Path) -> None:
     with open(file.absolute(), 'a') as f:
         f.write('\n')
 
 
-def main():
+def main() -> int:
     args = parse_args()
     files = get_all_files(args.paths)
     bad_files = get_files_with_no_newline(files)
@@ -82,8 +82,9 @@ def main():
 
     print(f"{count} of {len(files)} files do not have the correct ending.")
     if count != 0:
-        exit(1)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

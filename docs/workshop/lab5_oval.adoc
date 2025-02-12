@@ -266,7 +266,7 @@ In this exercise, you are going to use a `docker` container with the Fedora imag
 . We need the RHEL 8 content to test the Fedora image.
 As we have already seen earlier, the initial build of the content including build of the guide has already been done for us.
 
-. You test the `accounts_tmout` rule included in the `ospp` profile of the RHEL 8 datastream.
+. You test the `accounts_tmout` rule included in the `ospp` profile of the RHEL 8 data stream.
 With that in mind, execute the test suite:
 +
 [subs="attributes"]
@@ -275,7 +275,7 @@ With that in mind, execute the test suite:
             --docker {container_name} \
             --datastream build/ssg-rhel8-ds.xml \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----
@@ -302,7 +302,7 @@ The alternative mode is `profile` mode, which is simpler--there are no test scen
 
 * You want to use `docker` with the `fedora_container` image as the back end, so you supply the `--docker {container_name}` arguments.
 
-* Of course you have to specify which datastream to use for testing--you use the built one, so you specify `--datastream build/ssg-rhel8-ds.xml` arguments.
+* Of course you have to specify which data stream to use for testing--you use the built one, so you specify `--datastream build/ssg-rhel8-ds.xml` arguments.
 
 * Finally, you specify what to test--a rule regular expression: `accounts_tmout` or `^accounts_tmout$`.
 
@@ -417,7 +417,7 @@ NOTE: The delimiters are different than the link:https://jinja.pocoo.org/docs[Ji
 
 So, did you do everything correctly?
 
-. Rebuild the datastream and execute the test suite again--the result should be exactly the same.
+. Rebuild the data stream and execute the test suite again--the result should be exactly the same.
 +
 TIP: You can use the `Up` arrow key to browse the command history so you do not have to retype them every time.
 +
@@ -431,7 +431,7 @@ TIP: You can use the `Up` arrow key to browse the command history so you do not 
             --docker {container_name} \
             --datastream build/ssg-rhel8-ds.xml \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----
@@ -571,7 +571,7 @@ This way, you do not have to worry about possibly introducing those link:https:/
 [... ]$ SSH_ADDITIONAL_OPTIONS="-o IdentityFile=/workspace/content/.ssh/id_rsa" tests/automatus.py rule \
             --docker {container_name} \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----
@@ -590,7 +590,7 @@ INFO - Script wrong_value.fail.sh using profile xccdf_org.ssgproject.content_pro
 
 As there are no errors, this proves that your check-remediation combination works as expected.
 
-TIP: You do not need to specify the parameter `--datastream` when there is datastream build for only one product, so our command this time is shorter.
+TIP: You do not need to specify the parameter `--datastream` when there is data stream build for only one product, so our command this time is shorter.
 
 == OVAL Development
 
@@ -654,7 +654,7 @@ fi
 [... ]$ SSH_ADDITIONAL_OPTIONS="-o IdentityFile=/workspace/content/.ssh/id_rsa" tests/automatus.py rule \
             --docker {container_name} \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----
@@ -703,7 +703,7 @@ This time, when rebuilt and executed again, the tests pass:
 [... ]$ SSH_ADDITIONAL_OPTIONS="-o IdentityFile=/workspace/content/.ssh/id_rsa" tests/automatus.py rule \
             --docker {container_name} \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----
@@ -755,7 +755,7 @@ Execute the test suite again and expect the `ERROR - Script correct_value.pass.s
 [... ]$ SSH_ADDITIONAL_OPTIONS="-o IdentityFile=/workspace/content/.ssh/id_rsa" tests/automatus.py rule \
             --docker {container_name} \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----
@@ -802,7 +802,7 @@ The non-capturing group that consists of `export` followed by at least one white
 [... ]$ SSH_ADDITIONAL_OPTIONS="-o IdentityFile=/workspace/content/.ssh/id_rsa" tests/automatus.py rule \
             --docker {container_name} \
             --remediate-using bash \
-            --remove-machine-only \
+            --make-applicable-in-containers \
             --remove-platforms \
             accounts_tmout
 ----

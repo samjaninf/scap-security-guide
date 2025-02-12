@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Backup interactive scripts on the production web server are prohibited'
 
@@ -25,8 +24,6 @@ rationale: |-
 
 severity: medium
 
-references:
-    stigid: "WG420"
 
 ocil_clause: |-
     If fileos with these extensions have no relationship with web activity,

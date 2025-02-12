@@ -21,12 +21,16 @@ rationale: |-
     and restrictive permissions are necessary to ensure execution of these programs
     cannot be co-opted.
 
+identifiers:
+    cce@slmicro5: CCE-93801-9
+
 severity: medium
 
 references:
     disa: CCI-001495
     srg: SRG-OS-000258-GPOS-00099
     stigid@ubuntu2004: UBTU-20-010423
+    stigid@ubuntu2204: UBTU-22-232010
 
 ocil_clause: 'any of these files are group-writable or world-writable'
 

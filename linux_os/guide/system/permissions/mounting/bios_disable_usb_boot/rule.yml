@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhcos4,rhel7,rhel8
 
 title: 'Disable Booting from USB Devices in Boot Firmware'
 
@@ -17,7 +16,6 @@ severity: unknown
 
 identifiers:
     cce@rhcos4: CCE-82662-8
-    cce@rhel7: CCE-26960-5
 
 references:
     cis-csc: 12,16
@@ -29,4 +27,4 @@ references:
     nist: MP-7,CM-7(b),CM-6(a)
     nist-csf: PR.AC-3,PR.AC-6
 
-platform: machine
+platform: system_with_kernel

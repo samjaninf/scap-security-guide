@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable Printer Browsing Entirely if Possible'
 
@@ -20,9 +19,6 @@ rationale: |-
     capability, the system will no longer generate or receive such broadcasts.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80283-5
 
 references:
     cis-csc: 11,14,3,9

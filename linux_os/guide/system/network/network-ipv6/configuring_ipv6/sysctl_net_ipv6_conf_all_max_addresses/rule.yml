@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15
 
 title: Configure Maximum Number of Autoconfigured Addresses on All IPv6 Interfaces
 
@@ -13,18 +12,15 @@ rationale: >-
 severity: unknown
 
 identifiers:
-    cce@rhel7: CCE-84258-3
     cce@rhel8: CCE-84259-1
     cce@rhel9: CCE-84112-2
+    cce@rhel10: CCE-88552-5
     cce@sle12: CCE-91521-5
     cce@sle15: CCE-91206-3
 
-references:
-      anssi: BP28(R22)
-
 {{{ complete_ocil_entry_sysctl_option_value(sysctl="net.ipv6.conf.all.max_addresses", value="1") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable MIME Magic'
 
@@ -15,5 +14,3 @@ rationale: |-
 
 severity: unknown
 
-identifiers:
-    cce@rhel7: CCE-80308-0

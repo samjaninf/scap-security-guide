@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle15
 
 title: 'Use Kerberos Security on All Exports'
 
@@ -18,9 +17,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-27464-7
     cce@rhel8: CCE-80924-4
     cce@rhel9: CCE-89947-6
+    cce@rhel10: CCE-90391-4
     cce@sle15: CCE-91416-8
 
 references:

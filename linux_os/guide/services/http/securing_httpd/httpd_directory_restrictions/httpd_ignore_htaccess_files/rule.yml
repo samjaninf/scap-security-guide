@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Ignore HTTPD .htaccess Files'
 
@@ -19,12 +18,6 @@ rationale: |-
     (sh, ksh, bash) are popular choices.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80554-9
-
-references:
-    stigid: WG400
 
 ocil_clause: 'it is not'
 

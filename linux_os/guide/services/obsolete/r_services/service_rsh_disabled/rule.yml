@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,ol7,ol8,rhel7,rhel8,rhv4
 
 title: 'Disable rsh Service'
 
@@ -20,13 +19,11 @@ rationale: |-
 severity: high
 
 identifiers:
-    cce@rhel7: CCE-27337-5
     cce@rhel8: CCE-82431-8
+    cce@rhel10: CCE-90186-8
 
 references:
     cis-csc: 1,11,12,14,15,16,3,5,8,9
-    cis@alinux2: 2.1.17
-    cis@rhel7: 2.2.17
     cobit5: APO13.01,BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS01.04,DSS05.02,DSS05.03,DSS05.04,DSS05.05,DSS05.07,DSS05.10,DSS06.03,DSS06.06,DSS06.10
     cui: 3.1.13,3.4.7
     disa: CCI-000068,CCI-001436
@@ -39,7 +36,7 @@ references:
 
 {{{ complete_ocil_entry_socket_and_service_disabled("rsh") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

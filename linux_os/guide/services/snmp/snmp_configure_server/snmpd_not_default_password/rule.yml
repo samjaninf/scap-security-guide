@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: debian10,debian11,fedora,ol7,ol8,rhel7,rhel8
 
 title: 'Ensure Default SNMP Password Is Not Used'
 
@@ -9,7 +8,7 @@ description: |-
     <tt>public</tt> and <tt>private</tt>.
     This profile configures new read-only community string to <tt>{{{ xccdf_value("var_snmpd_ro_string") }}}</tt> and read-write community string to <tt>{{{ sub_var_value("var_snmpd_rw_string") }}}</tt>.
     Once the default community strings have been changed, restart the SNMP service:
-    <pre>$ sudo service snmpd restart</pre>
+    <pre>$ sudo systemctl restart snmpd</pre>
 
 rationale: |-
     Whether active or not, default simple network management protocol (SNMP) community
@@ -19,9 +18,6 @@ rationale: |-
     network(s).
 
 severity: high
-
-identifiers:
-    cce@rhel7: CCE-27386-2
 
 references:
     cis-csc: 1,12,15,16,5
@@ -34,7 +30,6 @@ references:
     nist-csf: PR.AC-1,PR.AC-6,PR.AC-7
     srg: SRG-OS-000480-GPOS-00227
     stigid@ol7: OL07-00-040800
-    stigid@rhel7: RHEL-07-040800
 
 ocil_clause: 'the default SNMP passwords public and private have not been changed or removed'
 

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Do Not Use Dynamic DNS'
 
@@ -20,9 +19,6 @@ rationale: |-
     clients.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80332-0
 
 references:
     cis-csc: 11,14,3,9

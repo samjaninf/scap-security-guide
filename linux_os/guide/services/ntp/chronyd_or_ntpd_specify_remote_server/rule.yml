@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,fedora,ol7,ol8,rhcos4,rhel7,rhel8,rhv4
 
 title: 'Specify a Remote NTP Server'
 
@@ -86,16 +85,14 @@ rationale: |-
 
 severity: medium
 
-platform: machine and (package[chrony] or package[ntp])  # The check uses service_... extended definition, which doesn't support offline mode
+platform: package[chrony] or package[ntp]
 
 identifiers:
     cce@rhcos4: CCE-82683-4
-    cce@rhel7: CCE-27278-1
     cce@rhel8: CCE-80765-1
 
 references:
     cis-csc: 1,14,15,16,3,5,6
-    cis@rhel8: 2.2.1.2
     cobit5: APO11.04,BAI03.05,DSS05.04,DSS05.07,MEA02.01
     cui: 3.3.7
     disa: CCI-000160,CCI-001891

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Enable the user_exec_content SELinux Boolean'
 
@@ -12,9 +11,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-82332-8
 
 {{{ complete_ocil_entry_sebool_enabled(sebool="user_exec_content") }}}
 

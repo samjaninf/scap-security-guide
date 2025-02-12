@@ -12,6 +12,12 @@ from ssg.constants import ansible_system as ansible_rem_system
 from ssg.constants import puppet_system as puppet_rem_system
 from ssg.constants import anaconda_system as anaconda_rem_system
 from ssg.constants import ignition_system as ignition_rem_system
+from ssg.constants import oval_namespace, SCE_SYSTEM
+
+CHECK_SYSTEM_URI_TO_TYPE = {
+    oval_namespace: "oval",
+    SCE_SYSTEM: "sce",
+}
 
 SYSTEM_ATTRIBUTE = {
     'bash': bash_rem_system,
@@ -34,11 +40,16 @@ def get_all_xccdf_ids_in_datastream(datastream):
     checklists_node = root.find(".//ds:checklists", PREFIX_TO_NS)
     if checklists_node is None:
         logging.error(
-            "Checklists not found within DataStream")
+            "Checklists not found within data stream")
 
-    all_checklist_components = checklists_node.findall('ds:component-ref',
-                                                       PREFIX_TO_NS)
-    xccdf_ids = [component.get("id") for component in all_checklist_components]
+    xccdf_ids = []
+    for cref in checklists_node.findall("ds:component-ref", PREFIX_TO_NS):
+        href = cref.get('{%s}href' % PREFIX_TO_NS["xlink"])
+        comp_id = href.lstrip("#")
+        query = ".//ds:component[@id='%s']/xccdf-1.2:Benchmark" % (comp_id)
+        benchmark_node = root.find(query, PREFIX_TO_NS)
+        if benchmark_node is not None:
+            xccdf_ids.append(cref.get("id"))
     return xccdf_ids
 
 
@@ -48,7 +59,7 @@ def infer_benchmark_id_from_component_ref_id(datastream, ref_id):
                                    .format(ref_id), PREFIX_TO_NS)
     if component_ref_node is None:
         msg = (
-            'Component reference of Ref-Id {} not found within datastream'
+            'Component reference of Ref-Id {} not found within data stream'
             .format(ref_id))
         raise RuntimeError(msg)
 
@@ -101,11 +112,18 @@ def instance_in_platforms(inst, platforms):
         (hasattr(platforms, "__iter__") and inst.get("idref") in platforms)
 
 
+def make_applicable_in_containers(root):
+    remove_machine_platform(root)
+    remove_machine_remediation_condition(root)
+
+
 def remove_machine_platform(root):
     remove_platforms_from_element(root, "xccdf-1.2:Rule", "cpe:/a:machine")
     remove_platforms_from_element(root, "xccdf-1.2:Group", "cpe:/a:machine")
     remove_platforms_from_element(root, "xccdf-1.2:Rule", "#machine")
     remove_platforms_from_element(root, "xccdf-1.2:Group", "#machine")
+    remove_platforms_from_element(root, "xccdf-1.2:Rule", "#system_with_kernel")
+    remove_platforms_from_element(root, "xccdf-1.2:Group", "#system_with_kernel")
 
 
 def remove_platforms(root):
@@ -135,6 +153,7 @@ def remove_bash_machine_remediation_condition(root):
     system = "urn:xccdf:fix:script:sh"
     considered_machine_platform_checks = [
         r"\[\s+!\s+-f\s+/\.dockerenv\s+\]\s+&&\s+\[\s+!\s+-f\s+/run/\.containerenv\s+\]",
+        r"rpm\s+--quiet\s+-q\s+kernel"
     ]
     repl = "true"
     _replace_in_fix(root, system, considered_machine_platform_checks, repl)
@@ -144,6 +163,7 @@ def remove_ansible_machine_remediation_condition(root):
     system = "urn:xccdf:fix:script:ansible"
     considered_machine_platform_checks = [
         r"\bansible_virtualization_type\s+not\s+in.*docker.*",
+        r"\"kernel\"\s+in\s+ansible_facts.packages"
     ]
     repl = "True"
     _replace_in_fix(root, system, considered_machine_platform_checks, repl)
@@ -192,7 +212,7 @@ def add_platform_to_benchmark(root, cpe_regex):
     benchmarks = root.findall(benchmark_query, PREFIX_TO_NS)
     if not benchmarks:
         msg = (
-            "No benchmarks found in the datastream"
+            "No benchmarks found in the data stream"
         )
         raise RuntimeError(msg)
 
@@ -220,16 +240,13 @@ def add_platform_to_benchmark(root, cpe_regex):
             benchmark.insert(platform_index, e)
 
 
-def add_product_to_fips_certified(root, product="fedora"):
-    query = OVAL_DEF_QUERY + "/{0}".format(
-        "oval-def:definition[@id='oval:ssg-installed_OS_is_FIPS_certified:def:1']/"
-        "oval-def:criteria")
-    criteria = root.find(query, PREFIX_TO_NS)
-    if criteria:
-        e = ET.Element("oval-def:extend_definition",
-                       comment="Installed OS is {0}".format(product),
-                       definition_ref="oval:ssg-installed_OS_is_{0}:def:1".format(product))
-        criteria.append(e)
+def remove_fips_certified(root):
+    def_id = "oval:ssg-installed_OS_is_FIPS_certified:def:1"
+    parent_query = ".//oval-def:extend_definition[@definition_ref='{0}']/..".format(def_id)
+    child_query = "oval-def:extend_definition[@definition_ref='{0}']".format(def_id)
+    for parent in root.findall(parent_query, PREFIX_TO_NS):
+        for child in parent.findall(child_query, PREFIX_TO_NS):
+            parent.remove(child)
 
 
 def _get_benchmark_node(datastream, benchmark_id, logging):
@@ -239,7 +256,7 @@ def _get_benchmark_node(datastream, benchmark_id, logging):
     if benchmark_node is None:
         if logging is not None:
             logging.error(
-                "Benchmark ID '{}' not found within DataStream"
+                "Benchmark ID '{}' not found within data stream"
                 .format(benchmark_id))
     return benchmark_node
 
@@ -310,3 +327,20 @@ def find_fix_in_benchmark(datastream, benchmark_id, rule_id, fix_type='bash', lo
 
     fix = rule.find("xccdf-1.2:fix[@system='{0}']".format(system_attribute), PREFIX_TO_NS)
     return fix
+
+
+def find_checks_in_rule(datastream, benchmark_id, rule_id):
+    """
+    Return check types for given rule from benchmark.
+    """
+    checks = set()
+    rule = find_rule_in_benchmark(datastream, benchmark_id, rule_id)
+    if rule is None:
+        return checks
+    check_els = rule.findall("xccdf-1.2:check", PREFIX_TO_NS)
+    for check_el in check_els:
+        system = check_el.get("system")
+        check = CHECK_SYSTEM_URI_TO_TYPE.get(system, None)
+        if check is not None:
+            checks.add(check)
+    return checks

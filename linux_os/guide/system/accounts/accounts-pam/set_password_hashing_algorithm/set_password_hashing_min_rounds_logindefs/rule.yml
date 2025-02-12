@@ -1,17 +1,16 @@
 documentation_complete: true
 
-prodtype: ol8,ol9,rhel8,rhel9,sle12,sle15
 
 title: 'Set Password Hashing Rounds in /etc/login.defs'
 
 description: |-
     In <tt>/etc/login.defs</tt>, ensure <tt>SHA_CRYPT_MIN_ROUNDS</tt> and
-    <tt>SHA_CRYPT_MAX_ROUNDS</tt> has the minimum value of <tt>5000</tt>.
+    <tt>SHA_CRYPT_MAX_ROUNDS</tt> has the minimum value of <tt>{{{ xccdf_value("var_password_hashing_min_rounds_login_defs") }}}</tt>.
     For example:
-    <pre>SHA_CRYPT_MIN_ROUNDS 5000
-    SHA_CRYPT_MAX_ROUNDS 5000</pre>
+    <pre>SHA_CRYPT_MIN_ROUNDS {{{ xccdf_value("var_password_hashing_min_rounds_login_defs") }}}
+    SHA_CRYPT_MAX_ROUNDS {{{ xccdf_value("var_password_hashing_min_rounds_login_defs") }}}</pre>
     Notice that if neither are set, they already have the default value of 5000.
-    If either is set, they must have the minimum value of 5000.
+    If either is set, they must have the minimum value of {{{ xccdf_value("var_password_hashing_min_rounds_login_defs") }}}.
 
 rationale: |-
     Passwords need to be protected at all times, and encryption is the standard
@@ -27,12 +26,13 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-89707-4
     cce@rhel9: CCE-89708-2
+    cce@rhel10: CCE-90508-3
     cce@sle12: CCE-83171-9
     cce@sle15: CCE-85567-6
+    cce@slmicro5: CCE-93682-3
 
 references:
-    anssi: BP28(R68)
-    disa: CCI-000196,CCI-000803
+    disa: CCI-000803,CCI-004062
     nist@sle12: IA-5(1)(c),IA-5(1).1(v),IA-7,IA-7.1
     srg: SRG-OS-000073-GPOS-00041,SRG-OS-000120-GPOS-00061
     stigid@ol8: OL08-00-010130
@@ -43,9 +43,9 @@ references:
 ocil_clause: 'it does not'
 
 ocil: |-
-    Inspect <tt>/etc/login.defs</tt> and ensure that if eihter
+    Inspect <tt>/etc/login.defs</tt> and ensure that if either
     <tt>SHA_CRYPT_MIN_ROUNDS</tt> or <tt>SHA_CRYPT_MAX_ROUNDS</tt>
-    are set, they must have the minimum value of <tt>5000</tt>.
+    are set, they must have the minimum value of <tt>{{{ xccdf_value("var_password_hashing_min_rounds_login_defs") }}}</tt>.
 
 srg_requirement: '{{{ full_name }}} shadow password suite must be configured to use a sufficient number of hashing rounds.'
 
@@ -54,4 +54,4 @@ fixtext: |-
 
     Edit/modify the following line in the "/etc/login.defs" file and set "SHA_CRYPT_MIN_ROUNDS" to a value no lower than "5000":
 
-    SHA_CRYPT_MIN_ROUNDS 5000
+    SHA_CRYPT_MIN_ROUNDS {{{ xccdf_value("var_password_hashing_min_rounds_login_defs") }}}

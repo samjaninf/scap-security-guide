@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Configure the polyinstantiation_enabled SELinux Boolean'
 
@@ -14,14 +13,11 @@ rationale: ""
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82305-4
     cce@rhel8: CCE-84230-2
     cce@rhel9: CCE-84083-5
+    cce@rhel10: CCE-88652-3
     cce@sle12: CCE-91579-3
     cce@sle15: CCE-91238-6
-
-references:
-    anssi: BP28(R39)
 
 {{{ complete_ocil_entry_sebool_var(sebool="polyinstantiation_enabled") }}}
 

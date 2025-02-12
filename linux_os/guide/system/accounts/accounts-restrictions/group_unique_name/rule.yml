@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,rhel7,rhel8,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Ensure All Groups on the System Have Unique Group Names'
 
@@ -11,22 +10,18 @@ rationale: 'To assure accountability and prevent unauthenticated access, groups 
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86327-4
     cce@rhel8: CCE-86328-2
+    cce@rhel10: CCE-88449-4
     cce@sle12: CCE-92207-0
     cce@sle15: CCE-91340-0
+    cce@slmicro5: CCE-94046-0
 
 references:
-    cis@alinux2: 6.2.19
-    cis@alinux3: 6.2.15
-    cis@rhel7: 6.2.6
-    cis@rhel8: 6.2.6
-    cis@rhel9: 6.2.7
     cis@sle12: 6.2.17
     cis@sle15: 6.2.17
+    cis@slmicro5: 6.2.17
     cis@ubuntu2004: 6.2.16
     cis@ubuntu2204: 6.2.8
-    pcidss4: "8.2.1"
 
 ocil_clause: 'has duplicate group names'
 

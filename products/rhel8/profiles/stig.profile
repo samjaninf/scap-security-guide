@@ -1,7 +1,7 @@
 documentation_complete: true
 
 metadata:
-    version: V1R11
+    version: V2R2
     SMEs:
         - mab879
         - ggbecker
@@ -12,10 +12,10 @@ title: 'DISA STIG for Red Hat Enterprise Linux 8'
 
 description: |-
     This profile contains configuration checks that align to the
-    DISA STIG for Red Hat Enterprise Linux 8 V1R11.
+    DISA STIG for Red Hat Enterprise Linux 8 V2R2.
 
-    In addition to being applicable to Red Hat Enterprise Linux 8, DISA recognizes this
-    configuration baseline as applicable to the operating system tier of
+    In addition to being applicable to Red Hat Enterprise Linux 8, this
+    configuration baseline is applicable to the operating system tier of
     Red Hat technologies that are based on Red Hat Enterprise Linux 8, such as:
 
     - Red Hat Enterprise Linux Server
@@ -32,6 +32,7 @@ selections:
     - var_password_pam_difok=8
     - var_password_pam_maxrepeat=3
     - var_password_hashing_algorithm=SHA512
+    - var_password_hashing_algorithm_pam=sha512
     - var_password_pam_maxclassrepeat=4
     - var_password_pam_minclass=4
     - var_accounts_minimum_age_login_defs=1
@@ -40,7 +41,7 @@ selections:
     - var_password_pam_remember_control_flag=requisite_or_required
     - var_selinux_state=enforcing
     - var_selinux_policy_name=targeted
-    - var_password_pam_unix_rounds=5000
+    - var_password_hashing_min_rounds_login_defs=100000
     - var_password_pam_minlen=15
     - var_password_pam_ocredit=1
     - var_password_pam_dcredit=1
@@ -72,6 +73,8 @@ selections:
     - var_sssd_certificate_verification_digest_function=sha1
     - login_banner_text=dod_banners
     - var_authselect_profile=sssd
+    - var_multiple_time_servers=stig
+    - var_time_service_set_maxpoll=18_hours
 
     ### Enable / Configure FIPS
     - enable_fips_mode
@@ -88,10 +91,6 @@ selections:
     ### Rules:
     # RHEL-08-010000
     - installed_OS_is_vendor_supported
-
-    # RHEL-08-010001
-    - package_mcafeetp_installed
-    - agent_mfetpd_running
 
     # RHEL-08-010010
     - security_patches_up_to_date
@@ -204,11 +203,9 @@ selections:
     - configure_ssh_crypto_policy
 
     # RHEL-08-010290
-    - harden_sshd_macs_openssh_conf_crypto_policy
     - harden_sshd_macs_opensshserver_conf_crypto_policy
 
     # RHEL-08-010291
-    - harden_sshd_ciphers_openssh_conf_crypto_policy
     - harden_sshd_ciphers_opensshserver_conf_crypto_policy
 
     # RHEL-08-010292
@@ -478,7 +475,8 @@ selections:
     - accounts_have_homedir_login_defs
 
     # RHEL-08-010770
-    - file_permission_user_init_files
+    - file_permission_user_init_files_root
+    - var_user_initialization_files_regex=all_dotfiles
 
     # RHEL-08-010780
     - no_files_unowned_by_user
@@ -498,7 +496,7 @@ selections:
     # RHEL-08-020000
     - account_temp_expire_date
 
-    # RHEL-08-020010, RHEL-08-020011, RHEL-08-020025, RHEL-08-020026
+    # RHEL-08-020010, RHEL-08-020011
     - accounts_passwords_pam_faillock_deny
 
     # RHEL-08-020012, RHEL-08-020013
@@ -522,6 +520,12 @@ selections:
     # RHEL-08-020024
     - accounts_max_concurrent_login_sessions
 
+    # RHEL-08-020025
+    - account_password_pam_faillock_system_auth
+
+    # RHEL-08-020026
+    - account_password_pam_faillock_password_auth
+
     # RHEL-08-020027, RHEL-08-020028
     - account_password_selinux_faillock_dir
 
@@ -537,19 +541,7 @@ selections:
 
     # RHEL-08-020035
     - logind_session_timeout
-
-    # RHEL-08-020039
-    - package_tmux_installed
-
-    # RHEL-08-020040
-    - configure_tmux_lock_command
-    - configure_tmux_lock_keybinding
-
-    # RHEL-08-020041
-    - configure_bashrc_tmux
-
-    # RHEL-08-020042
-    - no_tmux_in_shells
+    - var_logind_session_timeout=10_minutes
 
     # RHEL-08-020050
     - dconf_gnome_lock_screen_on_smartcard_removal
@@ -557,14 +549,14 @@ selections:
     # RHEL-08-020060
     - dconf_gnome_screensaver_idle_delay
 
-    # RHEL-08-020070
-    - configure_tmux_lock_after_time
-
     # RHEL-08-020080
     - dconf_gnome_screensaver_user_locks
 
     # RHEL-08-020081
     - dconf_gnome_session_idle_user_locks
+
+    # RHEL-08-020082
+    - dconf_gnome_screensaver_lock_locked
 
     # RHEL-08-020090
     - sssd_enable_certmap
@@ -618,12 +610,6 @@ selections:
 
     # RHEL-08-020210
     - accounts_password_set_max_life_existing
-
-    # RHEL-08-020220
-    - accounts_password_pam_pwhistory_remember_system_auth
-
-    # RHEL-08-020221
-    - accounts_password_pam_pwhistory_remember_password_auth
 
     # RHEL-08-020230
     - accounts_password_pam_minlen
@@ -955,6 +941,7 @@ selections:
     # remediation fails because default configuration file contains pool instead of server keyword
     - chronyd_or_ntpd_set_maxpoll
     - chronyd_server_directive
+    - chronyd_specify_remote_server
 
     # RHEL-08-030741
     - chronyd_client_only
@@ -988,6 +975,7 @@ selections:
     - package_rsh-server_removed
 
     # RHEL-08-040020
+    - kernel_module_uvcvideo_disabled
 
     # RHEL-08-040021
     - kernel_module_atm_disabled
@@ -1020,6 +1008,8 @@ selections:
     - kernel_module_usb-storage_disabled
 
     # RHEL-08-040090
+    - configured_firewalld_default_deny
+    - set_firewalld_default_zone
 
     # RHEL-08-040100
     - package_firewalld_installed
@@ -1097,6 +1087,7 @@ selections:
     - service_usbguard_enabled
 
     # RHEL-08-040150
+    - firewalld-backend
 
     # RHEL-08-040159
     - package_openssh-server_installed

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Configure the selinuxuser_direct_dri_enabled SELinux Boolean'
 
@@ -13,9 +12,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-82311-2
 
 {{{ complete_ocil_entry_sebool_disabled(sebool="selinuxuser_direct_dri_enabled") }}}
 

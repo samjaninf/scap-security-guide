@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Install Intrusion Detection Software'
 
@@ -20,7 +19,6 @@ conflicts:
     - selinux_state
 
 identifiers:
-    cce@rhel7: CCE-26818-5
     cce@rhel8: CCE-80831-1
     cce@rhel9: CCE-88837-0
     cce@sle12: CCE-92218-7
@@ -36,7 +34,6 @@ references:
     nist: CM-6(a)
     nist-csf: DE.CM-1,PR.AC-5,PR.DS-5,PR.PT-4
     pcidss: Req-11.4
-    pcidss4: "11.5.1.1"
 
 ocil_clause: 'no host-based intrusion detection tools are installed'
 
@@ -53,5 +50,5 @@ warnings:
         clarification be required, DISA contact information is published publicly at
         https://public.cyber.mil/stigs/
 
-platform: machine
+platform: system_with_kernel
 

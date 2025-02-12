@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Remove tftp Daemon'
 
@@ -18,16 +17,16 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80443-5
     cce@rhel8: CCE-83590-0
     cce@rhel9: CCE-84153-6
+    cce@rhel10: CCE-88586-3
     cce@sle12: CCE-91465-5
     cce@sle15: CCE-91158-6
 
 references:
-    anssi: BP28(R1)
-    cis@rhel8: 2.3.6
-    cis@rhel9: 2.3.3
+    disa: CCI-000197
+    srg: SRG-OS-000074-GPOS-00042
+
 
 ocil: '{{{ describe_package_remove(package="tftp") }}}'
 

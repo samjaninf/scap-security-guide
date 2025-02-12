@@ -101,7 +101,7 @@ selections:
 
   ## Events to be logged
   ## Identifiers 0580 / 0584 / 0582 / 0585 / 0586 / 0846 / 0957
-  - display_login_attempts
+  - sshd_print_last_log
   - sebool_auditadm_exec_content
   - audit_rules_privileged_commands
   - audit_rules_session_events
@@ -127,6 +127,7 @@ selections:
   ## 0479 / 0480 / 0481 / 0489 / 0497 / 0994 / 0998 / 1001 /  1139 / 
   ## 1372 / 1373 / 1374 / 1375
   - enable_fips_mode
+  - enable_dracut_fips_module
   - var_system_crypto_policy=fips
   - configure_crypto_policy
 

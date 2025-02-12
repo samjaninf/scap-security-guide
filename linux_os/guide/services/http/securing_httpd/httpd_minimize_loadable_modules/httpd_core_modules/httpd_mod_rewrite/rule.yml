@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable HTTP mod_rewrite'
 
@@ -17,5 +16,3 @@ rationale: |-
 
 severity: unknown
 
-identifiers:
-    cce@rhel7: CCE-80305-6

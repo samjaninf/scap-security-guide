@@ -18,8 +18,8 @@ Five arguments to OpenSCAP are needed to perform a system scan against the upstr
 * `--report`
   * Optional, indicates location to place HTML formatted results
 
-* datastream location
-  * Mandatory, identifies location of SCAP Source Datastream file
+* data stream location
+  * Mandatory, identifies location of SCAP source data stream file
 
 Putting these arguments together, a properly formatted command would be:
 
@@ -168,7 +168,7 @@ fi
 # END OF SCRIPT
 ```
 
-This output could be redirected to a bash script, or built into your RHEL7 provisioning process (e.g. the %post section of a kickstart).
+This output could be redirected to a bash script, or built into your RHEL provisioning process (e.g. the %post section of a kickstart).
 
 #### Ansible Playbooks
 

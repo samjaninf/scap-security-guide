@@ -12,14 +12,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86117-9
     cce@rhel8: CCE-86118-7
     cce@rhel9: CCE-86119-5
-
-references:
-    cis@rhel7: 5.3.2
-    cis@rhel8: 5.2.2
-    cis@rhel9: 5.2.2
+    cce@rhel10: CCE-90624-8
 
 ocil_clause: '{{{ ocil_clause_file_owner(file="/etc/ssh/*_key", owner="root") }}}'
 
@@ -34,3 +29,8 @@ template:
         file_regex:
             - ^.*_key$
         fileuid: '0'
+
+warnings:
+    - general: |-
+        Remediation is not possible at bootable container build time because SSH host
+        keys are generated post-deployment.

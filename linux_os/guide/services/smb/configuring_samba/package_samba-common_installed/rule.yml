@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhcos4,rhel7,rhel8,rhel9,rhv4,sle15
 
 title: 'Install the Samba Common Package'
 
@@ -11,9 +10,6 @@ description: |-
 rationale: 'If the samba-common package is not installed, samba cannot be configured.'
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80360-1
 
 ocil_clause: 'the package is not installed'
 

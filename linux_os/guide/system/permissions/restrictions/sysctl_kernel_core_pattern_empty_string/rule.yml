@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel9
 
 title: 'Disable storing core dumps'
 
@@ -29,6 +28,7 @@ conflicts:
 
 identifiers:
     cce@rhel9: CCE-86005-6
+    cce@rhel10: CCE-86218-5
 
 references:
     ospp: FMT_SMF_EXT.1
@@ -42,4 +42,4 @@ ocil: |
     <pre>$ sysctl kernel.core_pattern | cat -A</pre>
     <code>kernel.core_pattern = $</code>
 
-platform: machine
+platform: system_with_kernel

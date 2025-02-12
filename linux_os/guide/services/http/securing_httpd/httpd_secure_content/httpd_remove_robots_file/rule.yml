@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'The robots.txt Files Must Not Exist'
 
@@ -29,8 +28,6 @@ rationale: |-
 
 severity: medium
 
-references:
-    stigid: WG310
 
 ocil_clause: 'it is not'
 

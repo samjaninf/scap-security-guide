@@ -1,5 +1,6 @@
 documentation_complete: true
 
+
 title: 'Enable the NTP Daemon'
 
 description: |-
@@ -26,7 +27,6 @@ identifiers:
     cce@sle15: CCE-91294-9
 
 references:
-    anssi: NT012(R03)
     cis-csc: 1,14,15,16,3,5,6
     cis@ubuntu2004: 2.2.1.4
     cis@ubuntu2204: 2.1.4.4
@@ -38,7 +38,6 @@ references:
     nist: CM-6(a),AU-8(1)(a)
     nist-csf: PR.PT-1
     pcidss: Req-10.4
-    pcidss4: 10.6.1
 
 ocil: |-
     {{{ ocil_service_enabled(service="ntp") }}}
@@ -47,3 +46,10 @@ template:
     name: service_enabled
     vars:
         servicename: ntp
+
+{{% if product in ["sle15"] or 'rhel' in product %}}
+warnings:
+    - general:
+        The <pre>ntp</pre> package is not available in {{{ full_name }}}. Please
+        consider the <pre>chrony</pre> package instead together with the respective <pre>service_chronyd_enabled</pre> rule.
+{{% endif %}}

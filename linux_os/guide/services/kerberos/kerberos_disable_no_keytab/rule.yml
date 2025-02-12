@@ -2,29 +2,27 @@ documentation_complete: true
 
 # new major OS versions will most likely not be applicable because of the
 # kerberos version higher than 1.17-18
-prodtype: ol7,ol8,rhcos4,rhel7,rhel8,rhel9
 
 title: 'Disable Kerberos by removing host keytab'
 
 description: |-
-    Kerberos is not an approved key distribution method for
-    Common Criteria. To prevent using Kerberos by system daemons,
-    remove the Kerberos keytab files, especially
+    Kerberos may rely on key distribution functions unapproved by Common Criteria.
+    To prevent using Kerberos by system daemons, remove the Kerberos keytab files, especially
     <tt>/etc/krb5.keytab</tt>.
 
 rationale: |-
-    The key derivation function (KDF) in Kerberos is not FIPS compatible.
+    Some key derivation functions (KDF) in Kerberos are not FIPS-compatible
 
 severity: medium
 
 identifiers:
     cce@rhel8: CCE-82175-1
     cce@rhel9: CCE-84221-1
+    cce@rhel10: CCE-90440-9
 
 references:
     disa: CCI-000803
     ism: 0418,1055,1402
-    ospp: FTP_ITC_EXT.1
     srg: SRG-OS-000120-GPOS-00061
     stigid@ol8: OL08-00-010161
     stigid@rhel8: RHEL-08-010161

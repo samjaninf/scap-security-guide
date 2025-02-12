@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Ensure shadow Group is Empty'
 
@@ -19,18 +18,17 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86818-2
     cce@sle12: CCE-92213-8
     cce@sle15: CCE-91344-2
+    cce@slmicro5: CCE-94044-5
 
 references:
-    cis@rhel7: 6.2.4
     cis@sle12: 6.2.18
     cis@sle15: 6.2.18
+    cis@slmicro5: 6.2.18
     cis@ubuntu2004: 6.2.17
     cis@ubuntu2204: 6.2.4
     pcidss: Req-8.2.1
-    pcidss4: 8.3.2
 
 ocil_clause: 'shadow group is not empty'
 

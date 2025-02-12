@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,sle12,sle15,ubuntu1804,ubuntu2004,ubuntu2204
 
 title: 'Add nosuid Option to /var/tmp'
 
@@ -20,19 +19,13 @@ severity: medium
 
 identifiers:
     cce@rhcos4: CCE-82736-0
-    cce@rhel7: CCE-82153-8
     cce@rhel8: CCE-82154-6
     cce@rhel9: CCE-83863-1
+    cce@rhel10: CCE-87892-6
     cce@sle12: CCE-91593-4
     cce@sle15: CCE-91279-0
 
 references:
-    anssi: BP28(R12)
-    cis@alinux2: 1.1.9
-    cis@alinux3: 1.1.4.3
-    cis@rhel7: 1.1.14
-    cis@rhel8: 1.1.4.3
-    cis@rhel9: 1.1.4.3
     cis@sle12: 1.1.14
     cis@sle15: 1.1.14
     cis@ubuntu1804: 1.1.8
@@ -43,7 +36,7 @@ references:
     stigid@ol8: OL08-00-040133
     stigid@rhel8: RHEL-08-040133
 
-platform: machine and mount[var-tmp]
+platform: mount[var-tmp]
 
 template:
     name: mount_option

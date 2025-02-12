@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Limit Available Methods'
 
@@ -26,5 +25,3 @@ rationale: |-
 
 severity: unknown
 
-identifiers:
-    cce@rhel7: CCE-80319-7

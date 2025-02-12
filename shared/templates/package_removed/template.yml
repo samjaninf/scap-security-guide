@@ -4,3 +4,5 @@ supported_languages:
   - bash
   - oval
   - puppet
+  - kickstart
+  - bootc

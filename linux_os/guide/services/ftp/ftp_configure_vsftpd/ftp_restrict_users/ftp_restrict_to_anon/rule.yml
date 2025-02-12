@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Restrict Access to Anonymous Users if Possible'
 
@@ -23,7 +22,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80249-6
     cce@rhel8: CCE-82412-8
 
 references:

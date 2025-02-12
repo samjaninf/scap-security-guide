@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Set the UEFI Boot Loader Password'
 
@@ -10,14 +9,14 @@ description: |-
     <br /><br />
     Since plaintext passwords are a security risk, generate a hash for the password
     by running the following command:
-    {{% if product in ["sle12", "sle15", "ubuntu2004", "ubuntu2204"] %}}
+    {{% if product in ["sle12", "sle15", "slmicro5", "ubuntu2004", "ubuntu2204", "ubuntu2404", "ubuntu2404"] %}}
     <pre># grub2-mkpasswd-pbkdf2</pre>
     {{% else %}}
     <pre># grub2-setpassword</pre>
     {{% endif %}}
     When prompted, enter the password that was selected.
     <br /><br />
-    {{% if product in ["sle12", "sle15", "ubuntu2004", "ubuntu2204"] %}}
+    {{% if product in ["sle12", "sle15", "slmicro5", "ubuntu2004", "ubuntu2204", "ubuntu2404", "ubuntu2404"] %}}
     Using the hash from the output, modify the <tt>/etc/grub.d/40_custom</tt>
     file with the following content:
     <pre>set superusers="boot"
@@ -41,21 +40,18 @@ severity: high
 
 identifiers:
     cce@rhcos4: CCE-82552-1
-    cce@rhel7: CCE-80354-4
     cce@rhel8: CCE-80829-5
     cce@rhel9: CCE-88654-9
+    cce@rhel10: CCE-89236-4
     cce@sle12: CCE-83045-5
     cce@sle15: CCE-83275-8
+    cce@slmicro5: CCE-93779-7
 
 references:
-    anssi: BP28(R17)
     cis-csc: 11,12,14,15,16,18,3,5
-    cis@alinux3: 1.5.1
-    cis@rhel7: 1.4.1
-    cis@rhel8: 1.4.1
-    cis@rhel9: 1.4.1
     cis@sle12: 1.5.1
     cis@sle15: 1.5.1
+    cis@slmicro5: 1.5.1
     cis@ubuntu2004: 1.5.1
     cis@ubuntu2204: 1.4.1
     cobit5: DSS05.02,DSS05.04,DSS05.05,DSS05.07,DSS06.03,DSS06.06
@@ -71,11 +67,11 @@ references:
     srg: SRG-OS-000080-GPOS-00048
     stigid@ol7: OL07-00-010491
     stigid@ol8: OL08-00-010140
-    stigid@rhel7: RHEL-07-010491
     stigid@rhel8: RHEL-08-010140
     stigid@sle12: SLES-12-010440
     stigid@sle15: SLES-15-010200
     stigid@ubuntu2004: UBTU-20-010009
+    stigid@ubuntu2204: UBTU-22-212010
 
 ocil_clause: 'no password is set'
 
@@ -97,7 +93,6 @@ warnings:
         Also, do NOT manually add the superuser account and password to the
         <tt>grub.cfg</tt> file as the grub2-mkconfig command overwrites this file.
 
-platform: machine
 
 fixtext: |-
     Configure {{{ full_name }}} to use a secure UEFI boot loader password.

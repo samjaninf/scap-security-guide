@@ -175,7 +175,6 @@ selections:
     - audit_rules_privileged_commands_usernetctl
     - audit_rules_privileged_commands_chage
     - audit_rules_privileged_commands_chsh
-    - audit_rules_privileged_commands_pt_chown
     - audit_rules_sysadmin_actions
     - audit_rules_privileged_commands_gpasswd
     - audit_rules_privileged_commands_newgidmap
@@ -233,4 +232,5 @@ selections:
     - dnf-automatic_security_updates_only
     - package_dnf-automatic_installed
     - timer_dnf-automatic_enabled
+    - package_rng-tools_installed
     - service_rngd_enabled

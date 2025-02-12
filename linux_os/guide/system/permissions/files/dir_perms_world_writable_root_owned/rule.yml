@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Ensure All World-Writable Directories Are Owned by root User'
 
@@ -17,15 +16,14 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83374-9
     cce@rhel8: CCE-83375-6
     cce@rhel9: CCE-83903-5
+    cce@rhel10: CCE-89514-4
     cce@sle12: CCE-91597-5
     cce@sle15: CCE-91239-4
 
 references:
-    anssi: BP28(R40)
-    disa: CCI-000366
+    disa: CCI-000366,CCI-001090
     srg: SRG-OS-000480-GPOS-00227,SRG-OS-000138-GPOS-00069
     stigid@rhel8: RHEL-08-010700
 

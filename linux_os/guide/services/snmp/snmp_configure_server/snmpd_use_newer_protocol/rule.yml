@@ -1,13 +1,12 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8,rhel9
 
 title: 'Configure SNMP Service to Use Only SNMPv3 or Newer'
 
 description: |-
     Edit <tt>/etc/snmp/snmpd.conf</tt>, removing any references to <tt>rocommunity</tt>, <tt>rwcommunity</tt>, or <tt>com2sec</tt>.
     Upon doing that, restart the SNMP service:
-    <pre>$ sudo service snmpd restart</pre>
+    <pre>$ sudo systemctl restart snmpd</pre>
 
 rationale: |-
     Earlier versions of SNMP are considered insecure, as they potentially allow
@@ -16,9 +15,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80276-9
     cce@rhel8: CCE-84292-2
     cce@rhel9: CCE-87293-7
+    cce@rhel10: CCE-87264-8
 
 references:
     ism: "1311"

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7
 
 title: 'Uninstall abrt-addon-python Package'
 
@@ -12,9 +11,6 @@ rationale: |-
     plugin for handling uncaught exceptions in python programs.
 
 severity: low
-
-identifiers:
-    cce@rhel7: CCE-82924-2
 
 references:
     disa: CCI-000381

@@ -9,6 +9,29 @@ this easier: `.pyenv.sh`. To set `PYTHONPATH` correctly for the current
 shell, simply call `source .pyenv.sh`. For more information on how to
 use this script, please see the comments at the top of the file.
 
+It is also possible to install the module with `pip`.
+In this case it is recommended to install it within a Python virtual environment.
+Please note that this possibility was added after releasing the 0.1.75 version and until the release 0.1.76 is out it can only be installed from `master` branch.
+To install the ssg module currently present in the master branch, run the following command:
+
+```bash
+pip install git+https://github.com/ComplianceasCode/content
+```
+
+It is also possible to install an ssg library version associated with a certain release.
+This is recommended because the library is not stable and it can change unexpectedly when installing from master.
+This is an example command which installs the library associated with the 0.1.76 release:
+
+```bash
+pip install git+https://github.com/ComplianceasCode/content@v0.1.76
+```
+
+The installed package is named `ssg`.
+Please note that the name of the package will very probably change in the future.
+Therefore, if you install the module this way, please pay close attention to the release notes.
+It is worth emphasizing here that stability of the module is not guaranteed.
+Currently, it is used mainly for building the content and it is therefore modified predominantly based on needs of the content build system.
+
 ## Profile Statistics and Utilities
 
 The `profile_tool.py` tool displays XCCDF profile statistics. It can
@@ -17,7 +40,7 @@ OVAL check implemented, how many have a remediation available, shows
 rule IDs which are missing them and other useful information.
 
 To use the script, first build the content, then pass the built XCCDF
-(not DataStream) to the script.
+(not data stream) to the script.
 
 For example, to check which rules in RHEL8 OSPP profile are missing
 remediations, run this command:
@@ -37,11 +60,65 @@ For example, to subtract selected rules from a given profile based on
 rules selected by another profile, run this command:
 
 ```bash
-    $ ./build-scripts/profile_tool.py sub --profile1 rhel7/profiles/ospp.profile --profile2 rhel7/profiles/pci-dss.profile
-````
+    $ ./build-scripts/profile_tool.py sub --profile1 rhel9/profiles/ospp.profile --profile2 rhel9/profiles/pci-dss.profile
+```
 
 This will result in a new YAML profile containing exclusive rules to the
 profile pointed by the `--profile1` option.
+
+The tool can also generate a list of the most used rules contained in profiles from a given data stream or benchmark.
+
+For example, to get a list of the most used rules in the benchmark for `rhel8`, run this command:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-rules build/ssg-rhel8-xccdf.xml
+```
+
+Or you can also run this command to get a list of the most used rules in the entire project:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-rules
+```
+
+Optionally, you can use this command to limit the statistics for a specific product:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-rules --products rhel9
+```
+
+The result will be a list of rules with the number of uses in the profiles.
+The list can be generated as plain text, JSON or CVS.
+Via the `--format FORMAT` parameter.
+
+The tool can also generate a list of the most used component based on rules contained in profiles from the entire project:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-components
+```
+
+Optionally, you can use this command to limit the statistics for a specific product:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-components --products rhel9
+```
+
+You can also get a list of the most used components with used rules for the RHEL9 product, you can use the `--rules` flag.
+As shown in this command:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-components --products rhel9 --rules
+```
+
+You can also use the `--all` flag to get a list of all components and rules in the output, including unused components and unused rules.
+As shown in this command:
+
+```bash
+    $ ./build-scripts/profile_tool.py most-used-components --products rhel9 --all
+```
+
+The result will be a list of rules with the number of uses in the profiles.
+The list can be generated as plain text, JSON or CVS.
+Via the `--format FORMAT` parameter.
 
 ## Generating Controls from DISA's XCCDF Files
 
@@ -70,6 +147,19 @@ Example
 
 ```bash
     $ ./utils/build_stig_control.py -p rhel8 -m shared/references/disa-stig-rhel8-v1r5-xccdf-manual.xml
+```
+
+
+## Generating Controls From a Reference
+When converting profile to use a control file this script can be helpful in creating the skeleton control.
+The output of this script will need to be adjusted to add other keys such as title or description to the controls.
+This script does require that `./utils/rule_dir_json.py` be run before this script is used.
+See `./utils/build_control_from_reference.py --help` for the full set options the script provides.
+
+
+Example
+```bash
+    $ ./utils/build_control_from_reference.py --product rhel10 --reference ospp --output controls/ospp.yml
 ```
 
 ## Generating login banner regular expressions
@@ -123,7 +213,6 @@ These sub-commands are:
 - `duplicate_subkeys`: finds (but doesn't fix!) any rules with duplicated
   `identifiers` or `references`.
 - `sort_subkeys`: sorts all subkeys under `identifiers` and `references`.
-- `sort_prodtypes`: sorts the products in prodtype.
 - `add-cce`: automatically assign CCE identifiers to rules.
 
 To execute:
@@ -156,7 +245,6 @@ Then based on the available pool you want to assign the CCEs, you can run someth
 ```
 
 Note: Multiple rules can have the CCE at the same time by just adding space separated rule IDs.
-Note: The rule should have the product assigned to the `prodtype` attribute or the `prodtype` should be empty.
 
 Example for `sle15` product:
 
@@ -164,34 +252,6 @@ Example for `sle15` product:
     $ python utils/fix_rules.py --product products/sle15/product.yml add-cce --cce-pool sle15 audit_rules_privileged_commands_newuidmap audit_rules_privileged_commands_newuidmap
 ```
 
-
-### `utils/autoprodtyper.py` &ndash; automatically add product to `prodtype`
-
-When building a profile for a new product version (such as forking
-`ubuntu1804` into `ubuntu2004`), it is helpful to be able to build a
-profile (adding in all rules that are necessary) and then attempt a
-build.
-
-However, usually lots of rules will lack the new product in its `prodtype`
-field.
-
-This is where `utils/autoprodtyper.py` comes in: point it at a product and
-a profile and it will automatically modify the prodtype, adding this product.
-
-To execute:
-
-```bash
-    $ ./utils/autoprodtyper.py <product> <profile>
-```
-
-For example:
-
-```bash
-    $ ./utils/autoprodtyper.py ubuntu2004 cis_level1_server
-```
-
-Note that it is generally good practice to commit all changes prior to running
-one of these commands and then commit the results separately.
 
 ### `utils/refchecker.py` &ndash; automatically check `rule.yml` for references
 
@@ -218,52 +278,12 @@ product-independent.
 
 Note that this utility does not modify the rule directories at all.
 
-### `utils/mod_prodtype.py` &ndash; programmatically modify prodtype in `rule.yml`
-
-`utils/mod_prodtype.py` is a command-based utility for modifying `rule.yml`
-files. It supports the following sub-commands:
-
-- `add`: add the given product(s) to the specified rule's prodtype.
-- `list`: list computed and actual products in the specified rule's prodtype.
-- `replace`: perform a pattern-match replacement on the specified rule's
-  prodtype.
-- `remove`: remove the given product(s) from the specified rule's prodtype.
-
-To execute:
-
-```bash
-    $ ./utils/mod_prodtype.py <rule_id> <command> [...other arguments...]
-```
-
-For an example of `add`:
-
-```bash
-    $ ./utils/mod_prodtype.py accounts_passwords_pam_tally2 add ubuntu2004
-```
-
-For an example of `list`:
-
-```bash
-    $ ./utils/mod_prodtype.py accounts_passwords_pam_tally2 list
-```
-
-For an example of `replace`:
-
-```bash
-    $ ./utils/mod_prodtype.py accounts_passwords_pam_tally2 replace ubuntu2004~ubuntu1604,ubuntu1804,ubuntu2004
-```
-
-For an example of `remove`:
-
-```bash
-    $ ./utils/mod_prodtype.py accounts_passwords_pam_tally2 remove ubuntu1604 ubuntu1804 ubuntu2004
-````
 
 ### `utils/mod_checks.py` and `utils/mod_fixes.py` &ndash; programmatically modify check and fix applicability
 
 These two utilities have identical usage. Both modifies the platform/product
-applicability of various files (either OVAL or hardening content), similar to
-`utils/mod_prodtype.py` above. They supports the following sub-commands:
+applicability of various files (either OVAL or hardening content). They support
+the following sub-commands:
 
 - `add`: add the given platform(s) to the specified rule's OVAL check.
   **Note**: Only applies to shared content.
@@ -382,7 +402,7 @@ Compare current DISA's manual benchmark, and generate per file diffs:
     $ utils/compare_ds.py --disa-content --rule-diffs ./disa-stig-rhel8-v1r6-xccdf-manual.xml shared/references/disa-stig-rhel8-v1r7-xccdf-manual.xml
 ```
 
-Compare two datastreams:
+Compare two data streams:
 
 ```bash
     $ utils/compare_ds.py /tmp/ssg-rhel8-ds.xml build/ssg-rhel8-ds.xml > content.diff
@@ -457,6 +477,16 @@ To execute:
 
 ```bash
     $ ./utils/import_srg_spreadsheet.py --changed 20220811_submission.xlsx --current build/cac_stig_output.xlsx -p rhel9
+```
+
+### `utils/import_disa_stig.py` &ndash; Import Content from DISA's XML Content
+
+This script imports SRG Requirements, Check Text, and Fix Text from a DISA STIG XML File.
+This script only updates STIG items that only have one rule assigned to them.
+
+To execute:
+```bash
+$ ./utils/import_disa_stig.py --product rhel9 --control stig_rhel9 shared/references/disa-stig-rhel9-v1r2-xccdf-manual.xml
 ```
 
 ## Profiling the Build System
@@ -613,9 +643,8 @@ $ python utils/generate_profile.py -i benchmark.xlsx list
 To generate a rule for a specific control:
 
 ```
-$ python utils/generate_profile.py -i benchmark.xlsx generate --product-type ocp -c 1.1.2
+$ python utils/generate_profile.py -i benchmark.xlsx generate -c 1.1.2
 documentation_complete: false
-prodtype: ocp
 title: |-
   Ensure that the API server pod specification file ownership is set to root:root
 description: 'Ensure that the API server pod specification file ownership is set to
@@ -646,7 +675,7 @@ template: PLACEHOLDER
 To generate an entire section:
 
 ```
-$ python utils/generate_profile.py -i benchmark.xlsx generate --product-type ocp -s 1
+$ python utils/generate_profile.py -i benchmark.xlsx generate -s 1
 ```
 
 The `PLACEHOLDER` values must be filled in later, ideally when the rules are
@@ -672,3 +701,89 @@ $ python3 utils/compare_versions.py compare_tags v0.1.67 v0.1.68 rhel9
 ```
 
 It will internally clone the upstream project, checkout these tags, generate ComplianceAsCode JSON manifests, compare them and print the output.
+
+
+### `utils/oscal/build_cd_from_policy.py` &ndash; Build a Component Definition from a Policy
+
+This script builds an OSCAL Component Definition (cd) (version `1.0.4`) for an existing OSCAL profile from a policy. The script uses the
+[compliance-trestle](https://github.com/oscal-compass/compliance-trestle) library to build the component definition. The component definition can be used with the `compliance-trestle` CLI after generation.
+
+Some assumption made by this script:
+
+- The script maps control file statuses to valid OSCAL [statuses](https://pages.nist.gov/OSCAL-Reference/models/v1.1.1/system-security-plan/json-reference/#/system-security-plan/control-implementation/implemented-requirements/by-components/implementation-status) as follows:
+
+  * `pending` - `alternative`
+
+  * `not applicable`: `not-applicable`
+
+  * `inherently met`: `implemented`
+
+  * `documentation`: `implemented`
+
+  * `planned`: `planned`
+
+  * `partial`: `partial`
+
+  * `supported`: `implemented`
+
+  * `automated`: `implemented`
+
+  * `manual`: `alternative`
+
+  * `does not meet`: `alternative`
+
+- The script uses the "Section *letter*:" convention in the control notes to create statements under the implemented requirements.
+- The script maps parameter to rules uses the `xccdf_variable` field under `template.vars`
+- To determine what responses will mapped to the controls in the OSCAL profile the control id and label property from the resolved catalog is searched.
+
+It supports the following arguments:
+  - `-o`, `--output` &mdash; Path to write the cd to
+  - `-r`, `--root` &mdash; Root of the SSG project. Defaults to /content.
+  - `-v`, `--vendor-dir` &mdash; Path to the vendor directory with third party OSCAL artifacts
+  - `-p`, `--profile` &mdash; Main profile href, or name of the profile model in the trestle workspace
+  - `-pr`, `--product` &mdash; Product to build cd with
+  - `-c`, `--control` &mdash; Control to use as the source for control responses. To optionally filter by level, use the format <control_id>:<level>.
+  - `-j`, `--json` &mdash; Path to the rules_dir.json. Defaults to /content/build/rule_dirs.json.
+  - `-b`, `--build-config-yaml` &mdash; YAML file with information about the build configuration
+  - `-t`, `--component-definition-type` &mdash; Type of component definition to create. Defaults to service. Options are service or validation.
+
+An example of how to execute the script:
+
+```bash
+$ ./build_product ocp4
+$ ./utils/rule_dir_json.py
+$ ./utils/oscal/build_cd_from_policy.py -o build/ocp4.json -p fedramp_rev4_high -pr ocp4 -c nist_ocp4:high
+```
+
+### `utils/ansible_playbook_to_role.py` &ndash; Generates Ansible Roles and pushes them to Github
+
+This script converts the Ansible playbooks created by the build system and converts them to Ansible roles and can upload them to GitHub.
+
+
+An example of how to execute the script to generate roles locally:
+
+```bash
+$ ./build_product rhel9
+$ ./utils/ansible_playbook_to_role.py --dry-run output
+```
+
+### `utils/find_unused_rules.py` &ndash; List Rules That Are Not Used In Any Data stream
+
+This script will output rules are not in any data streams.
+To prevent false positives the script will not run if the number of build datas treams less than the total number of products in the project.
+The script assumes that `./build_project --derivatives` was executed before the script is used.
+This script does require that `./utils/rule_dir_json.py` was executed before this script is used as well.
+
+This script works by comparing rules in the data streams to the rules in the `rule_dirs.json` file.
+The script works by adding off the rule ids from the data streams to a `set`.
+Then the script converts the keys of `rule_dirs.json` to a set.
+The set of rules in the data stream is subtracted to from the set of rules in `rule_dirs.json`.
+The difference is then output to the user.
+
+Example usage:
+
+```bash
+$ ./build_product --derivatives
+$ ./utils/rule_dir_json.py
+$ ./utils/find_unused_rules.py
+```

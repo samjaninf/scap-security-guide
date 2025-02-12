@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhel9,rhv4
 
 title: 'Enable the kerberos_enabled SELinux Boolean'
 
@@ -15,8 +14,8 @@ rationale: ""
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82296-5
     cce@rhel8: CCE-84293-0
+    cce@rhel10: CCE-89262-0
 
 references:
     ism: 0418,1055,1402

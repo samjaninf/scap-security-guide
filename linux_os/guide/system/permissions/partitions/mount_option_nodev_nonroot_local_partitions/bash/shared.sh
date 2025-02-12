@@ -2,7 +2,7 @@
 
 MOUNT_OPTION="nodev"
 # Create array of local non-root partitions
-readarray -t partitions_records < <(findmnt --mtab --raw --evaluate | grep "^/\w" | grep "\s/dev/\w")
+readarray -t partitions_records < <(findmnt --mtab --raw --evaluate | grep "^/\w" | grep -v "^/proc" | grep "\s/dev/\w")
 
 # Create array of polyinstantiated directories, in case one of them is found in mtab
 readarray -t polyinstantiated_dirs < \
@@ -23,3 +23,6 @@ for partition_record in "${partitions_records[@]}"; do
         {{{ bash_ensure_partition_is_mounted("$mount_point") | indent(8)}}}
     fi
 done
+
+# Remediate unmounted /etc/fstab entries
+sed -i -E '/nodev/! s;^\s*(/dev/\S+|UUID=\S+)\s+(/\w\S*)\s+(\S+)\s+(\S+)(.*)$;\1 \2 \3 \4,nodev \5;' /etc/fstab

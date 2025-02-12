@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Disable loading and unloading of kernel modules'
 
@@ -16,22 +15,19 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83392-1
     cce@rhel8: CCE-83397-0
     cce@rhel9: CCE-83967-0
+    cce@rhel10: CCE-87060-0
     cce@sle12: CCE-91566-0
     cce@sle15: CCE-91256-8
 
-references:
-    anssi: BP28(R24)
-
 {{{ complete_ocil_entry_sysctl_option_value(sysctl="kernel.modules_disabled", value="1") }}}
 
-platform: machine
+platform: system_with_kernel
 
 warnings:
   - general:
-      This rule doesn't come with Bash remediation.
+      This rule doesn't come with remediation.
       Remediating this rule during the installation process disrupts the install and boot process.
 
 template:
@@ -43,3 +39,4 @@ template:
     backends:
         # Automated remediation of this rule during installations disrupts the first boot
         bash: 'off'
+        ansible: 'off'

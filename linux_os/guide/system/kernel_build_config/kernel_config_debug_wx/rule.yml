@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel8,rhel9
 
 title: 'Warn on W+X mappings found at boot'
 
@@ -25,9 +24,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-87032-9
     cce@rhel9: CCE-88032-8
-
-references:
-    anssi: BP28(R15)
+    cce@rhel10: CCE-89612-6
 
 ocil_clause: 'the kernel was not built with the required value'
 

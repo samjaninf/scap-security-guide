@@ -161,160 +161,6 @@ fi
 
 
 {{#
-    Macro to perform remediation for 'audit_rules_privileged_commands' rule
-
-    Example macro invocation(s)::
-
-         perform_audit_rules_privileged_commands_remediation("auditctl", "500")
-         perform_audit_rules_privileged_commands_remediation("augenrules", "1000")
-
-:param tool: tool used to load audit rules either 'auditctl' or 'augenrules'
-:type tool: str
-:param min_auid: minimum original ID the user logged in with
-:type min_auid: str
-
-#}}
-{{%- macro bash_perform_audit_rules_privileged_commands_remediation(tool, min_auid) -%}}
-files_to_inspect=()
-{{% if tool == "auditctl" %}}
-# If the audit tool is 'auditctl', then:
-# * add '/etc/audit/audit.rules'to the list of files to be inspected,
-# * specify '/etc/audit/audit.rules' as the output audit file, where
-#   missing rules should be inserted
-files_to_inspect=("/etc/audit/audit.rules")
-output_audit_file="/etc/audit/audit.rules"
-{{%- elif tool == "augenrules" -%}}
-# If the audit tool is 'augenrules', then:
-# * add '/etc/audit/rules.d/*.rules' to the list of files to be inspected
-#   (split by newline),
-# * specify /etc/audit/rules.d/privileged.rules' as the output file, where
-#   missing rules should be inserted
-readarray -t files_to_inspect < <(find /etc/audit/rules.d -maxdepth 1 -type f -name '*.rules' -print)
-output_audit_file="/etc/audit/rules.d/privileged.rules"
-{{%- else -%}}
-{{{ raise("Unknown tool used: " + tool) }}}
-{{%- endif %}}
-
-# Obtain the list of SUID/SGID binaries on the particular system (split by newline)
-# into privileged_binaries array
-privileged_binaries=()
-readarray -t privileged_binaries < <(find / -not \( -fstype afs -o -fstype ceph -o -fstype cifs -o -fstype smb3 -o -fstype smbfs -o -fstype sshfs -o -fstype ncpfs -o -fstype ncp -o -fstype nfs -o -fstype nfs4 -o -fstype gfs -o -fstype gfs2 -o -fstype glusterfs -o -fstype gpfs -o -fstype pvfs2 -o -fstype ocfs2 -o -fstype lustre -o -fstype davfs -o -fstype fuse.sshfs \) -type f \( -perm -4000 -o -perm -2000 \) 2> /dev/null)
-
-# Keep list of SUID/SGID binaries that have been already handled within some previous iteration
-sbinaries_to_skip=()
-
-# For each found sbinary in privileged_binaries list
-for sbinary in "${privileged_binaries[@]}"
-do
-
-    # Check if this sbinary wasn't already handled in some of the previous sbinary iterations
-    # Return match only if whole sbinary definition matched (not in the case just prefix matched!!!)
-    if [[ $(sed -ne "\|${sbinary}|p" <<< "${sbinaries_to_skip[*]}") ]]
-    then
-        # If so, don't process it second time & go to process next sbinary
-        continue
-    fi
-
-    # Reset the counter of inspected files when starting to check
-    # presence of existing audit rule for new sbinary
-    count_of_inspected_files=0
-
-    # Define expected rule form for this binary
-    expected_rule="-a always,exit -F path=${sbinary} -F auid>={{{ min_auid }}} -F auid!=unset -F key=privileged"
-
-    # If list of audit rules files to be inspected is empty, just add new rule and move on to next binary
-    if [[ ${#files_to_inspect[@]} -eq 0 ]]; then
-        echo "$expected_rule" >> "$output_audit_file"
-        continue
-    fi
-
-    # Replace possible slash '/' character in sbinary definition so we could use it in sed expressions below
-    sbinary_esc=${sbinary//$'/'/$'\/'}
-
-    # For each audit rules file from the list of files to be inspected
-    for afile in "${files_to_inspect[@]}"
-    do
-        # Search current audit rules file's content for match. Match criteria:
-        # * existing rule is for the same SUID/SGID binary we are currently processing (but
-        #   can contain multiple -F path= elements covering multiple SUID/SGID binaries)
-        # * existing rule contains all arguments from expected rule form (though can contain
-        #   them in arbitrary order)
-
-        base_search=$(sed -e '/-a always,exit/!d' -e '/-F path='"${sbinary_esc}"'[^[:graph:]]/!d'		\
-                -e '/-F path=[^[:space:]]\+/!d'						\
-                -e '/-F auid>='"{{{ min_auid }}}"'/!d' -e '/-F auid!=\(4294967295\|unset\)/!d'	\
-                -e '/-k \|-F key=/!d' "$afile")
-
-        # Increase the count of inspected files for this sbinary
-        count_of_inspected_files=$((count_of_inspected_files + 1))
-
-        # Search current audit rules file's content for presence of rule pattern for this sbinary
-        if [[ $base_search ]]
-        then
-
-            # Current audit rules file already contains rule for this binary =>
-            # Store the exact form of found rule for this binary for further processing
-            concrete_rule=$base_search
-
-            # Select all other SUID/SGID binaries possibly also present in the found rule
-
-            readarray -t handled_sbinaries < <(grep -o -e "-F path=[^[:space:]]\+" <<< "$concrete_rule")
-            handled_sbinaries=("${handled_sbinaries[@]//-F path=/}")
-
-            # Merge the list of such SUID/SGID binaries found in this iteration with global list ignoring duplicates
-            readarray -t sbinaries_to_skip < <(for i in "${sbinaries_to_skip[@]}" "${handled_sbinaries[@]}"; do echo "$i"; done | sort -du)
-
-            # if there is a -F perm flag, remove it
-            if grep -q '.*-F\s\+perm=[rwxa]\+.*' <<< "$concrete_rule"; then
-
-                # Separate concrete_rule into three sections using hash '#'
-                # sign as a delimiter around rule's permission section borders
-                # note that the trailing space after perm flag is captured because there would be
-                # two consecutive spaces after joining remaining parts of the rule together
-                concrete_rule="$(echo "$concrete_rule" | sed -n "s/\(.*\)\+\(-F perm=[rwax]\+\ \?\)\+/\1#\2#/p")"
-
-                # Split concrete_rule into head and tail sections using hash '#' delimiter
-                # The second column contains the permission section, which we don't need to extract
-                rule_head=$(cut -d '#' -f 1 <<< "$concrete_rule")
-                rule_tail=$(cut -d '#' -f 3 <<< "$concrete_rule")
-
-                # Remove permissions section from existing rule in the file
-                sed -i "s#${rule_head}\(.*\)${rule_tail}#${rule_head}${rule_tail}#" "$afile"
-            fi
-        # If the required audit rule for particular sbinary wasn't found yet, insert it under following conditions:
-        #
-        # * in the "auditctl" mode of operation insert particular rule each time
-        #   (because in this mode there's only one file -- /etc/audit/audit.rules to be inspected for presence of this rule),
-        #
-        # * in the "augenrules" mode of operation insert particular rule only once and only in case we have already
-        #   searched all of the files from /etc/audit/rules.d/*.rules location (since that audit rule can be defined
-        #   in any of those files and if not, we want it to be inserted only once into /etc/audit/rules.d/privileged.rules file)
-        #
-	{{% if tool in ("augenrules", "auditctl") -%}}
-	{{% if tool == "augenrules" -%}}
-        elif [[ $count_of_inspected_files -eq "${#files_to_inspect[@]}" ]]
-        then
-	{{%- endif %}}
-	{{% if tool == "auditctl" -%}}
-        else
-	{{%- endif %}}
-            # Check if this sbinary wasn't already handled in some of the previous afile iterations
-            # Return match only if whole sbinary definition matched (not in the case just prefix matched!!!)
-            if [[ ! $(sed -ne "\|${sbinary}|p" <<< "${sbinaries_to_skip[*]}") ]]
-            then
-                # Current audit rules file's content doesn't contain expected rule for this
-                # SUID/SGID binary yet => append it
-                echo "$expected_rule" >> "$output_audit_file"
-            fi
-            continue
-	{{%- endif %}}
-        fi
-    done
-done
-{{%- endmacro -%}}
-
-
-{{#
     Set set a parameter in /etc/sshd_config
 
 :parameter parameter: Parameter to set
@@ -363,6 +209,7 @@ done
 {{%- set line_regex = prefix_regex ~ parameter ~ separator_regex %}}
 mkdir -p {{{ sshd_config_dir }}}
 touch {{{ sshd_config_dir }}}/{{{ hardening_config_basename }}}
+chmod 0600 {{{ sshd_config_dir }}}/{{{ hardening_config_basename }}}
 {{{ lineinfile_absent(sshd_config_path, line_regex, insensitive=true) }}}
 {{{ lineinfile_absent_in_directory(sshd_config_dir, line_regex, insensitive=true, filename_glob="*.conf") }}}
 {{{ set_config_file(
@@ -453,18 +300,7 @@ fi
 {{% else %}}
 {{%- set target_path="/etc/systemd/coredump.conf" -%}}
 {{% endif %}}
-{{{ set_config_file(
-        path=target_path,
-        parameter=parameter,
-        value=value,
-        create=true,
-        insert_after="",
-        insert_before="",
-        insensitive=true,
-        separator="=",
-        separator_regex="\s*=\s*",
-        prefix_regex="^\s*")
-    }}}
+{{{ bash_ensure_ini_config(target_path, section="Coredump", key=parameter, value=value) }}}
 {{%- endmacro -%}}
 
 
@@ -555,7 +391,7 @@ then
     if [ ! -e "$key_rule_file" ]
     then
         touch "$key_rule_file"
-        chmod 0640 "$key_rule_file"
+        chmod 0600 "$key_rule_file"
     fi
     files_to_inspect+=("$key_rule_file")
 fi
@@ -648,7 +484,12 @@ if rpm -q --quiet "{{{ package }}}" ; then
 {{% if SSG_TEST_SUITE_ENV %}}
     rpm -e --nodeps "{{{ package }}}"
 {{% else %}}
-    {{{ pkg_manager }}} remove -y "{{{ package }}}"
+    {{%- if pkg_manager == "dnf" -%}}
+        dnf remove -y --noautoremove "{{{ package }}}"
+    {{%- else -%}}
+        {{{ pkg_manager }}} remove -y "{{{ package }}}"
+    {{%- endif -%}}
+
 {{% endif %}}
 fi
 {{%- elif pkg_manager == "apt_get" -%}}
@@ -761,7 +602,6 @@ then
     fi
 fi
 
-
 [ ! -z "${DCONFFILE}" ] && echo "" >> "${DCONFFILE}"
 if ! grep -q "\\[{{{ path }}}\\]" "${DCONFFILE}"
 then
@@ -776,7 +616,14 @@ then
         sed -i "\\|\\[{{{ path }}}\\]|a\\{{{ key }}}=${escaped_value}" "${DCONFFILE}"
 fi
 
+{{%- if 'ubuntu' in product %}}
+# Make sure permissions allow regular users to read dconf settings.
+# Also define the umask to avoid `dconf update` changing permissions.
+chmod -R u=rwX,go=rX /etc/dconf/db
+(umask 0022 && dconf update)
+{{%- else %}}
 dconf update
+{{%- endif %}}
 {{%- endmacro -%}}
 
 
@@ -803,7 +650,14 @@ then
     echo "/{{{ key }}}/{{{ setting }}}" >> "/etc/dconf/db/{{{ db }}}/locks/{{{ lock_file }}}"
 fi
 
+{{%- if 'ubuntu' in product %}}
+# Make sure permissions allow regular users to read dconf settings.
+# Also define the umask to avoid `dconf update` changing permissions.
+chmod -R u=rwX,go=rX /etc/dconf/db
+(umask 0022 && dconf update)
+{{%- else %}}
 dconf update
+{{%- endif %}}
 {{%- endmacro -%}}
 
 
@@ -831,11 +685,15 @@ Macro to enable or disable a particular service.
 #}}
 {{%- if init_system == "systemd" -%}}
   {{%- if service_state == "disable" -%}}
+if [[ $(/usr/bin/systemctl is-system-running) != "offline" ]]; then
 /usr/bin/systemctl stop "{{{ service }}}"
+fi
 /usr/bin/systemctl disable "{{{ service }}}"
   {{%- else -%}}
 /usr/bin/systemctl enable "{{{ service }}}"
+if [[ $(/usr/bin/systemctl is-system-running) != "offline" ]]; then
 /usr/bin/systemctl start "{{{ service }}}"
+fi
   {{%- endif %}}
 # The service may not be running because it has been started and failed,
 # so let's reset the state so OVAL checks pass.
@@ -853,147 +711,6 @@ sed -i "s/disable.*/disable         = no/gI" "/etc/xinetd.d/$xinetd"
 sed -i "s/disable.*/disable         = yes/gI" "/etc/xinetd.d/$xinetd"
     {{%- endif -%}}
 {{%- endif -%}}
-{{%- endmacro -%}}
-
-
-{{%- macro _put_into_firefox_cfg(config_item, key, value_varname, where, sed_separator) -%}}
-# If the key exists, change it. Otherwise, add it to the config_file.
-if LC_ALL=C grep -m 1 -q '^{{{ config_item }}}("{{{ key }}}", ' "{{{ where }}}"; then
-    {{% if sed_separator in config_item %}}
-    {{{ raise("config_item (" + config_item + ") uses sed path separator (" + sed_separator + ") in " + rule_id) }}}
-    {{% elif sed_separator in key %}}
-    {{{ raise("key (" + key + ") uses sed path separator (" + sed_separator + ") in " + rule_id) }}}
-    {{% endif %}}
-    sed -i 's{{{ sed_separator }}}{{{ config_item }}}("{{{ key }}}".*{{{ sed_separator }}}{{{ config_item }}}("{{{ key }}}", '"${{{ value_varname }}})"';{{{ sed_separator }}}g' "{{{ where }}}"
-else
-    echo '{{{ config_item }}}("{{{ key }}}", '"${{{ value_varname }}}"');' >> "{{{ where }}}"
-fi
-{{%- endmacro -%}}
-
-
-{{%- macro _make_bash_variable_assignment(varname, value="", quoted_value="") -%}}
-{{% if value -%}}
-    {{{ varname }}}="{{{ value }}}"
-{{%- elif quoted_value -%}}
-    {{{ varname }}}="\"{{{ quoted_value }}}\""
-{{%- else %}}
-    {{{ raise("Specify either 'value' or 'quoted_value' as macro arguments.") }}}
-{{%- endif -%}}
-{{%- endmacro -%}}
-
-
-{{#
-
-Example Calls:
-
-    With a fixed integer value::
-
-        bash_firefox_js_setting("local-settings.js", "general.config.obscure_value", "0")
-
-    With a fixed string value::
-
-        bash_firefox_js_setting("local-settings.js", "general.config.filename", quoted_value="mozilla.cfg")
-
-    With a string variable::
-
-        bash_firefox_js_setting("local-settings.js", "general.config.filename", quoted_value="$var_config_file_name")
-
-:param config_file:          Configuration file that will be modified
-:type config_file: str
-:param key:                  Configuration option to change
-:type key: str
-:param value:                Value of the configuration option to change
-:type value: str
-:param quoted_value:
-:type quoted_value: str
-:param sed_separator:
-:type sed_separator: char
-
-#}}
-{{%- macro bash_firefox_js_setting(config_file, key, value="", quoted_value="", sed_separator="/") %}}
-{{{ _make_bash_variable_assignment(varname="value", value=value, quoted_value=quoted_value) }}}
-firefox_js="{{{ config_file }}}"
-firefox_dirs="/usr/lib/firefox /usr/lib64/firefox /usr/local/lib/firefox /usr/local/lib64/firefox"
-firefox_pref="defaults/pref"
-firefox_preferences="defaults/preferences"
-
-# Check the possible Firefox install directories
-for firefox_dir in ${firefox_dirs}; do
-    # If the Firefox directory exists, then Firefox is installed
-    if [ -d "${firefox_dir}" ]; then
-        # Different versions of Firefox have different preferences directories, check for them and set the right one
-        if [ -d "${firefox_dir}/${firefox_preferences}" ] ; then
-            firefox_pref_dir="${firefox_dir}/${firefox_preferences}"
-        elif [ -d "${firefox_dir}/${firefox_pref}" ] ; then
-            firefox_pref_dir="${firefox_dir}/${firefox_pref}"
-        else
-            firefox_pref_dir="${firefox_dir}/${firefox_preferences}"
-            mkdir -p "${firefox_pref_dir}"
-            chmod 755 "${firefox_pref_dir}"
-        fi
-
-        # Make sure the Firefox .js file exists and has the appropriate permissions
-        if ! [ -f "${firefox_pref_dir}/${firefox_js}" ] ; then
-            touch "${firefox_pref_dir}/${firefox_js}"
-            chmod 644 "${firefox_pref_dir}/${firefox_js}"
-        fi
-
-        {{{ _put_into_firefox_cfg(config_item="pref", key=key, value_varname="value", where="${firefox_pref_dir}/${firefox_js}", sed_separator=sed_separator) | indent(4 * 2) }}}
-    fi
-done
-{{%- endmacro -%}}
-
-
-{{#
-Function to replace configuration setting(s) in the Firefox preferences configuration (.cfg) file or add the
-preference if it does not exist.
-
-Example Call(s):
-
-    Without string or variable::
-
-        bash_firefox_cfg_setting("mozilla.cfg" "extensions.update.enabled" value="false")
-
-    With string::
-
-        bash_firefox_cfg_setting("mozilla.cfg" "security.default_personal_cert" quoted_value="Ask Every Time")
-
-    With a string variable::
-
-        bash_firefox_cfg_setting("mozilla.cfg" "browser.startup.homepage" quoted_value="${var_default_home_page}")
-
-:param config_file:           Configuration file that will be modified
-:type config_file: str
-:param key:                  Configuration option to change
-:type key: str
-:param value:                Value of the configuration option to change
-:type value: str
-:param quoted_value:
-:type quoted_value: str
-:param sed_separator:
-:type sed_separator: char
-
-#}}
-{{%- macro bash_firefox_cfg_setting(config_file, key, value="", quoted_value="", sed_separator="/") %}}
-firefox_cfg="{{{ config_file }}}"
-{{{ _make_bash_variable_assignment(varname="value", value=value, quoted_value=quoted_value) }}}
-firefox_dirs="/usr/lib/firefox /usr/lib64/firefox /usr/local/lib/firefox /usr/local/lib64/firefox"
-
-# Check the possible Firefox install directories
-for firefox_dir in ${firefox_dirs}; do
-    # If the Firefox directory exists, then Firefox is installed
-    if [ -d "${firefox_dir}" ]; then
-        # Make sure the Firefox .cfg file exists and has the appropriate permissions
-        if ! [ -f "${firefox_dir}/${firefox_cfg}" ] ; then
-            echo "//  IMPORTANT: Start your code on the 2nd line" > "${firefox_dir}/${firefox_cfg}"
-            chmod 644 "${firefox_dir}/${firefox_cfg}"
-        elif ! head -1 "${firefox_dir}/${firefox_cfg}" | grep -q "^//"; then
-            sed -i '1 i\// IMPORTANT: Start your code on the 2nd line' "${firefox_dir}/${firefox_cfg}"
-        fi
-
-        {{{ _put_into_firefox_cfg(config_item="lockPref", key=key, value_varname="value", where="${firefox_dir}/${firefox_cfg}", sed_separator=sed_separator) | indent(4 * 2) }}}
-    fi
-done
 {{%- endmacro -%}}
 
 
@@ -1079,21 +796,26 @@ authselect enable-feature {{{ feature }}}
 
 #}}
 {{%- macro bash_enable_pam_faillock_directly_in_pam_files() -%}}
-{{% if 'ubuntu' in product %}}
+{{% if 'debian' in product %}}
 pam_file="/etc/pam.d/common-auth"
 if ! grep -qE '^\s*auth\s+required\s+pam_faillock\.so\s+preauth.*$' "$pam_file" ; then
-    sed -i --follow-symlinks '/^auth.*pam_unix\.so.*/i auth        required      pam_faillock.so preauth' "$pam_file"
+    # insert at the top
+    sed -i --follow-symlinks '/^# here are the per-package modules/i auth        required      pam_faillock.so preauth' "$pam_file"
 fi
 if ! grep -qE '^\s*auth\s+\[default=die\]\s+pam_faillock\.so\s+authfail.*$' "$pam_file" ; then
-    num_lines=$(sed -n 's/^auth.*success=\([0-9]\).*pam_unix\.so.*/\1/p' "$pam_file")
+
+    num_lines=$(sed -n 's/^\s*auth.*success=\([1-9]\).*pam_unix\.so.*/\1/p' "$pam_file")
     if [ ! -z "$num_lines" ]; then
-        echo "$num_lines"
-        pattern=""
-        for ((i=1; i <= num_lines; i++)); do
-            pattern="${pattern}n;"
-        done;
-        sed -i --follow-symlinks '/^auth.*pam_unix\.so.*/{'$pattern'a auth        [default=die]      pam_faillock.so authfail
- }' "$pam_file"
+
+        # Add pam_faillock (authfail) module below pam_unix, skipping N-1 lines, where N is
+        # the number of jumps in the pam_unix success=N statement. Ignore commented and empty lines.
+
+        append_position=$(cat -n "${pam_file}" \
+                          | grep -P "^\s+\d+\s+auth\s+.*$" \
+                          | grep -w "pam_unix.so" -A $(( num_lines - 1 )) \
+                          | tail -n 1 | cut -f 1 | tr -d ' '
+                         )
+        sed -i --follow-symlinks ''${append_position}'a auth        [default=die]      pam_faillock.so authfail' "$pam_file"
     else
         sed -i --follow-symlinks '/^auth.*pam_unix\.so.*/a auth        [default=die]      pam_faillock.so authfail' "$pam_file"
     fi
@@ -1106,6 +828,38 @@ pam_file="/etc/pam.d/common-account"
 if ! grep -qE '^\s*account\s+required\s+pam_faillock\.so.*$' "$pam_file" ; then
     echo 'account   required     pam_faillock.so' >> "$pam_file"
 fi
+{{% elif 'ubuntu' in product %}}
+conf_name=cac_faillock
+
+if [ ! -f /usr/share/pam-configs/"$conf_name" ]; then
+    cat << EOF > /usr/share/pam-configs/"$conf_name"
+Name: Enable pam_faillock to deny access
+Default: yes
+Conflicts: faillock
+Priority: 0
+Auth-Type: Primary
+Auth:
+    [default=die]                   pam_faillock.so authfail
+EOF
+fi
+
+if [ ! -f /usr/share/pam-configs/"$conf_name"_notify ]; then
+    cat << EOF > /usr/share/pam-configs/"$conf_name"_notify
+Name: Notify of failed login attempts and reset count upon success
+Default: yes
+Conflicts: faillock_notify
+Priority: 1025
+Auth-Type: Primary
+Auth:
+    requisite                       pam_faillock.so preauth
+Account-Type: Primary
+Account:
+    required                        pam_faillock.so
+EOF
+fi
+
+DEBIAN_FRONTEND=noninteractive pam-auth-update
+
 {{% else %}}
 AUTH_FILES=("/etc/pam.d/system-auth" "/etc/pam.d/password-auth")
 for pam_file in "${AUTH_FILES[@]}"
@@ -1127,6 +881,54 @@ if [ -f /usr/bin/authselect ]; then
 else
     {{{ bash_enable_pam_faillock_directly_in_pam_files() }}}
 fi
+{{%- endmacro -%}}
+
+
+{{#
+    Enable pam_pwquality.so PAM module by using pam-auth-update.
+    This option is only recommended when pam-auth-update tool is available for the system.
+#}}
+{{%- macro bash_pam_pwquality_enable() -%}}
+conf_name=cac_pwquality
+if [ ! -f /usr/share/pam-configs/"$conf_name" ]; then
+    cat << EOF > /usr/share/pam-configs/"$conf_name"
+Name: Pwquality password strength checking
+Default: yes
+Priority: 1025
+Conflicts: cracklib, pwquality
+Password-Type: Primary
+Password:
+    requisite                   pam_pwquality.so
+EOF
+fi
+
+DEBIAN_FRONTEND=noninteractive pam-auth-update
+{{%- endmacro -%}}
+
+
+{{#
+    Enable pam_unix.so PAM module by using pam-auth-update.
+    This option is only recommended when pam-auth-update tool is available for the system.
+#}}
+{{%- macro bash_pam_unix_enable() -%}}
+conf_name=cac_unix
+conf_path="/usr/share/pam-configs"
+
+if [ ! -f "$conf_path"/"$conf_name" ]; then
+    if [ -f "$conf_path"/unix ]; then
+        if grep -q "$(md5sum "$conf_path"/unix | cut -d ' ' -f 1)" /var/lib/dpkg/info/libpam-runtime.md5sums;then
+            cp "$conf_path"/unix "$conf_path"/"$conf_name"
+            sed -i 's/Priority: [0-9]\+/Priority: 257\
+Conflicts: unix/' "$conf_path"/"$conf_name"
+            DEBIAN_FRONTEND=noninteractive pam-auth-update
+        else
+            echo "Not applicable - checksum of $conf_path/unix does not match the original." >&2
+        fi
+    else
+        echo "Not applicable - $conf_path/unix does not exist" >&2
+    fi
+fi
+
 {{%- endmacro -%}}
 
 
@@ -1170,7 +972,7 @@ PAM_FILE_PATH="/etc/authselect/$CURRENT_PROFILE/$PAM_FILE_NAME"
 #}}
 {{%- macro bash_pam_lastlog_enable_showfailed(pam_file, control, after_match='') -%}}
 if [ -f /usr/bin/authselect ]; then
-    if authselect list-features minimal | grep -q with-silent-lastlog; then
+    if authselect list-features sssd | grep -q with-silent-lastlog; then
         {{{ bash_disable_authselect_feature('with-silent-lastlog') | indent(8) }}}
     else
         {{# the following macro ensures the PAM_FILE_PATH variable is properly set #}}
@@ -1203,7 +1005,7 @@ fi
 #}}
 {{%- macro bash_pam_pwhistory_enable(pam_file, control, after_match='') -%}}
 if [ -f /usr/bin/authselect ]; then
-    if authselect list-features minimal | grep -q with-pwhistory; then
+    if authselect list-features sssd | grep -q with-pwhistory; then
         {{{ bash_enable_authselect_feature('with-pwhistory') | indent(8) }}}
     else
         {{# the following macro ensures the PAM_FILE_PATH variable is properly set #}}
@@ -1211,7 +1013,25 @@ if [ -f /usr/bin/authselect ]; then
         {{{ bash_ensure_pam_module_line("$PAM_FILE_PATH", 'password', control, 'pam_pwhistory.so', after_match) | indent(8) }}}
     fi
 else
+{{% if 'ubuntu' in product %}}
+conf_name={{{ pam_file }}}
+conf_path="/usr/share/pam-configs"
+
+if [ ! -f "$conf_path"/"$conf_name" ]; then
+    cat << EOF > "$conf_path"/"$conf_name"
+Name: pwhistory password history checking
+Default: yes
+Priority: 1024
+Password-Type: Primary
+Password: {{{ control }}} pam_pwhistory.so remember=24 enforce_for_root try_first_pass use_authtok
+Password-Initial: {{{ control }}} pam_pwhistory.so remember=24 enforce_for_root try_first_pass
+EOF
+fi
+
+DEBIAN_FRONTEND=noninteractive pam-auth-update
+{{% else %}}
     {{{ bash_ensure_pam_module_line(pam_file, 'password', control, 'pam_pwhistory.so', after_match) | indent(4) }}}
+{{% endif %}}
 fi
 {{%- endmacro -%}}
 
@@ -1279,12 +1099,14 @@ fi
 #}}
 {{%- macro bash_pam_faillock_parameter_value(option, value='', authfail=True) -%}}
 {{% if 'ubuntu' in product %}}
-AUTH_FILES=("/etc/pam.d/common-auth" "/etc/pam.d/password-auth")
+AUTH_FILES=("/etc/pam.d/common-auth")
+SKIP_FAILLOCK_CHECK=true
 {{% else %}}
 AUTH_FILES=("/etc/pam.d/system-auth" "/etc/pam.d/password-auth")
+SKIP_FAILLOCK_CHECK=false
 {{% endif %}}
 FAILLOCK_CONF="/etc/security/faillock.conf"
-if [ -f $FAILLOCK_CONF ]; then
+if [ -f $FAILLOCK_CONF ] || [ "$SKIP_FAILLOCK_CHECK" = "true" ]; then
     {{%- if value == '' %}}
     regex="^\s*{{{ option }}}"
     line="{{{ option }}}"
@@ -1301,10 +1123,12 @@ if [ -f $FAILLOCK_CONF ]; then
         sed -i --follow-symlinks 's|^\s*\({{{ option }}}\s*=\s*\)\(\S\+\)|\1'"{{{ value }}}"'|g' $FAILLOCK_CONF
     fi
     {{%- endif %}}
+    {{% if 'ubuntu' not in product %}}
     for pam_file in "${AUTH_FILES[@]}"
     do
         {{{ bash_remove_pam_module_option_configuration("$pam_file",'auth','','pam_faillock.so', option ) | indent(8) }}}
     done
+    {{% endif %}}
 else
     for pam_file in "${AUTH_FILES[@]}"
     do
@@ -1332,6 +1156,38 @@ else
         {{%- endif %}}
     done
 fi
+{{%- endmacro -%}}
+
+
+{{#
+    Sets PAM pwquality module options and values. The module argument is not removed from pam files
+    since it is not inserted there in Ubuntu case.
+    It also assume pam_pwquality.so is added as required module for account.
+
+:param option: pwquality option eg. retry, minlen, dcredit
+:type option: str
+:param value: value of option
+:type value: str
+
+#}}
+{{%- macro bash_pam_pwquality_parameter_value(option, value='') -%}}
+PWQUALITY_CONF="/etc/security/pwquality.conf"
+    {{%- if value == '' %}}
+    regex="^\s*{{{ option }}}"
+    line="{{{ option }}}"
+    {{%- else %}}
+    regex="^\s*{{{ option }}}\s*="
+    line="{{{ option }}} = {{{ value }}}"
+    {{%- endif %}}
+    if ! grep -q $regex $PWQUALITY_CONF; then
+        echo $line >> $PWQUALITY_CONF
+    {{%- if value == '' %}}
+    fi
+    {{%- else %}}
+    else
+        sed -i --follow-symlinks 's|^\s*\({{{ option }}}\s*=\s*\)\(\S\+\)|\1'"{{{ value }}}"'|g' $PWQUALITY_CONF
+    fi
+    {{%- endif %}}
 {{%- endmacro -%}}
 
 
@@ -1380,7 +1236,7 @@ printf '%s\n' "{{{ message | replace('"', '\\"') }}}" >&2
 
 #}}
 {{%- macro set_config_file(path, parameter, value, create, insert_after, insert_before, insensitive=true, separator=" ", separator_regex="\s\+", prefix_regex="^\s*", sed_path_separator="/") -%}}
-    {{%- set new_line = parameter+separator+value -%}}
+    {{%- set new_line = parameter+separator~value -%}}
     {{#- An escaped dollar in the parameter is escaped because of its significance for the shell, so when making a regex out of the parameter, we remove the shell escape, as the regex escape will do its thing. -#}}
     {{%- set line_regex = prefix_regex + ((parameter | replace("\\$", "$") | escape_regex) | replace("/", "\/")) + separator_regex -%}}
 if [ -e "{{{ path }}}" ] ; then
@@ -1560,7 +1416,6 @@ for f in /etc/sudoers /etc/sudoers.d/* ; do
 done
 {{%- endmacro -%}}
 
-
 {{% macro bash_sssd_ldap_config(parameter, value) -%}}
 SSSD_CONF="/etc/sssd/sssd.conf"
 LDAP_REGEX='[[:space:]]*\[domain\/[^]]*]([^(\n)]*(\n)+)+?[[:space:]]*{{{ parameter }}}'
@@ -1587,6 +1442,12 @@ if grep -qvzosP $AD_REGEX $SSSD_CONF; then
                 fi
         fi
 fi
+
+readarray -t SSSD_CONF_D_FILES < <(find /etc/sssd/conf.d/ -name "*.conf")
+for SSSD_CONF_D_FILE in "${SSSD_CONF_D_FILES[@]}"; do
+    sed -i "s#{{{ parameter }}}[^(\n)]*#{{{ parameter }}} = {{{ value }}}#" "$SSSD_CONF_D_FILE"
+done
+
 {{%- endmacro %}}
 
 
@@ -1595,7 +1456,7 @@ fi
 #}}
 {{%- macro bash_package_installed(pkgname) -%}}
 {{%- if pkg_manager == "apt_get" -%}}
-dpkg-query --show --showformat='${db:Status-Status}\n' "{{{ pkgname }}}" 2>/dev/null | grep -q installed
+dpkg-query --show --showformat='${db:Status-Status}\n' "{{{ pkgname }}}" 2>/dev/null | grep -q ^installed
 {{%- else -%}}
 rpm --quiet -q "{{{ pkgname }}}"
 {{%- endif -%}}
@@ -1705,14 +1566,14 @@ fi
 
 #}}
 {{%- macro bash_restrict_permissions_home_directories(recursive=false) -%}}
-for home_dir in $(awk -F':' '{ if ($3 >= {{{ uid_min }}} && $3 != {{{ nobody_uid }}}) print $6 }' /etc/passwd); do
+for home_dir in $(awk -F':' '{ if ($3 >= {{{ uid_min }}} && $3 != {{{ nobody_uid }}} && $6 != "/") print $6 }' /etc/passwd); do
     # Only update the permissions when necessary. This will avoid changing the inode timestamp when
     # the permission is already defined as expected, therefore not impacting in possible integrity
     # check systems that also check inodes timestamps.
     {{%- if recursive %}}
-    find "$home_dir" -perm /7027 -exec chmod u-s,g-w-s,o=- {} \;
+    find "$home_dir" -perm /7027 \! -type l -exec chmod u-s,g-w-s,o=- {} \;
     {{%- else %}}
-    find "$home_dir" -maxdepth 0 -perm /7027 -exec chmod u-s,g-w-s,o=- {} \;
+    find "$home_dir" -maxdepth 0 -perm /7027 \! -type l -exec chmod u-s,g-w-s,o=- {} \;
     {{%- endif %}}
 done
 {{%- endmacro -%}}
@@ -1860,7 +1721,6 @@ Notes:
 #}}
 {{% macro bash_fix_audit_syscall_rule(tool, action_arch_filters, other_filters, auid_filters, syscall, syscall_groupings, key) -%}}
 
-
 unset syscall_a
 unset syscall_grouping
 unset syscall_string
@@ -1890,7 +1750,6 @@ read -a syscall_grouping <<< {{{ syscall_groupings }}}
 #
 files_to_inspect=()
 
-
 {{% if tool == "auditctl" %}}
 # If audit tool is 'auditctl', then add '/etc/audit/audit.rules'
 # file to the list of files to be inspected
@@ -1912,7 +1771,7 @@ then
     if [ ! -e "$file_to_inspect" ]
     then
         touch "$file_to_inspect"
-        chmod 0640 "$file_to_inspect"
+        chmod 0600 "$file_to_inspect"
     fi
 fi
 {{%- endif %}}
@@ -2005,7 +1864,7 @@ if [ "$skip" -ne 0 ]; then
         auid_string=$([[ {{{ auid_filters }}} ]] && echo " {{{ auid_filters }}}") || /bin/true
         full_rule="{{{ action_arch_filters }}}${syscall_string}${other_string}${auid_string} -F key={{{ key }}}" || /bin/true
         echo "$full_rule" >> "$default_file"
-        chmod o-rwx ${default_file}
+        chmod 0600 ${default_file}
     else
         # Check if the syscalls are declared as a comma separated list or
         # as multiple -S parameters
@@ -2067,7 +1926,7 @@ Part of the grub2_bootloader_argument template.
 
 #}}
 {{% macro grub2_bootloader_argument_remediation(arg_name, arg_name_value) %}}
-{{% if 'ubuntu' in product or product in ['rhel7', 'ol7', 'sle12', 'sle15'] %}}
+{{% if 'ubuntu' in product or 'debian' in product or product in ['ol7', 'sle12', 'sle15'] %}}
 {{{ update_etc_default_grub_manually(arg_name, arg_name_value) }}}
 {{% endif -%}}
 {{{ grub_command("add", arg_name_value) }}}
@@ -2084,7 +1943,7 @@ Part of the grub2_bootloader_argument template.
 {{%- macro update_etc_default_grub_manually_absent(arg_name) -%}}
 # Correct the form of default kernel command line in GRUB
 if grep -q '^GRUB_CMDLINE_LINUX=.*{{{ arg_name }}}=.*"'  '/etc/default/grub' ; then
-       sed -i 's/\(^GRUB_CMDLINE_LINUX=".*\){{{ arg_name }}}=?[^[:space:]]*\(.*"\)/\1 \2/' '/etc/default/grub'
+       sed -i 's/\(^GRUB_CMDLINE_LINUX=".*\){{{ arg_name }}}=\?[^[:space:]]*\(.*"\)/\1 \2/' '/etc/default/grub'
 fi
 {{%- endmacro %}}
 
@@ -2098,7 +1957,7 @@ Part of the grub2_bootloader_argument_absent template.
 
 #}}
 {{% macro grub2_bootloader_argument_absent_remediation(arg_name) %}}
-{{% if 'ubuntu' in product or product in ['rhel7', 'ol7', 'sle12', 'sle15'] %}}
+{{% if 'ubuntu' in product or product in ['ol7', 'sle12', 'sle15', 'slmicro5'] %}}
 {{{ update_etc_default_grub_manually_absent(arg_name) }}}
 {{% endif -%}}
 {{{ grub_command("remove", arg_name) }}}
@@ -2288,9 +2147,9 @@ This macro creates a Bash conditional which uses dpkg to check if a package pass
 #}}
 {{%- macro bash_pkg_conditional_dpkg(package, op=None, ver=None) -%}}
 {{%- if ver -%}}
-dpkg-query --show --showformat='${db:Status-Status}\n' '{{{ package }}}' 2>/dev/null | grep -q installed && {{{ bash_compare_version_dpkg(package, op, ver) }}}
+dpkg-query --show --showformat='${db:Status-Status}\n' '{{{ package }}}' 2>/dev/null | grep -q '^installed' && {{{ bash_compare_version_dpkg(package, op, ver) }}}
 {{%- else -%}}
-dpkg-query --show --showformat='${db:Status-Status}\n' '{{{ package }}}' 2>/dev/null | grep -q installed
+dpkg-query --show --showformat='${db:Status-Status}\n' '{{{ package }}}' 2>/dev/null | grep -q '^installed'
 {{%- endif -%}}
 {{%- endmacro -%}}
 
@@ -2371,7 +2230,7 @@ Example macro invocation(s)::
 :type value: str
 
 #}}
-{{% macro bash_ensure_ini_config(files, section, key, value) -%}}
+{{% macro bash_ensure_ini_config(files, section, key, value, no_quotes=true) -%}}
 found=false
 
 # set value in all files if they contain section or key
@@ -2382,12 +2241,20 @@ for f in $(echo -n "{{{ files }}}"); do
 
     # find key in section and change value
     if grep -qzosP "[[:space:]]*\[{{{ section }}}\]([^\n\[]*\n+)+?[[:space:]]*{{{ key }}}" "$f"; then
-            sed -i "s/{{{ key }}}[^(\n)]*/{{{ key }}} = {{{ value }}}/" "$f"
+{{% if no_quotes %}}
+            sed -i "s/{{{ key }}}[^(\n)]*/{{{ key }}}={{{ value | replace("/", "\/") }}}/" "$f"
+{{% else %}}
+            sed -i 's/{{{ key }}}[^(\n)]*/{{{ key }}}="{{{ value | replace("/", "\/") }}}"/' "$f"
+{{% endif %}}
             found=true
 
     # find section and add key = value to it
     elif grep -qs "[[:space:]]*\[{{{ section }}}\]" "$f"; then
-            sed -i "/[[:space:]]*\[{{{ section }}}\]/a {{{ key }}} = {{{ value }}}" "$f"
+{{% if no_quotes %}}
+            sed -i "/[[:space:]]*\[{{{ section }}}\]/a {{{ key }}}={{{ value | replace("/", "\/") }}}" "$f"
+{{% else %}}
+            sed -i '/[[:space:]]*\[{{{ section }}}\]/a {{{ key }}}="{{{ value | replace ("/", "\/") }}}"' "$f"
+{{% endif %}}
             found=true
     fi
 done
@@ -2396,7 +2263,11 @@ done
 if ! $found ; then
     file=$(echo "{{{ files }}}" | cut -f1 -d ' ')
     mkdir -p "$(dirname "$file")"
-    echo -e "[{{{ section }}}]\n{{{ key }}} = {{{ value }}}" >> "$file"
+{{% if no_quotes %}}
+    echo -e "[{{{ section }}}]\n{{{ key }}}={{{ value }}}" >> "$file"
+{{% else %}}
+    echo -e '[{{{ section }}}]\n{{{ key }}}="{{{ value }}}"' >> "$file"
+{{% endif %}}
 fi
 {{%- endmacro %}}
 
@@ -2432,22 +2303,23 @@ fi
 
 #}}
 {{%- macro bash_ensure_pam_module_line(pam_file, group, control, module, after_match='') -%}}
-if ! grep -qP '^\s*{{{ group }}}\s+'"{{{ control }}}"'\s+{{{ module }}}\s*.*' "{{{ pam_file }}}"; then
+{{% set control_regex = control | escape_regex %}}
+if ! grep -qP "^\s*{{{ group }}}\s+{{{ control_regex }}}\s+{{{ module }}}\s*.*" "{{{ pam_file }}}"; then
     # Line matching group + control + module was not found. Check group + module.
     if [ "$(grep -cP '^\s*{{{ group }}}\s+.*\s+{{{ module }}}\s*' "{{{ pam_file }}}")" -eq 1 ]; then
         # The control is updated only if one single line matches.
-        sed -i -E --follow-symlinks 's/^(\s*{{{ group }}}\s+).*(\b{{{ module }}}.*)/\1'"{{{ control }}}"' \2/' "{{{ pam_file }}}"
+        sed -i -E --follow-symlinks "s/^(\s*{{{ group }}}\s+).*(\b{{{ module }}}.*)/\1{{{ control }}} \2/" "{{{ pam_file }}}"
     else
         {{%- if after_match == '' %}}
-        echo '{{{ group }}}    '"{{{ control }}}"'    {{{ module }}}' >> "{{{ pam_file }}}"
+        echo "{{{ group }}}    {{{ control }}}    {{{ module }}}" >> "{{{ pam_file }}}"
         {{%- elif after_match == 'BOF'  %}}
-        sed -i --follow-symlinks '1i {{{ group }}}     '"{{{ control }}}"'    {{{ module }}}' "{{{ pam_file }}}"
+        sed -i --follow-symlinks "1i {{{ group }}}     {{{ control }}}    {{{ module }}}" "{{{ pam_file }}}"
         {{%- else %}}
         LAST_MATCH_LINE=$(grep -nP "{{{ after_match }}}" "{{{ pam_file }}}" | tail -n 1 | cut -d: -f 1)
         if [ ! -z $LAST_MATCH_LINE ]; then
-            sed -i --follow-symlinks $LAST_MATCH_LINE' a {{{ group }}}     '"{{{ control }}}"'    {{{ module }}}' "{{{ pam_file }}}"
+            sed -i --follow-symlinks $LAST_MATCH_LINE" a {{{ group }}}     {{{ control }}}    {{{ module }}}" "{{{ pam_file }}}"
         else
-            echo '{{{ group }}}    '"{{{ control }}}"'    {{{ module }}}' >> "{{{ pam_file }}}"
+            echo "{{{ group }}}    {{{ control }}}    {{{ module }}}" >> "{{{ pam_file }}}"
         fi
         {{%- endif %}}
     fi
@@ -2475,19 +2347,20 @@ fi
 
 #}}
 {{%- macro bash_ensure_pam_module_option(pam_file, group, control, module, option, value='', after_match='') -%}}
+{{% set control_regex = control | escape_regex %}}
 {{{ bash_ensure_pam_module_line(pam_file, group, control, module, after_match) }}}
 # Check the option
-if ! grep -qP '^\s*{{{ group }}}\s+'"{{{ control }}}"'\s+{{{ module }}}\s*.*\s{{{ option }}}\b' "{{{ pam_file }}}"; then
+if ! grep -qP "^\s*{{{ group }}}\s+{{{ control_regex }}}\s+{{{ module }}}\s*.*\s{{{ option }}}\b" "{{{ pam_file }}}"; then
     {{%- if value == '' %}}
-    sed -i -E --follow-symlinks '/\s*{{{ group }}}\s+'"{{{ control }}}"'\s+{{{ module }}}.*/ s/$/ {{{ option }}}/' "{{{ pam_file }}}"
+    sed -i -E --follow-symlinks "/\s*{{{ group }}}\s+{{{ control_regex }}}\s+{{{ module }}}.*/ s/$/ {{{ option }}}/" "{{{ pam_file }}}"
     {{%- else %}}
-    sed -i -E --follow-symlinks '/\s*{{{ group }}}\s+'"{{{ control }}}"'\s+{{{ module }}}.*/ s/$/ {{{ option }}}='"{{{ value }}}"'/' "{{{ pam_file }}}"
+    sed -i -E --follow-symlinks "/\s*{{{ group }}}\s+{{{ control_regex }}}\s+{{{ module }}}.*/ s/$/ {{{ option }}}={{{ value }}}/" "{{{ pam_file }}}"
     {{%- endif %}}
 {{%- if value == '' %}}
 fi
 {{%- else %}}
 else
-    sed -i -E --follow-symlinks 's/(\s*{{{ group }}}\s+'"{{{ control }}}"'\s+{{{ module }}}\s+.*)('"{{{ option }}}"'=)[[:alnum:]]+\s*(.*)/\1\2'"{{{ value }}}"' \3/' "{{{ pam_file }}}"
+    sed -i -E --follow-symlinks "s/(\s*{{{ group }}}\s+{{{ control_regex }}}\s+{{{ module }}}\s+.*)({{{ option }}}=)[[:alnum:]]+\s*(.*)/\1\2{{{ value }}} \3/" "{{{ pam_file }}}"
 fi
 {{%- endif %}}
 {{%- endmacro -%}}
@@ -2510,11 +2383,11 @@ fi
 #}}
 {{%- macro bash_remove_pam_module_option(pam_file, group, control, module, option) -%}}
 {{%- if control == '' %}}
-if grep -qP '^\s*{{{ group }}}\s.*\b{{{ module }}}\s.*\b{{{ option }}}\b' "{{{ pam_file }}}"; then
-    sed -i -E --follow-symlinks 's/(.*{{{ group }}}.*{{{ module }}}.*)\b{{{ option }}}\b=?[[:alnum:]]*(.*)/\1\2/g' "{{{ pam_file }}}"
+if grep -qP "^\s*{{{ group }}}\s.*\b{{{ module }}}\s.*\b{{{ option }}}\b" "{{{ pam_file }}}"; then
+    sed -i -E --follow-symlinks "s/(.*{{{ group }}}.*{{{ module }}}.*)\b{{{ option }}}\b=?[[:alnum:]]*(.*)/\1\2/g" "{{{ pam_file }}}"
 {{%- else %}}
-if grep -qP '^\s*{{{ group }}}\s+'"{{{ control }}}"'\s+{{{ module }}}\s.*\b{{{ option }}}\b' "{{{ pam_file }}}"; then
-    sed -i -E --follow-symlinks 's/(.*{{{ group }}}.*'"{{{ control }}}"'.*{{{ module }}}.*)\s{{{ option }}}=?[[:alnum:]]*(.*)/\1\2/g' "{{{ pam_file }}}"
+if grep -qP "^\s*{{{ group }}}\s+{{{ control }}}\s+{{{ module }}}\s.*\b{{{ option }}}\b" "{{{ pam_file }}}"; then
+    sed -i -E --follow-symlinks "s/(.*{{{ group }}}.*{{{ control }}}.*{{{ module }}}.*)\s{{{ option }}}=?[[:alnum:]]*(.*)/\1\2/g" "{{{ pam_file }}}"
 {{%- endif %}}
 fi
 {{%- endmacro -%}}
@@ -2554,6 +2427,11 @@ CURRENT_PROFILE=$(authselect current -r | awk '{ print $1 }')
 # If not already in use, a custom profile is created preserving the enabled features.
 if [[ ! $CURRENT_PROFILE == custom/* ]]; then
     ENABLED_FEATURES=$(authselect current | tail -n+3 | awk '{ print $2 }')
+    # The "local" profile does not contain essential security features required by multiple Benchmarks.
+    # If currently used, it is replaced by "sssd", which is the best option in this case.
+    if [[ $CURRENT_PROFILE == local ]]; then
+        CURRENT_PROFILE="sssd"
+    fi
     authselect create-profile hardening -b $CURRENT_PROFILE
     CURRENT_PROFILE="custom/hardening"
     {{{ bash_apply_authselect_changes('before-hardening-custom-profile') | indent(4) }}}
@@ -2748,4 +2626,67 @@ while read -r user; do
     del+="/^${user}:/d;"
 done < <(awk -F: '($3 >= {{{ uid_min }}}) { print $1 }' /etc/passwd)
 sed -i "${del}" /etc/passwd
+{{%- endmacro -%}}
+
+{{#
+Macro for enabling dconf user profile in /etc/dconf/profile/<PROFILE>
+
+The macro adds the following lines to the profile:
+---
+user-db:user
+system-db:<DATABASE>
+---
+If the profile exists but does not contain the above lines, the
+lines will be inserted at the beginning of the profile.
+
+:param profile: name of dconf profile (e.g. user, gdm)
+:type profile: str
+:param database: name of dconf database (e.g. local, gdm)
+:type database: str
+#}}
+{{% macro bash_enable_dconf_user_profile(profile, database) -%}}
+
+mkdir -p /etc/dconf/profile
+dconf_profile_path=/etc/dconf/profile/{{{ profile }}}
+
+[[ -s "${dconf_profile_path}" ]] || echo > "${dconf_profile_path}"
+
+if ! grep -Pzq "(?s)^\s*user-db:user.*\n\s*system-db:{{{ database }}}" "${dconf_profile_path}"; then
+    sed -i --follow-symlinks "1s/^/user-db:user\nsystem-db:{{{ database }}}\n/" "${dconf_profile_path}"
+fi
+
+# Make sure the corresponding directories exist
+mkdir -p /etc/dconf/db/{{{ database }}}.d
+
+# Make sure permissions allow regular users to read dconf settings.
+# Also define the umask to avoid `dconf update` changing permissions.
+chmod -R u=rwX,go=rX /etc/dconf/profile
+(umask 0022 && dconf update)
+{{%- endmacro -%}}
+
+{{#
+This macro defines a conditional expression that is evaluated as true
+if the remediation is performed during a build of a bootable container image.
+#}}
+{{%- macro bash_bootc_build() -%}}
+{ rpm --quiet -q kernel rpm-ostree bootc && ! rpm --quiet -q openshift-kubelet && { [ -f "/run/.containerenv" ] || [ -f "/.containerenv" ]; }; }
+{{%- endmacro -%}}
+
+{{#
+This macro defines a conditional expression that is evaluated as true
+if the remediation is not performed during a build of a bootable container image.
+#}}
+{{%- macro bash_not_bootc_build() -%}}
+! {{{ bash_bootc_build() }}}
+{{%- endmacro -%}}
+
+
+{{#
+This macro creates a Bash conditional which checks the system architecture in /proc/sys/kernel/{osrelease,arch}
+
+  :param arch: system architecture (x86_64, aarch64, s90x, ppc64le, ...)
+  :type arch: str
+#}}
+{{%- macro bash_arch_conditional(arch) -%}}
+( grep -sqE "^.*\.{{{ arch }}}$" /proc/sys/kernel/osrelease || grep -sqE "^{{{ arch }}}$" /proc/sys/kernel/arch; )
 {{%- endmacro -%}}

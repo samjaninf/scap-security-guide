@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Configure Dovecot to Use the SSL Certificate file'
 
@@ -23,5 +22,3 @@ rationale: |-
 
 severity: unknown
 
-identifiers:
-    cce@rhel7: CCE-80297-5

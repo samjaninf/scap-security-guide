@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Encrypt All File Uploads'
 
@@ -16,8 +15,6 @@ rationale: |-
 
 severity: high
 
-references:
-    stigid: WG235
 
 ocil_clause: 'it is not'
 

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7
 
 title: 'Ensure SELinux support is enabled in Docker'
 
@@ -22,8 +21,5 @@ rationale: |-
 severity: high
 
 platform: machine  # The check uses service_... extended definition, which doesnt support offline mode
-
-identifiers:
-    cce@rhel7: CCE-80442-7
 
 platform: machine

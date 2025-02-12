@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhcos4,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Verify Group Ownership of System Login Banner for Remote Connections'
 
@@ -17,18 +16,17 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-86050-2
     cce@rhel8: CCE-86051-0
     cce@rhel9: CCE-86052-8
+    cce@rhel10: CCE-88343-9
     cce@sle12: CCE-92236-9
     cce@sle15: CCE-91358-2
+    cce@slmicro5: CCE-94059-3
 
 references:
-    cis@rhel7: 1.7.6
-    cis@rhel8: 1.7.6
-    cis@rhel9: 1.7.6
     cis@sle12: 1.8.1.6
     cis@sle15: 1.8.1.6
+    cis@slmicro5: 1.8.1.6
     cis@ubuntu2004: 1.8.1.6
     cis@ubuntu2204: 1.7.6
 
@@ -42,4 +40,3 @@ template:
     vars:
         filepath: /etc/issue.net
         gid_or_name: '0'
-        missing_file_pass: 'true'

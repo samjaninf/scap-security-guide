@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel9
 
 title: 'Configure Firewalld to Trust Loopback Traffic'
 
@@ -22,11 +21,9 @@ rationale: |-
 severity: medium
 
 identifiers:
+    cce@rhel8: CCE-87278-8
     cce@rhel9: CCE-86116-1
-
-references:
-    ccn@rhel9: A.8.SEC-RHEL3
-    cis@rhel9: 3.4.2.4
+    cce@rhel10: CCE-90267-6
 
 ocil_clause: 'loopback traffic is not trusted'
 

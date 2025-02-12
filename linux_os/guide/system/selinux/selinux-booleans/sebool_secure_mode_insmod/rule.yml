@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Configure the secure_mode_insmod SELinux Boolean'
 
@@ -11,13 +10,10 @@ description: |-
 
 rationale: ""
 
-references:
-    anssi: BP28(R67)
 
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82308-8
     cce@rhel8: CCE-83310-3
     cce@rhel9: CCE-84087-6
     cce@sle12: CCE-91576-9

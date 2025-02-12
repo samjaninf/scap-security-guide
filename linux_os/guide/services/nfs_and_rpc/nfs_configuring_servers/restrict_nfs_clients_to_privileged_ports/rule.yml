@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Restrict NFS Clients to Privileged Ports'
 
@@ -19,9 +18,6 @@ rationale: |-
     attacker could gain access to data on the NFS server.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80242-1
 
 references:
     cis-csc: 11,12,14,15,16,18,3,5

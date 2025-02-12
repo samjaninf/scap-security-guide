@@ -44,21 +44,18 @@ ocil: |-
 
 identifiers:
     cce@rhcos4: CCE-82664-4
-    cce@rhel7: CCE-80219-9
     cce@rhel8: CCE-82422-7
     cce@rhel9: CCE-86817-4
+    cce@rhel10: CCE-90003-5
     cce@sle12: CCE-92212-0
     cce@sle15: CCE-91343-4
+    cce@slmicro5: CCE-93882-9
 
 references:
-    ccn@rhel9: A.11.SEC-RHEL2
     cis-csc: 11,12,14,15,16,18,3,5
-    cis@alinux2: 5.2.18
-    cis@rhel7: 5.3.4
-    cis@rhel8: 5.2.4
-    cis@rhel9: 5.2.4
     cis@sle12: 5.2.4
     cis@sle15: 5.2.4
+    cis@slmicro5: 5.2.4
     cis@ubuntu2004: 5.2.17
     cis@ubuntu2204: 5.2.4
     cobit5: DSS05.02,DSS05.04,DSS05.05,DSS05.07,DSS06.03,DSS06.06
@@ -70,4 +67,8 @@ references:
     nist: AC-3,CM-6(a)
     nist-csf: PR.AC-4,PR.AC-6,PR.PT-3
     pcidss: Req-2.2.4
-    pcidss4: "2.2.6"
+
+warnings:
+    - general: |-
+        Automated remediation is not available for this configuration check
+        because each system has unique user names and group names.

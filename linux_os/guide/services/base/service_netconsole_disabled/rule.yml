@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable Network Console (netconsole)'
 
@@ -18,7 +17,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80261-1
     cce@rhel8: CCE-82455-7
 
 references:
@@ -37,7 +35,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="netconsole") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

@@ -23,15 +23,12 @@ severity: low
 
 identifiers:
     cce@rhcos4: CCE-82520-8
-    cce@rhel7: CCE-83395-4
     cce@rhel8: CCE-82297-3
     cce@rhel9: CCE-84065-2
+    cce@rhel10: CCE-86569-1
 
 references:
     cis-csc: 11,14,3,9
-    cis@alinux2: 3.4.4
-    cis@rhel7: 3.5.4
-    cis@rhel9: 3.1.3
     cis@ubuntu2004: 3.4.4
     cis@ubuntu2204: 3.4.4
     cobit5: BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS05.02,DSS05.05,DSS06.06

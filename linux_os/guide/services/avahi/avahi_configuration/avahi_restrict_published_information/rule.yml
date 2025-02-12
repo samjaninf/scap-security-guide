@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Restrict Information Published by Avahi'
 
@@ -31,7 +30,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80343-7
     cce@rhel8: CCE-82375-7
 
 references:

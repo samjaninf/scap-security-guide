@@ -1,11 +1,11 @@
 #!/bin/bash
-# platform = multi_platform_ubuntu
+# platform = multi_platform_ubuntu,multi_platform_debian
 # check-import = stdout
 
 # If apparmor or apparmor-utils are not installed, then this test fails.
-{{{ bash_package_installed("apparmor") }}} && {{{ bash_package_installed("apparmor-utils") }}}
+{{{ bash_package_installed("apparmor") }}}
 if [ $? -ne 0 ]; then
-        exit ${XCCDF_RESULT_FAIL}
+    exit ${XCCDF_RESULT_FAIL}
 fi
 
 # if number of apparmor profiles loaded not the same as enforced profiles, then it fails.

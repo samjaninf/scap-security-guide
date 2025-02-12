@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,rhcos4,rhel7
 
 title: 'Install the dracut-fips-aesni Package'
 
@@ -18,11 +17,7 @@ rationale: |-
 
 severity: medium
 
-identifiers:
-  cce@rhel7: CCE-90778-2
-
 references:
-    anssi: BP28(R1)
     cis-csc: 12,15,8
     cjis: 5.10.1.2
     cobit5: APO13.01,DSS01.04,DSS05.02,DSS05.03
@@ -60,5 +55,3 @@ warnings:
         party review by an accredited lab. While open source software is
         capable of meeting this, it does not meet FIPS-140 unless the vendor
         submits to this process.
-
-platform: machine

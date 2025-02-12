@@ -1,15 +1,14 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,rhel8,rhel9
-
 title: 'Disable LDAP Server (slapd)'
 
 description: |-
-    The Lightweight Directory Access Protocol (LDAP) is a service that provides a method for looking up information from a central database.
+    The Lightweight Directory Access Protocol (LDAP) is a service that
+    provides a method for looking up information from a central database.
 
 rationale: |-
-    If the system will not need to act as an LDAP server, it is recommended that the software be
-    disabled to reduce the potential attack surface.
+    If the system will not need to act as an LDAP server, it is recommended
+    that the software be disabled to reduce the potential attack surface.
 
 severity: medium
 
@@ -17,20 +16,17 @@ identifiers:
     cce@rhel8: CCE-87262-2
     cce@rhel9: CCE-87263-0
 
-references:
-    cis@alinux2: 2.1.6
-    cis@alinux3: 2.2.14
-
 ocil_clause: |-
     {{{ ocil_clause_service_disabled(service="slapd") }}}
 
 ocil: |-
     {{{ ocil_service_disabled(service="slapd") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled
     vars:
         servicename: slapd
         packagename: openldap-servers
+        packagename@ubuntu2404: slapd

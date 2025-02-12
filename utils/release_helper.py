@@ -11,7 +11,8 @@ Script created to help maintainers during the release process by automating Gith
 # - https://pygithub.readthedocs.io/en/latest/github_objects.html
 # - https://docs.github.com/en/rest
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
+
 from github import Github
 import argparse
 import configparser
@@ -35,7 +36,8 @@ def create_ini_file_template(creds_file):
         with open(new_creds_file, mode='w', encoding='utf-8') as file:
             file.write(
                 '[DEFAULT]\n'
-                'github_token = <generate your token in https://github.com/settings/tokens>\n')
+                'github_token = <generate your token in https://github.com/settings/tokens>\n'
+                '# Include these scopes: "repo:status", "repo_deployment" and "public_repo"')
         print(f'Great! {new_creds_file} was created! Edit it to include your personal token.')
     except Exception as e:
         print(f'Error: {e}')
@@ -240,10 +242,18 @@ def create_repo_milestone(repo, name) -> None:
     latest_release = get_latest_release(repo)
     estimated_release_date = get_next_release_date(latest_release.published_at)
     if get_confirmation(f'Are you sure about creating the "{name}" milestone?'):
+        future_release_date = get_next_release_date(estimated_release_date)
+        future_stabilization_date = get_next_stabilization_date(future_release_date)
+        formatted_date_stabilization = get_date_for_message(future_stabilization_date)
+        milestone_description = (
+            f'Milestone for the release {name}. '
+            f'Stabilization phase starts on {formatted_date_stabilization}')
         try:
             repo.create_milestone(
-                title=name, description=f'Milestone for the release {name}',
-                due_on=estimated_release_date)
+                title=name, description=milestone_description, due_on=estimated_release_date)
+            print(f'Milestone {name} successfully created with the following information:')
+            print(f'Description: {milestone_description}')
+            print(f'Due on: {estimated_release_date}')
         except Exception as e:
             print(f'Error: {e}')
             exit(1)
@@ -326,15 +336,42 @@ def get_monday_that_follows(date) -> datetime:
     return date + timedelta((0 - date.weekday()) % 7)
 
 
+def get_next_quarter_first_month(latest_release_date: datetime) -> int:
+    last_release_quarter = (latest_release_date.month - 1) // 3 + 1
+    if last_release_quarter == 4:
+        next_release_quarter = 1
+    else:
+        next_release_quarter = last_release_quarter + 1
+    return (next_release_quarter - 1) * 3 + 1
+
+
+def get_last_monday_of_month(year: int, month: int) -> datetime:
+    if month == 12:
+        last_month_day = datetime(year, month, 31)
+    else:
+        last_month_day = datetime(year, month + 1, 1) - timedelta(days=1)
+
+    days_since_monday = (last_month_day.weekday() - 0) % 7
+    return last_month_day - timedelta(days=days_since_monday)
+
+
 def get_next_stabilization_date(release_date) -> datetime:
     two_weeks_before = release_date - timedelta(weeks=2)
     stabilization_monday = get_monday_that_follows(two_weeks_before)
     return stabilization_monday.date()
 
 
-def get_next_release_date(latest_release_date) -> datetime:
-    two_months_ahead = latest_release_date + timedelta(days=60)
-    return get_friday_that_follows(two_months_ahead)
+def get_next_release_date(latest_release_date: datetime) -> datetime:
+    month = get_next_quarter_first_month(latest_release_date)
+    now = datetime.now(UTC)
+
+    if month > 9 and latest_release_date <= now:
+        year = latest_release_date.year + 1
+    else:
+        year = latest_release_date.year
+
+    last_monday = get_last_monday_of_month(year, month)
+    return get_friday_that_follows(last_monday + timedelta(weeks=1))
 
 
 def is_next_release_in_progress(repo) -> bool:
@@ -362,6 +399,13 @@ def get_date_for_message(date) -> datetime:
     return date.strftime("%B %d, %Y")
 
 
+def get_git_config_username() -> str:
+    user_name = subprocess.run(
+        ['git', 'config', 'user.name'],
+        capture_output=True, text=True, cwd=get_repo_root_path())
+    return user_name.stdout
+
+
 def get_release_highlights(release) -> str:
     highlights = []
     for line in release.body.split('\r\n'):
@@ -387,6 +431,8 @@ def get_release_start_message(repo) -> str:
     future_stabilization_date = get_next_stabilization_date(future_release_date)
     future_date_stabilization = get_date_for_message(future_stabilization_date)
 
+    message_author = get_git_config_username()
+
     template = f'''
         Subject: stabilization of v{next_release_version}
 
@@ -403,7 +449,9 @@ def get_release_start_message(repo) -> str:
         The next version, {future_version}, is scheduled to be released on {future_date},
         with the stabilization phase starting on {future_date_stabilization}.
 
-        Regards,'''
+        Regards,
+
+        {message_author}'''
     return template
 
 
@@ -414,6 +462,7 @@ def get_release_end_message(repo) -> str:
     last_commit = get_contributors_last_commit()
     new_contributors = get_new_contributors(last_commit)
     released_version = get_latest_version(repo)
+    message_author = get_git_config_username()
 
     for asset in latest_release.get_assets():
         if asset.content_type == 'application/x-bzip2':
@@ -453,7 +502,9 @@ SHA-512 hash: {source_tarball_hash}
 
 Thank you to everyone who contributed!
 
-Regards,'''
+Regards,
+
+{message_author}'''
     return template
 
 
@@ -706,7 +757,7 @@ def parse_arguments():
         epilog="Example: release_helper.py -c ~/secrets.ini -r ComplianceAsCode/content stats",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        '-c', '--creds-file', default='~/secret.ini',
+        '-c', '--creds-file', default='~/secrets.ini',
         help="INI file containing Github token.")
     parser.add_argument(
         '-r', '--repository', action='store', default='ComplianceAsCode/content',

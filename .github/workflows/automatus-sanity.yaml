@@ -2,7 +2,9 @@ name: Automatus Sanity
 on:
   pull_request:
     branches: [ master, 'stabilization*' ]
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.run_id }}
+  cancel-in-progress: true
 env:
   DATASTREAM: ssg-fedora-ds.xml
 jobs:
@@ -13,14 +15,14 @@ jobs:
       image: fedora:latest
     steps:
       - name: Install Deps
-        run: dnf install -y cmake make openscap-utils python3-pyyaml python3-jinja2 git python3-pip
+        run: dnf install -y cmake make openscap-utils python3-pyyaml python3-jinja2 git python3-pip python3-setuptools
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
         with:
           fetch-depth: 0
       - name: Build product
         run: ./build_product fedora --debug
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
         with:
           name: ${{ env.DATASTREAM }}
           path: build/${{ env.DATASTREAM }}
@@ -33,7 +35,7 @@ jobs:
       - name: Install Deps
         run: sudo apt-get update && sudo apt-get install cmake ninja-build libopenscap8 libxml2-utils xsltproc python3-jinja2 python3-yaml ansible-lint podman
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Generate id_rsa key
         run: ssh-keygen -N '' -t rsa -f ~/.ssh/id_rsa
       - name: Build test suite container
@@ -47,19 +49,19 @@ jobs:
           sudo chown root:root /usr/local/bin/oscap-ssh
           rm -f oscap-ssh
       - name: Get Datastream
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4
         with:
           name: ${{ env.DATASTREAM }}
       - name: Check One Rule
-        run: ./tests/automatus.py rule --remove-platforms --remove-machine-only --logdir log_rule --datastream ssg-fedora-ds.xml --container ssg_test_suite package_sudo_installed
+        run: ./tests/automatus.py rule --remove-platforms --make-applicable-in-containers --logdir log_rule --datastream ssg-fedora-ds.xml --container ssg_test_suite package_sudo_installed
       - name: Check One Rule - Ansible
-        run: ./tests/automatus.py rule --remove-platforms --remove-machine-only --logdir log_rule_ansible --remediate-using ansible --datastream ssg-fedora-ds.xml --container ssg_test_suite package_sudo_installed
+        run: ./tests/automatus.py rule --remove-platforms --make-applicable-in-containers --logdir log_rule_ansible --remediate-using ansible --datastream ssg-fedora-ds.xml --container ssg_test_suite file_owner_etc_passwd
       - name: Check Profile Mode
-        run: ./tests/automatus.py profile --remove-platforms --remove-machine-only --logdir log_profile --datastream ssg-fedora-ds.xml --container ssg_test_suite test
+        run: ./tests/automatus.py profile --remove-platforms --make-applicable-in-containers --logdir log_profile --datastream ssg-fedora-ds.xml --container ssg_test_suite test
       - name: Check Combined Mode
-        run: ./tests/automatus.py combined --remove-platforms --remove-machine-only --logdir log_combined --datastream ssg-fedora-ds.xml --container ssg_test_suite test
+        run: ./tests/automatus.py combined --remove-platforms --make-applicable-in-containers --logdir log_combined --datastream ssg-fedora-ds.xml --container ssg_test_suite test
       - name: Check Template Mode
-        run: ./tests/automatus.py template --remove-platforms --remove-machine-only --logdir log_template --datastream ssg-fedora-ds.xml --container ssg_test_suite --slice 1 15 file_owner
+        run: ./tests/automatus.py template --logdir log_template --datastream ssg-fedora-ds.xml --container ssg_test_suite --slice 1 15 file_owner
       - name: Check for ERROR in logs
         run: grep -q "^ERROR" log_rule/test_suite.log log_rule_ansible/test_suite.log log_profile/test_suite.log log_combined/test_suite.log log_template/test_suite.log
         id: check_results

@@ -20,17 +20,15 @@ selections:
   - package_talk-server_removed
   - package_xinetd_removed
   - service_xinetd_disabled
-  - package_ypbind_removed
   - package_telnet_removed
   - service_telnet_disabled
   - package_telnet-server_removed
   - package_rsh_removed
   - package_rsh-server_removed
-  - service_zebra_disabled
-  - package_quagga_removed
   - service_avahi-daemon_disabled
   - package_squid_removed
   - service_squid_disabled
+  - package_ypbind_removed
 
   ### Software update
   - ensure_oracle_gpgkey_installed
@@ -69,6 +67,8 @@ selections:
   - file_ownership_library_dirs
 
   ### Passwords
+  - var_authselect_profile=sssd
+  - enable_authselect
   - no_empty_passwords
 
   ### Partitioning

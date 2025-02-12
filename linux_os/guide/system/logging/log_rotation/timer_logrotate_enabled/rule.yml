@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol9,rhcos4,rhel9,sle12,sle15
 
 title: 'Enable logrotate Timer'
 
@@ -14,23 +13,27 @@ rationale: |-
 
 severity: medium
 
+{{% if 'rhel' in product %}}
+platform: package[logrotate] and os_linux[rhel]>=9
+{{% elif 'ol' in product %}}
+platform: package[logrotate] and os_linux[ol]>=9
+{{% else %}}
 platform: package[logrotate]
+{{% endif %}}
 
 identifiers:
-    cce@rhel7: CCE-86156-7
     cce@rhel8: CCE-86157-5
     cce@rhel9: CCE-86158-3
+    cce@rhel10: CCE-87463-6
     cce@sle12: CCE-92401-9
     cce@sle15: CCE-92585-9
+    cce@slmicro5: CCE-94013-0
 
 references:
-    anssi: BP28(R71),NT12(R18)
     cis-csc: 1,14,15,16,3,5,6
-    cis@rhel7: "4.2.4"
-    cis@rhel8: "4.3"
-    cis@rhel9: "4.3"
     cis@sle12: "4.2.4"
     cis@sle15: "4.2.4"
+    cis@slmicro5: 4.2.4
     cobit5: APO11.04,BAI03.05,DSS05.04,DSS05.07,MEA02.01
     disa: CCI-000366
     isa-62443-2009: 4.3.3.3.9,4.3.3.5.8,4.3.4.4.7,4.4.2.1,4.4.2.2,4.4.2.4
@@ -49,3 +52,11 @@ template:
     vars:
         timername: logrotate
         packagename: logrotate
+
+{{% if product in ["rhel8"] %}}
+warnings:
+    - general:
+        The Systemd unit <tt>logrotate.timer</tt> does not exist in
+        {{{ full_name }}}. The rule <tt>ensure_logrotate_activated</tt> is
+        suggested instead.
+{{% endif %}}

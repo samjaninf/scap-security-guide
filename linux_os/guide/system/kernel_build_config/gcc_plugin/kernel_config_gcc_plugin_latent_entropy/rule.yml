@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel8,rhel9
 
 title: 'Generate some entropy during boot and runtime'
 
@@ -30,9 +29,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-87034-5
     cce@rhel9: CCE-87035-2
-
-references:
-    anssi: BP28(R21)
+    cce@rhel10: CCE-87680-5
 
 ocil_clause: 'the kernel was not built with the required value'
 

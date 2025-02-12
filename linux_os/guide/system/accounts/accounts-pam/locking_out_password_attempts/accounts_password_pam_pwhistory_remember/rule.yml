@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: sle12,sle15,ubuntu2004
 
 title: 'Limit Password Reuse'
 
@@ -22,15 +21,16 @@ severity: medium
 identifiers:
     cce@sle12: CCE-83173-5
     cce@sle15: CCE-91398-8
+    cce@slmicro5: CCE-94082-5
 
 references:
     cis@sle12: 5.3.3
     cis@sle15: 5.3.3
+    cis@slmicro5: 5.3.3
     cis@ubuntu2004: 5.3.3
     disa: CCI-000200
     nist@sle12: IA-5(1)(e),IA-5 (1).1(v)
     srg: SRG-OS-000077-GPOS-00045
-    stigid@sle12: SLES-12-010310
 
 ocil_clause: |-
      the value of remember is not set equal to or greater than {{{ xccdf_value("var_password_pam_remember") }}}
@@ -48,6 +48,7 @@ ocil: |-
 
 platform: package[pam]
 
+{{% if 'ubuntu' not in product or product == 'ubuntu2004' %}}
 template:
     name: pam_options
     vars:
@@ -60,3 +61,4 @@ template:
           operation: greater than or equal
         - argument: use_authtok
           new_argument: use_authtok
+{{% endif %}}

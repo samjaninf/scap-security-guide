@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,rhv4,sle15,ubuntu2004,ubuntu2204
 
 title: 'Disable Ctrl-Alt-Del Burst Action'
 
@@ -51,16 +50,16 @@ severity: high
 
 identifiers:
     cce@rhcos4: CCE-82495-3
-    cce@rhel7: CCE-80449-2
     cce@rhel8: CCE-80784-2
     cce@rhel9: CCE-90308-8
+    cce@rhel10: CCE-87627-6
     cce@sle15: CCE-85665-8
 
 references:
     cis-csc: 12,13,14,15,16,18,3,5
     cobit5: APO01.06,DSS05.04,DSS05.07,DSS06.02
     cui: 3.4.5
-    disa: CCI-000366
+    disa: CCI-000366,CCI-002235
     hipaa: 164.308(a)(1)(ii)(B),164.308(a)(7)(i),164.308(a)(7)(ii)(A),164.310(a)(1),164.310(a)(2)(i),164.310(a)(2)(ii),164.310(a)(2)(iii),164.310(b),164.310(c),164.310(d)(1),164.310(d)(2)(iii)
     isa-62443-2009: 4.3.3.7.3
     isa-62443-2013: 'SR 2.1,SR 5.2'
@@ -75,6 +74,7 @@ references:
     stigid@rhel8: RHEL-08-040172
     stigid@sle15: SLES-15-040062
     stigid@ubuntu2004: UBTU-20-010460
+    stigid@ubuntu2204: UBTU-22-211015
 
 ocil_clause: 'the system is configured to reboot when Ctrl-Alt-Del is pressed more than 7 times in 2 seconds.'
 
@@ -92,7 +92,7 @@ fixtext: |-
 
 srg_requirement: 'The systemd Ctrl-Alt-Delete burst key sequence in {{{ full_name }}} must be disabled.'
 
-{{% if product not in ["ubuntu2004", "ubuntu2204"] %}}
+{{% if product not in ["ubuntu2004", "ubuntu2204", "ubuntu2404"] %}}
 warnings:
     - functionality: |-
         Disabling the <tt>Ctrl-Alt-Del</tt> key sequence

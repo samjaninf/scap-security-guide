@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel9
 
 title: 'Configure Microarchitectural Data Sampling mitigation'
 
@@ -41,13 +40,13 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-89456-8
     cce@rhel9: CCE-90456-5
+    cce@rhel10: CCE-88327-2
 
 ocil_clause: 'MDS mitigations are not configured appropriately'
 
 ocil: |-
     {{{ ocil_grub2_argument("mds=" + xccdf_value(var_mds_options)) | indent(4) }}}
 
-platform: machine
 
 template:
     name: grub2_bootloader_argument

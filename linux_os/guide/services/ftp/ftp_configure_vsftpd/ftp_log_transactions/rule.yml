@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Enable Logging of All FTP Transactions'
 
@@ -17,9 +16,6 @@ rationale: |-
     format. The default vsftpd log file is <tt>/var/log/vsftpd.log</tt>.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80247-0
 
 ocil_clause: 'xferlog_enable is missing, or is not set to yes'
 

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Ensure real-time clock is set to UTC'
 
@@ -28,12 +27,13 @@ references:
     stigid@sle12: SLES-12-030310
     stigid@sle15: SLES-15-010410
     stigid@ubuntu2004: UBTU-20-010230
+    stigid@ubuntu2204: UBTU-22-252020
 
 ocil_clause: 'the system real-time clock is not configured to use UTC as its time base'
 
 ocil: |-
     To verify that the system real-time clock is set to UTC or GMT, run the following command:
-    {{% if product in ['sle12','sle15'] %}}
+    {{% if product in ['sle12','sle15'] or 'ubuntu' in product %}}
     <pre># timedatectl status | grep -i "time zone"</pre>
     <pre># Time zone: UTC (UTC, +0000)</pre>
     {{% else %}}

@@ -1,7 +1,6 @@
 documentation_complete: true
 
 # TODO: The plan is not to need this for RHEL>=8.4
-prodtype: ol8,rhel8
 
 title: 'OpenSSL uses strong entropy source'
 
@@ -22,10 +21,10 @@ rationale: |-
 severity: medium
 identifiers:
     cce@rhel8: CCE-82721-2
+    cce@rhel10: CCE-89143-2
 
 references:
     ism: 1277,1552
-    ospp: FCS_RBG_EXT.1.2
     srg: SRG-OS-000480-GPOS-00227
 
 ocil: |-

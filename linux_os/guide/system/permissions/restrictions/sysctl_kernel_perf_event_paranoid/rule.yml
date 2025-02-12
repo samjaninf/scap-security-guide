@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,sle12,sle15
 
 title: 'Disallow kernel profiling by unprivileged users'
 
@@ -13,15 +12,14 @@ severity: low
 
 identifiers:
     cce@rhcos4: CCE-82502-6
-    cce@rhel7: CCE-81053-1
     cce@rhel8: CCE-81054-9
     cce@rhel9: CCE-83959-7
+    cce@rhel10: CCE-90142-1
     cce@sle12: CCE-91568-6
     cce@sle15: CCE-91258-4
 
 references:
-    anssi: BP28(R23)
-    disa: CCI-001090
+    disa: CCI-001082,CCI-001090
     nist: AC-6
     ospp: FMT_SMF_EXT.1
     srg: SRG-OS-000132-GPOS-00067,SRG-OS-000138-GPOS-00069,SRG-APP-000243-CTR-000600
@@ -36,7 +34,7 @@ fixtext: |-
 
 srg_requirement: '{{{ full_name }}} must prevent kernel profiling by unprivileged users.'
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

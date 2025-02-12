@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Enable HTTPD Error Logging'
 
@@ -18,12 +17,6 @@ rationale: |-
     problems.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-81130-7
-
-references:
-    stigid: WA00605
 
 ocil_clause: 'it is not'
 

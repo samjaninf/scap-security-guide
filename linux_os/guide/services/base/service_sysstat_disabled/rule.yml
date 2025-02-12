@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable System Statistics Reset Service (sysstat)'
 
@@ -20,7 +19,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-80273-6
     cce@rhel8: CCE-82388-0
 
 references:
@@ -38,7 +36,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="sysstat") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

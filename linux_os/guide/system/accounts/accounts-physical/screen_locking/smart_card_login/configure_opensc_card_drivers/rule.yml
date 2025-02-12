@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Configure opensc Smart Card Drivers'
 
@@ -30,16 +29,16 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80565-5
     cce@rhel8: CCE-80766-9
     cce@rhel9: CCE-89122-6
+    cce@rhel10: CCE-90065-4
     cce@sle12: CCE-92221-1
     cce@sle15: CCE-85843-1
 
 references:
     cis-csc: 1,12,15,16,5
     cobit5: DSS05.04,DSS05.05,DSS05.07,DSS05.10,DSS06.03,DSS06.10
-    disa: CCI-000765,CCI-000766,CCI-000767,CCI-000768,CCI-000771,CCI-000772,CCI-000884
+    disa: CCI-001941,CCI-004045,CCI-000765,CCI-000766,CCI-000764
     isa-62443-2009: 4.3.3.2.2,4.3.3.5.1,4.3.3.5.2,4.3.3.6.1,4.3.3.6.2,4.3.3.6.3,4.3.3.6.4,4.3.3.6.5,4.3.3.6.6,4.3.3.6.7,4.3.3.6.8,4.3.3.6.9,4.3.3.7.2,4.3.3.7.4
     isa-62443-2013: 'SR 1.1,SR 1.10,SR 1.2,SR 1.3,SR 1.4,SR 1.5,SR 1.7,SR 1.8,SR 1.9,SR 2.1'
     ism: 1382,1384,1386
@@ -47,7 +46,6 @@ references:
     nist: IA-2(1),IA-2(2),IA-2(3),IA-2(4),IA-2(6),IA-2(7),IA-2(11),CM-6(a)
     nist-csf: PR.AC-1,PR.AC-6,PR.AC-7
     pcidss: Req-8.3
-    pcidss4: "8.4"
     srg: SRG-OS-000104-GPOS-00051,SRG-OS-000106-GPOS-00053,SRG-OS-000107-GPOS-00054,SRG-OS-000109-GPOS-00056,SRG-OS-000108-GPOS-00055,SRG-OS-000108-GPOS-00057,SRG-OS-000108-GPOS-00058
 
 ocil_clause: '"{{{ xccdf_value("var_smartcard_drivers") }}}" is not listed as a card driver, or there is no line returned for "card_drivers"'

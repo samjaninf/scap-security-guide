@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,ol9,rhel7,rhel8,rhel9,rhv4
 
 title: 'Mount Remote Filesystems with nodev'
 
@@ -13,9 +12,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80239-7
     cce@rhel8: CCE-84052-0
     cce@rhel9: CCE-90838-4
+    cce@rhel10: CCE-88013-8
 
 references:
     cis-csc: 11,13,14,3,8,9
@@ -49,3 +48,5 @@ template:
         mount_has_to_exist: 'yes'
         mountoption: nodev
         mountpoint: remote_filesystems
+
+platform: nfs_mount_defined

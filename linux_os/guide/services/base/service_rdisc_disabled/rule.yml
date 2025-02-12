@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,ol7,ol8,ol9,rhel7,rhel8,rhel9,uos20
 
 title: 'Disable Network Router Discovery Daemon (rdisc)'
 
@@ -20,7 +19,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80268-6
     cce@rhel8: CCE-80883-2
     cce@rhel9: CCE-84237-7
 
@@ -40,7 +38,7 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="rdisc") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

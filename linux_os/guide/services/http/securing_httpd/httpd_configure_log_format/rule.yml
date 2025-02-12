@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Configure Error Log Format'
 
@@ -19,12 +18,6 @@ rationale: |-
     included in the access log entries.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80548-1
-
-references:
-    stigid: WA00612
 
 ocil_clause: 'it is not'
 

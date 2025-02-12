@@ -1,7 +1,7 @@
 documentation_complete: true
 
 metadata:
-    version: V1R7
+    version: V2R3
 
 reference: https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=operating-systems%2Cunix-linux
 
@@ -9,7 +9,7 @@ title: 'DISA STIG for Oracle Linux 8'
 
 description: |-
     This profile contains configuration checks that align to the
-    DISA STIG for Oracle Linux 8 V1R7.
+    DISA STIG for Oracle Linux 8 V2R3.
 
 selections:
     ### Variables
@@ -19,6 +19,7 @@ selections:
     - var_password_pam_difok=8
     - var_password_pam_maxrepeat=3
     - var_password_hashing_algorithm=SHA512
+    - var_password_hashing_algorithm_pam=sha512
     - var_password_pam_maxclassrepeat=4
     - var_password_pam_minclass=4
     - var_accounts_minimum_age_login_defs=1
@@ -37,7 +38,6 @@ selections:
     - var_password_pam_lcredit=1
     - var_password_pam_retry=3
     - var_password_pam_minlen=15
-    - var_sshd_set_keepalive=0
     - sshd_approved_macs=stig_extended
     - sshd_approved_ciphers=stig_extended
     - sshd_idle_timeout_value=10_minutes
@@ -61,6 +61,8 @@ selections:
     - var_auditd_disk_full_action=ol8
     - var_sssd_certificate_verification_digest_function=sha1
     - login_banner_text=dod_banners
+    - var_authselect_profile=sssd
+    - var_multiple_time_servers=stig
 
     ### Enable / Configure FIPS
     - enable_fips_mode
@@ -71,13 +73,12 @@ selections:
     - configure_kerberos_crypto_policy
     - enable_dracut_fips_module
 
+    # Other needed rules
+    - enable_authselect
+
     ### Rules:
     # OL08-00-010000
     - installed_OS_is_vendor_supported
-
-    # OL08-00-010001
-    - package_mcafeetp_installed
-    - agent_mfetpd_running
 
     # OL08-00-010010
     - security_patches_up_to_date
@@ -113,7 +114,7 @@ selections:
     - sssd_has_trust_anchor
 
     # OL08-00-010100
-    - ssh_private_keys_have_passcode
+    - ssh_keys_passphrase_protected
 
     # OL08-00-010110
     - set_password_hashing_algorithm_logindefs
@@ -126,6 +127,7 @@ selections:
 
     # OL08-00-010130
     - set_password_hashing_min_rounds_logindefs
+    - var_password_hashing_min_rounds_login_defs=100000
 
     # OL08-00-010140
     - grub2_uefi_password
@@ -167,7 +169,8 @@ selections:
     - dir_perms_world_writable_sticky_bits
 
     # OL08-00-010200
-    - sshd_set_keepalive_0
+    - sshd_set_keepalive
+    - var_sshd_set_keepalive=1
 
     # OL08-00-010201
     - sshd_set_idle_timeout
@@ -467,7 +470,7 @@ selections:
     - accounts_have_homedir_login_defs
 
     # OL08-00-010770
-    - file_permission_user_init_files
+    - file_permission_user_init_files_root
 
     # OL08-00-010780
     - no_files_unowned_by_user
@@ -486,10 +489,10 @@ selections:
     - sshd_do_not_permit_user_env
     - sshd_do_not_permit_user_env.severity=high
 
-    # OL08-00-020000
+    # OL08-00-020000, OL08-00-020270
     - account_temp_expire_date
 
-    # OL08-00-020010, OL08-00-020011, OL08-00-020025, OL08-00-020026
+    # OL08-00-020010, OL08-00-020011
     - accounts_passwords_pam_faillock_deny
 
     # OL08-00-020012, OL08-00-020013
@@ -513,6 +516,12 @@ selections:
 
     # OL08-00-020024
     - accounts_max_concurrent_login_sessions
+
+    # OL08-00-020025
+    - account_password_pam_faillock_system_auth
+
+    # OL08-00-020026
+    - account_password_pam_faillock_password_auth
 
     # OL08-00-020027, OL08-00-020028
     - account_password_selinux_faillock_dir
@@ -611,14 +620,6 @@ selections:
     # OL08-00-020210
     - accounts_password_set_max_life_existing
 
-    # OL08-00-020221
-    - accounts_password_pam_pwhistory_remember_system_auth
-    - accounts_password_pam_pwhistory_remember_system_auth.severity=medium
-
-    # OL08-00-020220
-    - accounts_password_pam_pwhistory_remember_password_auth
-    - accounts_password_pam_pwhistory_remember_password_auth.severity=low
-
     # OL08-00-020230
     - accounts_password_pam_minlen
 
@@ -646,9 +647,6 @@ selections:
 
     # OL08-00-020264
     - file_groupownership_lastlog
-
-    # OL08-00-020270
-    - account_emergency_expire_date
 
     # OL08-00-020280
     - accounts_password_pam_ocredit
@@ -712,6 +710,7 @@ selections:
 
     # OL08-00-030062
     - auditd_name_format
+    - var_auditd_name_format=stig
 
     # OL08-00-030063
     - auditd_log_format
@@ -738,7 +737,7 @@ selections:
     - audit_rules_immutable
 
     # OL08-00-030122
-    - audit_immutable_login_uids
+    - audit_rules_immutable_login_uids
 
     # OL08-00-030130
     - audit_rules_usergroup_modification_shadow
@@ -1144,7 +1143,7 @@ selections:
     - sysctl_net_ipv6_conf_default_accept_source_route
 
     # OL08-00-040259
-    - sysctl_net_ipv4_ip_forward
+    - sysctl_net_ipv4_conf_all_forwarding
 
     # OL08-00-040260
     - sysctl_net_ipv6_conf_all_forwarding

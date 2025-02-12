@@ -7,7 +7,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 #}}
 {{%- macro oval_affected(products) %}}
 <affected family="unix">
-{{{ prodtype_to_platform(products)|indent(2) }}}
+{{{ product_to_platform(products)|indent(2) }}}
 </affected>
 {{%- endmacro %}}
 
@@ -132,7 +132,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 <def-group>
   <definition class="compliance" id="{{{ rule_id }}}" version="1">
     {{{ oval_metadata("Ensure '" + parameter + "' is configured with value '" + value | replace("(?i)", "") | replace("(?-i)", "") + (" in section '" + section if section else "") + "' in " + path) }}}
-    {{% set dir_path = path + ".d" %}}          
+    {{% set dir_path = path + ".d" %}}
     <criteria comment="{{{ application }}} is configured correctly"
     operator="OR">
         {{{- oval_line_in_file_criterion(path, parameter) }}}
@@ -317,7 +317,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 :type id_stem: str
 
 #}}
-{{%- macro oval_line_in_file_state(value='', multi_value='', quotes='', id_stem='') -%}}
+{{%- macro oval_line_in_file_state(value='', multi_value=false, quotes='', id_stem='') -%}}
 {{%- set id_stem = id_stem or rule_id -%}}
 {{%- set regex = value -%}}
 {{%- if quotes != "" %}}
@@ -335,6 +335,23 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
   <ind:subexpression datatype="string" operation="pattern match">{{{ regex }}}</ind:subexpression>
 </ind:textfilecontent54_state>
 {{%- endmacro %}}
+
+{{% macro oval_line_in_file_define_variable(var_name, datatype) %}}
+<local_variable id="local_var_regex_{{{ rule_id }}}"
+comment="Regex that matches exact value represented by {{{ var_name }}} XCCDF variable"
+datatype="{{{ datatype }}}" version="1">
+    <variable_component var_ref="{{{ var_name }}}" />
+</local_variable>
+
+<external_variable comment="Variable defining the value the argument should have" datatype="{{{ datatype }}}" id="{{{ var_name }}}" version="1" />
+{{% endmacro %}}
+
+{{%- macro oval_line_in_file_state_xccdf_variable(var_name='', id_stem='', datatype='') -%}}
+{{%- set id_stem = id_stem or rule_id -%}}
+<ind:textfilecontent54_state id="state_{{{ id_stem }}}" version="1">
+  <ind:subexpression datatype="{{{ datatype }}}" operation="equals" var_ref="local_var_regex_{{{ rule_id }}}" />
+</ind:textfilecontent54_state>
+{{%- endmacro -%}}
 
 
 {{%- macro oval_line_in_directory_criterion(path='', parameter='', missing_parameter_pass=false, avoid_conflicting=false) -%}}
@@ -356,6 +373,9 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 {{{- oval_line_in_file_state(value, multi_value, quotes, id_stem=rule_id ~ "_config_dir") -}}}
 {{%- endmacro %}}
 
+{{%- macro oval_line_in_directory_state_xccdf_variable(var_name='', datatype='') -%}}
+{{{- oval_line_in_file_state_xccdf_variable(var_name, id_stem=rule_id ~ "_config_dir", datatype=datatype) -}}}
+{{%- endmacro -%}}
 
 {{#
   Macro to define the OVAL criterion to check if the configuration file exists (Criterion definition).
@@ -471,7 +491,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 :type is_regex: bool
 
 #}}
-{{%- macro oval_argument_value_in_line_test(filepath, name, value, line_prefix='', line_suffix='', is_regex=False) -%}}
+{{%- macro oval_argument_value_in_line_test(filepath, name, value='', line_prefix='', line_suffix='', is_regex=False) -%}}
 {{%- if value -%}}
   {{%- set name_value = name+"="+value -%}}
 {{%- else -%}}
@@ -526,28 +546,6 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 </def-group>
 {{%- endmacro -%}}
 
-
-{{#
-  High level macro to check if a particular combination of parameter and value in the ssh daemon configuration file is set.
-  A case insensitive comparison is used in the prefix because sshd_config has case-insensitive parameters (but case-sensitive values).
-
-:param parameter: The parameter to be checked in the configuration file.
-:type parameter: str
-:param value: The value to be checked. This can also be a regular expression (e.g: value1|value2 can match both values).
-:type value: str
-:param missing_parameter_pass: If set, the check will also pass if the parameter is not present in the configuration file (default is applied).
-:type missing_parameter_pass: bool
-:param multi_value: If set, it means that the parameter can accept multiple values and the expected value must be present in the current list of values.
-:type multi_value: bool
-:param missing_config_file_fail: If set, the check will fail if the configuration file doesn't exist in the system.
-:type missing_config_file_fail: bool
-
-#}}
-{{%- macro oval_sshd_config(parameter='', value='', missing_parameter_pass=false, multi_value=false, missing_config_file_fail=false) %}}
-{{{ oval_check_config_file("/etc/ssh/sshd_config", prefix_regex="^[ \\t]*(?i)", parameter=parameter, separator_regex='(?-i)[ \\t]+', value=value, missing_parameter_pass=missing_parameter_pass, application="sshd", multi_value=multi_value, missing_config_file_fail=missing_config_file_fail) }}}
-{{%- endmacro %}}
-
-
 {{#
   High level macro to check if a particular shell variable is set.
 
@@ -588,6 +586,8 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 :type path: str
 :param dropin_dir: Path to the dropin directory
 :type dropin_dir: str
+:param section: optional section if the file has an ini-like format
+:type section: str
 :param parameter: The shell variable name.
 :type parameter: str
 :param value: The variable value WITHOUT QUOTES.
@@ -604,7 +604,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 :type missing_config_file_fail: bool
 #}}
 
-{{%- macro oval_check_dropin_file(path, dropin_dir, parameter='', value='', application='', no_quotes=false, missing_parameter_pass=false, multi_value=false, missing_config_file_fail=false) %}}
+{{%- macro oval_check_dropin_file(path, dropin_dir, section='', parameter='', value='', application='', no_quotes=false, missing_parameter_pass=false, multi_value=false, missing_config_file_fail=false) %}}
 <def-group>
   {{%- set prefix_regex = "^[ \\t]*" -%}}
   {{%- set separator_regex = '=' -%}}
@@ -628,6 +628,12 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
     </criteria>
     {{%- endif %}}
   </definition>
+
+  {{%- set quotes = "'\"" -%}}
+  {{%- if no_quotes == "true" %}}
+  {{%- set quotes = "" -%}}
+  {{%- endif %}}
+
   {{{ oval_line_in_file_test(path, parameter) }}}
   {{{ oval_line_in_file_object(path, section, prefix_regex, parameter, separator_regex, false, multi_value) }}}
   {{{ oval_line_in_file_state(value, multi_value, quotes) }}}
@@ -713,7 +719,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
       <criteria comment="sshd is not installed" operator="AND">
         <extend_definition comment="sshd is not required or requirement is unset"
         definition_ref="sshd_not_required_or_unset" />
-        {{% if product in ['opensuse', 'sle12', 'sle15'] %}}
+        {{% if product in ['opensuse', 'sle12', 'sle15', 'slmicro5'] %}}
         <extend_definition comment="rpm package openssh removed"
         definition_ref="package_openssh_removed" />
         {{% else %}}
@@ -731,7 +737,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
       <criteria comment="sshd is installed and configured" operator="AND">
         <extend_definition comment="sshd is required or requirement is unset"
         definition_ref="sshd_required_or_unset" />
-        {{% if product in ['opensuse', 'sle12', 'sle15'] %}}
+        {{% if product in ['opensuse', 'sle12', 'sle15', 'slmicro5'] %}}
         <extend_definition comment="rpm package openssh installed"
         definition_ref="package_openssh_installed" />
         {{% else %}}
@@ -1027,12 +1033,20 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 :type missing_parameter_pass: bool
 :param config_is_distributed: Is the param in /etc/sshd_config.d vs just /etc/ssh/sshd_config
 :type config_is_distributed: bool
+:param xccdf_variable: the name of an XCCDF variable carrying the value, this conflicts with the value parameter
+:type xccdf_variable: str
+:param datatype: a data type of the value
+:type datatype: str
 
 #}}
-{{%- macro sshd_oval_check(parameter, value, missing_parameter_pass, config_is_distributed) -%}}
+{{%- macro sshd_oval_check(parameter, value, missing_parameter_pass, config_is_distributed, xccdf_variable="", datatype="") -%}}
 {{%- set sshd_config_path = "/etc/ssh/sshd_config" %}}
 {{%- set sshd_config_dir = "/etc/ssh/sshd_config.d" -%}}
+{{%- if xccdf_variable -%}}
+{{%- set description = "Ensure '" ~ parameter ~ "' is configured with value configured in " ~ xccdf_variable ~ " variable in " ~ sshd_config_path %}}
+{{%- else -%}}
 {{%- set description = "Ensure '" ~ parameter ~ "' is configured with value '" ~ value ~ "' in " ~ sshd_config_path %}}
+{{%- endif -%}}
 {{%- if config_is_distributed == "true" %}}
 {{%- set description = description  ~ " or in " ~ sshd_config_dir -%}}
 {{%- endif %}}
@@ -1045,7 +1059,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
      <criteria comment="sshd is not installed" operator="AND">
         <extend_definition comment="sshd is not required or requirement is unset"
           definition_ref="sshd_not_required_or_unset" />
-          {{% if product in ['opensuse', 'sle12','sle15'] %}}
+          {{% if product in ['opensuse', 'sle12','sle15', 'slmicro5'] %}}
           <extend_definition definition_ref="package_openssh_removed"
           comment="rpm package openssh removed"/>
           {{% else %}}
@@ -1056,10 +1070,10 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
      <criteria comment="sshd is installed and configured" operator="AND">
         <extend_definition comment="sshd is required or requirement is unset"
           definition_ref="sshd_required_or_unset" />
-        {{% if product in ['opensuse', 'sle12','sle15'] %}}
-        <extend_definition comment="rpm package openssh installed" 
+        {{% if product in ['opensuse', 'sle12','sle15', 'slmicro5'] %}}
+        <extend_definition comment="rpm package openssh installed"
           definition_ref="package_openssh_installed" />
-        {{% else %}}  
+        {{% else %}}
         <extend_definition comment="rpm package openssh-server installed"
           definition_ref="package_openssh-server_installed" />
         {{% endif %}}
@@ -1074,12 +1088,16 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
             {{% endif %}}
           </criteria>
           {{%- if not missing_parameter_pass %}}
-          <criterion comment="the configuraton exists" test_ref="test_{{{ parameter }}}_present_{{{ rule_id }}}" />
+          <criterion comment="the configuration exists" test_ref="test_{{{ parameter }}}_present_{{{ rule_id }}}" />
           {{% endif %}}
         </criteria>
       </criteria>
     </criteria>
   </definition>
+
+{{% if xccdf_variable %}}
+{{{ oval_line_in_file_define_variable(xccdf_variable, datatype) }}}
+{{% endif %}}
 
   {{% if product in ["ol8", "ol9"] %}}
   {{{ oval_line_in_file_object(sshd_config_path, parameter="include", id_stem="sshd_include_value_" ~ rule_id, ** case_insensitivity_kwargs)| indent (2) }}}
@@ -1105,18 +1123,30 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
     <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
   </ind:textfilecontent54_object>
 
+  {{%- if xccdf_variable -%}}
+  {{{ oval_line_in_file_state_xccdf_variable(xccdf_variable, id_stem=rule_id ~ "_sshd_included_files", datatype=datatype) | indent (2) }}}
+  {{%- else -%}}
   {{{ oval_line_in_file_state(value, id_stem=rule_id ~ "_sshd_included_files") | indent (2) }}}
+  {{%- endif -%}}
 
   {{% endif %}}
 
   {{{ oval_line_in_file_test(sshd_config_path, parameter, avoid_conflicting=true ) | indent (2) }}}
   {{{ oval_line_in_file_object(sshd_config_path, parameter=parameter, ** case_insensitivity_kwargs)| indent (2) }}}
+  {{%- if xccdf_variable -%}}
+  {{{ oval_line_in_file_state_xccdf_variable(xccdf_variable, datatype=datatype) }}}
+  {{%- else -%}}
   {{{ oval_line_in_file_state(value) | indent (2) }}}
+  {{%- endif -%}}
 
   {{%- if config_is_distributed == "true" %}}
   {{{ oval_line_in_directory_test(sshd_config_dir, parameter, avoid_conflicting=true) | indent (2) }}}
   {{{ oval_line_in_directory_object(sshd_config_dir, parameter=parameter, ** case_insensitivity_kwargs) | indent (2) }}}
+  {{%- if xccdf_variable -%}}
+  {{{ oval_line_in_directory_state_xccdf_variable(xccdf_variable, datatype) | indent (2) }}}
+  {{%- else -%}}
   {{{ oval_line_in_directory_state(value) | indent (2) }}}
+  {{%- endif -%}}
   {{%- endif %}}
 
   {{% if not missing_parameter_pass %}}
@@ -1151,12 +1181,29 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 
 :param object_id: Object id to be created.
 :type object_id: str
+:param include_root: If set to true, the "root" user account will be included to the list. Default: False.
+:type include_root: bool
 
 #}}
-{{%- macro create_interactive_users_list_object(object_id) -%}}
+{{%- macro create_interactive_users_list_object(object_id, include_root=False) -%}}
   {{%- set ignored_users_list="(nobody|nfsnobody)" %}}
 
   <unix:password_object id="{{{ object_id }}}" version="1">
+    <set>
+      {{% if include_root %}}
+        <object_reference>{{{ object_id }}}_root</object_reference>
+      {{% endif %}}
+      <object_reference>{{{ object_id }}}_others</object_reference>
+    </set>
+  </unix:password_object>
+
+  {{% if include_root %}}
+    <unix:password_object id="{{{ object_id }}}_root" version="1">
+      <unix:username datatype="string" operation="equals">root</unix:username>
+    </unix:password_object>
+  {{% endif %}}
+
+  <unix:password_object id="{{{ object_id }}}_others" version="1">
     <unix:username datatype="string" operation="pattern match">.*</unix:username>
     <filter action="include">state_{{{ rule_id }}}_users_uids</filter>
     <filter action="exclude">state_{{{ rule_id }}}_users_ignored</filter>
@@ -1176,9 +1223,10 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
   </unix:password_state>
 {{%- endmacro %}}
 
+
 {{#
   Extract from /etc/passwd a list of specified fields of local interactive users.
-  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin shell.
+  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin and /bin/false shell.
 
   Unlike macro create_interactive_users_list_object, this macro gives list that contains only local users, because it doesn't use the OVAL "unix:password_object" element, but it merely parses /etc/passwd using "ind:textfilecontent54_object".
 
@@ -1219,7 +1267,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
       regular expression which ensures that the third field in the entry
       contains at least 4 digits (or more) and therefore the regular
       expression doesn't match entries with values 999 or less. -->
-    <ind:pattern operation="pattern match">^([^:]*):[^:]*:\d{4,}:(?:[^:]*:){3}(?!\/sbin\/nologin)[^:]*$</ind:pattern>
+    <ind:pattern operation="pattern match">^([^:]*):[^:]*:\d{4,}:(?:[^:]*:){3}(?!(\/usr)?(\/sbin\/nologin|\/bin\/false))[^:]*$</ind:pattern>
     <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
     <filter action="exclude">state_{{{ object_id }}}_users_ignored</filter>
   </ind:textfilecontent54_object>
@@ -1231,9 +1279,10 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 
 {{%- endmacro %}}
 
+
 {{#
   Extract from /etc/passwd a list of home directories of local interactive users.
-  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin shell.
+  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin and /bin/false shell.
 
   Unlike macro create_interactive_users_list_object, this macro gives list that contains only local users, because it doesn't use the OVAL "unix:password_object" element, but it merely parses /etc/passwd using "ind:textfilecontent54_object".
 
@@ -1252,7 +1301,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 
 {{#
   Extract from /etc/passwd a list of User IDs of local interactive users.
-  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin shell.
+  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin and /bin/false shell.
 
   Unlike macro create_interactive_users_list_object, this macro gives list that contains only local users, because it doesn't use the OVAL "unix:password_object" element, but it merely parses /etc/passwd using "ind:textfilecontent54_object".
 
@@ -1271,7 +1320,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
 
 {{#
   Extract from /etc/passwd a list of Group IDs of local interactive users.
-  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin shell.
+  The list contains only items related to non-system UIDs and is filtered to exclude some special usernames and users with /sbin/nologin and /bin/false shell.
 
   Unlike macro create_interactive_users_list_object, this macro gives list that contains only local users, because it doesn't use the OVAL "unix:password_object" element, but it merely parses /etc/passwd using "ind:textfilecontent54_object".
 
@@ -1287,14 +1336,15 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
   second_literal_component_regex=":)(?:[^:]*:){2}([^:]+):(?:[^:]*:){2}[^:]*$") }}}
 {{%- endmacro %}}
 
+
 {{#
   Extract from /etc/passwd a list composed of password objects related to system UIDs.
   This list is then filtered to exclude some special usernames.
 
   The macro receives a string as parameter, which is used as the password_object id in the rule.
 
-  :param object_id: Object id to be created.
-  :type object_id: str
+:param object_id: Object id to be created.
+:type object_id: str
 
 #}}
 {{%- macro create_system_accounts_list_object(object_id) -%}}
@@ -1313,6 +1363,51 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
   <unix:password_state id="state_{{{ rule_id }}}_users_ignored" version="1">
     <unix:username datatype="string" operation="pattern match">^{{{ ignored_users_list }}}$</unix:username>
   </unix:password_state>
+{{%- endmacro %}}
+
+
+{{#
+  Check the system partition table and create a list of mount points referring to devices in /dev.
+  The filtered list of mount_points is stored in a local variable to be used in the "path"
+  parameter of "file_object" objects.
+
+  When using this variable in the "path" parameter of a "file_object" also make sure the
+  "recurse_file_system" parameter is set to "defined" in order to make sure the probe doesn't
+  leave the scope of that mount point. For example, when probing "/", the probe will ignore any
+  child directory which is a mount point for any other partition. Check the
+  "file_permissions_ungroupowned" rule for a reference.
+
+  Using this filtered list of mount points should increate performance and optimize resources
+  by skipping the check of a lot unnecessary file objects.
+
+  The macro receives a string as parameter, which is used as the local_variable id in the rule.
+
+:param variable_id: Variable id to be created.
+:type variable_id: str
+
+#}}
+{{%- macro create_local_mount_points_list(variable_id) -%}}
+  <!-- Create a partition_state to filter out remote and special file systems. -->
+  <linux:partition_state id="state_{{{ rule_id }}}_dev_partitons" version="1">
+    <linux:device operation="pattern match">^/dev/.*$</linux:device>
+  </linux:partition_state>
+
+  <!-- This object is created mainly to improve performance when collecting file objects.
+       Here all mount points are discovered and filtered to include only devices under /dev in
+       order to ignore special and remote file systems. -->
+  <linux:partition_object id="object_{{{ rule_id }}}_local_partitions" version="1">
+    <linux:mount_point operation="pattern match">.*</linux:mount_point>
+    <filter action="include">state_{{{ rule_id }}}_dev_partitons</filter>
+  </linux:partition_object>
+
+  <!-- Create a variable composed by mount points referring to devices in /dev.
+       There are cases where distributed or remote file systems are also represented as a /dev
+       device. For example, when using CEPH. These cases will also be treated as local devices. -->
+  <local_variable id="{{{ variable_id }}}" version="1"
+    datatype="string" comment="Mount points for local devices">
+    <object_component item_field="mount_point"
+      object_ref="object_{{{ rule_id }}}_local_partitions"/>
+  </local_variable>
 {{%- endmacro %}}
 
 
@@ -1356,6 +1451,7 @@ Generates the :code:`<affected>` tag for OVAL check using correct product platfo
     <ind:instance datatype="int">1</ind:instance>
   </ind:textfilecontent54_object>
 {{%- endmacro %}}
+
 
 {{#
 Generates an OVAL check that checks a particular field in the "/etc/shadow" file.
@@ -1495,47 +1591,44 @@ Generates an OVAL check that checks a particular field in the "/etc/shadow" file
 {{%- endmacro %}}
 
 {{#
-  Macro to define service disabled criteria. The definition vary from socket to configuration
-  depending on the oval version
+  Macro to define service disabled criteria. The definition varies regarding socket configuration
+  depending on the oval version. These definitions are used together with the tests defined in
+  oval_test_service_disabled_tests macro.
+
   :param name: Name of the service to be checked
 #}}
 {{%- macro oval_test_service_disabled_criteria(name='') -%}}
-{{% if init_system == "systemd" %}}
-  {{% if target_oval_version >= [5, 11] %}}
-
+{{%- if init_system == "systemd" %}}
+  {{%- if target_oval_version >= [5, 11] %}}
   {{# we are using systemd and our target OVAL version does support the systemd related tests #}}
-
       <criteria operator="AND" comment="service {{{ name }}} is not configured to start">
-        <criterion comment="{{{ name }}} is not running"
-          test_ref="test_service_not_running_{{{ rule_id }}}_{{{ name }}}" />
-        <criterion comment="Property LoadState of service {{{ name }}} is masked"
-          test_ref="test_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}" />
+        <criterion test_ref="test_service_not_running_{{{ rule_id }}}_{{{ name }}}"
+          comment="{{{ name }}} is not running"/>
+        <criterion test_ref="test_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}"
+          comment="Property LoadState of service {{{ name }}} is masked"/>
       </criteria>
-  {{% else %}}
-
+  {{%- else %}}
   {{# fallback if we are using systemd but can't use the new systemd features of OVAL 5.11 #}}
-
       <criteria operator="AND" comment="service and socket {{{ name }}} are disabled">
-        <criterion comment="{{{ name }}} disabled in multi-user.target"
-          test_ref="test_{{{ rule_id }}}_{{{ name }}}_disabled_multi_user_target" />
-        <criterion comment="{{{ name }}} socket disabled in sockets.target"
-          test_ref="test_{{{ rule_id }}}_{{{ name }}}_socket_disabled_sockets_target" />
+        <criterion test_ref="test_{{{ rule_id }}}_{{{ name }}}_disabled_multi_user_target"
+          comment="{{{ name }}} disabled in multi-user.target"/>
+        <criterion test_ref="test_{{{ rule_id }}}_{{{ name }}}_disabled_sockets_target"
+          comment="{{{ name }}} socket disabled in sockets.target"/>
       </criteria>
-  {{% endif %}}
-
+  {{%- endif %}}
 {{% endif %}}
-
 {{%- endmacro -%}}
 
 {{#
-  Macro to define service disabled tests. The definition vary from oval unit definition,
-  to check configuration unit file, depending on the oval version.
+  Macro to define service disabled tests. The tests varies depending on the oval version. These
+  tests are used together with the definitions defined in oval_test_service_disabled_criteria
+  macro.
+
   :param name: Name of the service to be checked
 #}}
 {{%- macro oval_test_service_disabled_tests(name='') -%}}
-{{% if init_system == "systemd" %}}
-  {{% if target_oval_version >= [5, 11] %}}
-
+{{%- if init_system == "systemd" %}}
+  {{%- if target_oval_version >= [5, 11] %}}
   {{# we are using systemd and our target OVAL version does support the systemd related tests #}}
       <linux:systemdunitproperty_test id="test_service_not_running_{{{ rule_id }}}_{{{ name }}}"
         check="all" check_existence="any_exist"
@@ -1543,15 +1636,18 @@ Generates an OVAL check that checks a particular field in the "/etc/shadow" file
         <linux:object object_ref="obj_service_not_running_{{{ rule_id }}}_{{{ name }}}"/>
         <linux:state state_ref="state_service_not_running_{{{ rule_id }}}_{{{ name }}}"/>
       </linux:systemdunitproperty_test>
+
     <linux:systemdunitproperty_object id="obj_service_not_running_{{{ rule_id }}}_{{{ name }}}"
       comment="Retrieve the ActiveState property of {{{ name }}}" version="1">
       <linux:unit operation="pattern match">^{{{ name }}}\.(service|socket)$</linux:unit>
       <linux:property>ActiveState</linux:property>
     </linux:systemdunitproperty_object>
+
     <linux:systemdunitproperty_state id="state_service_not_running_{{{ rule_id }}}_{{{ name }}}"
       version="1" comment="{{{ name }}} is not running">
       <linux:value operation="pattern match">inactive|failed</linux:value>
     </linux:systemdunitproperty_state>
+
     <linux:systemdunitproperty_test check="all" check_existence="any_exist"
       id="test_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}"
       comment="Test that the property LoadState from the service {{{ name }}} is masked"
@@ -1559,19 +1655,19 @@ Generates an OVAL check that checks a particular field in the "/etc/shadow" file
       <linux:object object_ref="obj_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}"/>
       <linux:state state_ref="state_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}"/>
     </linux:systemdunitproperty_test>
+
     <linux:systemdunitproperty_object  comment="Retrieve the LoadState property of {{{ name }}}"
       version="1" id="obj_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}">
       <linux:unit operation="pattern match">^{{{ name }}}\.(service|socket)$</linux:unit>
       <linux:property>LoadState</linux:property>
     </linux:systemdunitproperty_object>
+
     <linux:systemdunitproperty_state comment="LoadState is set to masked"
       id="state_service_loadstate_is_masked_{{{ rule_id }}}_{{{ name }}}"
       version="1">
       <linux:value>masked</linux:value>
     </linux:systemdunitproperty_state>
-
-  {{% else %}}
-
+  {{%- else %}}
   {{# fallback if we are using systemd but can't use the new systemd features of OVAL 5.11 #}}
       <unix:file_test check="all" check_existence="none_exist"
         comment="look for {{{ name }}}.service in /etc/systemd/system/multi-user.target.wants"
@@ -1589,7 +1685,7 @@ Generates an OVAL check that checks a particular field in the "/etc/shadow" file
 
       <unix:file_test check="all" check_existence="none_exist"
         comment="look for {{{ name }}}.socket in /etc/systemd/system/sockets.target.wants"
-        id="test_{{{ rule_id }}}_{{{ name }}}_socket_disabled_sockets_target" version="1">
+        id="test_{{{ rule_id }}}_{{{ name }}}_disabled_sockets_target" version="1">
         <unix:object object_ref="object_{{{ rule_id }}}_{{{ name }}}_socket_disabled_sockets_tgt"/>
       </unix:file_test>
 
@@ -1603,10 +1699,93 @@ Generates an OVAL check that checks a particular field in the "/etc/shadow" file
       <unix:file_state id="unit_{{{ rule_id }}}_{{{ name }}}_state_symlink" version="1">
         <unix:type operation="equals">symbolic link</unix:type>
       </unix:file_state>
-
-  {{% endif %}}
-
-{{% endif %}}
-
+  {{%- endif %}}
+{{%- endif %}}
 {{%- endmacro -%}}
 
+{{#
+Generate OVAL test that tests if the system is configured to use nss-altfiles
+by checking if '/etc/nssswitch.conf' contains 'altfiles' in 'group' key.
+The macros generates the OVAL test including the dependent OVAL object and OVAL state.
+#}}
+{{%- macro oval_test_nsswitch_uses_altfiles() -%}}
+<ind:textfilecontent54_test id="test_{{{ rule_id }}}_nsswitch_uses_altfiles" version="1"
+  check="all" check_existence="at_least_one_exists"
+  comment="Test if /etc/nssswitch.conf contains 'altfiles' in 'group' key">
+  <ind:object object_ref="object_{{{ rule_id }}}_nsswitch_uses_altfiles"/>
+  <ind:state state_ref="state_{{{ rule_id }}}_nsswitch_uses_altfiles"/>
+</ind:textfilecontent54_test>
+<ind:textfilecontent54_object id="object_{{{ rule_id }}}_nsswitch_uses_altfiles" version="1">
+  <ind:filepath>/etc/nsswitch.conf</ind:filepath>
+  <ind:pattern operation="pattern match">^\s*group:\s+(.*)$</ind:pattern>
+  <ind:instance operation="greater than or equal" datatype="int">1</ind:instance>
+</ind:textfilecontent54_object>
+<ind:textfilecontent54_state id="state_{{{ rule_id }}}_nsswitch_uses_altfiles" version="1">
+  <ind:subexpression operation="pattern match">altfiles</ind:subexpression>
+</ind:textfilecontent54_state>
+{{%- endmacro -%}}
+
+{{#
+  Macro for checking the system architecture in /proc/sys/kernel/{osrelease,arch}
+
+  :param arch: system architecture (x86_64, aarch64, s90x, ppc64le, ...)
+  :type arch: str
+#}}
+{{%- macro oval_check_proc_sys_kernel_osrelease_arch(arch) -%}}
+<def-group>
+  <definition class="inventory" id="proc_sys_kernel_osrelease_arch_{{{ arch }}}"
+  version="1">
+    <metadata>
+      <title>Test that the architecture is {{{ arch }}}</title>
+      <affected family="unix">
+        <platform>multi_platform_all</platform>
+      </affected>
+      <description>Check that architecture of kernel in /proc/sys/kernel is {{{ arch }}}</description>
+    </metadata>
+    <criteria>
+      <criterion comment="Architecture is {{{ arch }}}"
+      test_ref="test_proc_sys_kernel_osrelease_arch_{{{ arch }}}" />
+    </criteria>
+  </definition>
+  <ind:textfilecontent54_test check="all" check_existence="at_least_one_exists"
+      comment="proc_sys_kernel is for {{{ arch }}} architecture"
+      id="test_proc_sys_kernel_osrelease_arch_{{{ arch }}}" version="1">
+    <ind:object object_ref="object_proc_sys_kernel_osrelease_arch_{{{ arch }}}" />
+  </ind:textfilecontent54_test>
+
+  <ind:textfilecontent54_object id="object_proc_sys_kernel_osrelease_arch_{{{ arch }}}" version="1">
+    <ind:filepath operation="pattern match">/proc/sys/kernel/(osrelease|arch)</ind:filepath>
+    <ind:pattern operation="pattern match">^.*\.{{{ arch }}}$|^{{{ arch }}}$</ind:pattern>
+    <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+  </ind:textfilecontent54_object>
+
+</def-group>
+{{%- endmacro -%}}
+
+{{#
+Macro to check if external variable is set to value
+  :param variable: Name of the external variable to check
+  :type variable: str
+  :param value: Value of the external variable
+  :type value: str
+  :param test_id: Suffix of the Ids in test, obj, and state elements
+  :type test_id: str
+  :param operation: Value operation
+  :type operation: str
+#}}
+{{%- macro oval_test_external_variable_value(variable,value,test_id='',operation='equals') -%}}
+  <ind:variable_test id="{{{ test_id }}}"
+  comment="Check external {{{ variable }}} is set to {{{ value }}}" check="all" version="1">
+    <ind:object object_ref="obj_{{{ test_id }}}"/>
+    <ind:state state_ref="ste_{{{ test_id }}}" />
+  </ind:variable_test>
+
+  <ind:variable_object id="obj_{{{ test_id }}}" version="1">
+    <ind:var_ref>{{{ variable }}}</ind:var_ref>
+  </ind:variable_object>
+  <ind:variable_state id="ste_{{{ test_id }}}" version="1">
+    <ind:value operation="{{{ operation }}}" datatype="string">{{{ value }}}</ind:value>
+  </ind:variable_state>
+
+  <external_variable comment="External variable {{{ variable }}}" datatype="string" id="{{{ variable }}}" version="1" />
+{{%- endmacro -%}}

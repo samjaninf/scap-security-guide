@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Configure HTTP PERL Scripts To Use TAINT Option'
 
@@ -27,12 +26,6 @@ rationale: |-
     or popen(). The script will exit with a warning message.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80560-6
-
-references:
-    stigid: WG460
 
 ocil_clause: 'it is not'
 

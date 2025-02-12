@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 """
-Takes given XCCDF or DataStream and adds RHEL derivative operating system(s) CPE name next
+Takes given XCCDF or data stream and adds RHEL derivative operating system(s) CPE name next
 to RHEL CPE names. Can automatically recognize RHEL CPEs and adds the derivitive OS ones
 next to those accordingly.
 
@@ -16,8 +16,8 @@ Author: Martin Preisler <mpreisle@redhat.com>
 import sys
 from optparse import OptionParser
 
-import ssg.constants
 import ssg.build_derivatives
+import ssg.constants
 import ssg.xccdf
 import ssg.xml
 
@@ -25,10 +25,8 @@ XCCDF12_NS = ssg.constants.XCCDF12_NS
 oval_ns = ssg.constants.oval_namespace
 
 CENTOS_NOTICE_ELEMENT = ssg.xml.ElementTree.fromstring(ssg.constants.CENTOS_NOTICE)
-SL_NOTICE_ELEMENT = ssg.xml.ElementTree.fromstring(ssg.constants.SL_NOTICE)
 
 CENTOS_WARNING = 'centos_warning'
-SL_WARNING = 'sl_warning'
 
 
 def parse_args():
@@ -36,11 +34,9 @@ def parse_args():
     parser = OptionParser(usage=usage)
     parser.add_option("--enable-centos", dest="centos", default=False,
                       action="store_true", help="Enable CentOS")
-    parser.add_option("--enable-sl", dest="sl", default=False,
-                      action="store_true", help="Enable Scientific Linux")
     parser.add_option("-i", "--input", dest="input_content", default=False,
                       action="store",
-                      help="INPUT can be XCCDF or Source DataStream")
+                      help="INPUT can be XCCDF or Source data stream")
     parser.add_option("-o", "--output", dest="output", default=False,
                       action="store", help="XML Tree content")
     parser.add_option("--id-name", dest="id_name", default="ssg",
@@ -48,19 +44,24 @@ def parse_args():
     parser.add_option(
         "--cpe-items-dir",
         dest="cpe_items_dir", help="path to the directory where compiled cpe items are stored")
-    (options, args) = parser.parse_args()
+    parser.add_option(
+        "--unlinked-cpe-oval-path",
+        dest="unlinked_oval_file_path",
+        help="path to the unlinked cpe oval"
+    )
 
-    if options.centos and options.sl:
-        sys.stderr.write(
-            "Cannot enable two derivative OS(s) at the same time\n"
-        )
-        parser.print_help()
-        sys.exit(1)
+    (options, args) = parser.parse_args()
 
     if not options.output and not options.input_content:
         parser.print_help()
         sys.exit(1)
     return options, args
+
+
+def store_xml(tree, path):
+    if hasattr(ssg.xml.ElementTree, "indent"):
+        ssg.xml.ElementTree.indent(tree, space="  ", level=0)
+    tree.write(path, encoding="utf-8", xml_declaration=True)
 
 
 def main():
@@ -71,12 +72,6 @@ def main():
         notice = CENTOS_NOTICE_ELEMENT
         warning = CENTOS_WARNING
         derivative = "CentOS"
-
-    if options.sl:
-        mapping = ssg.constants.RHEL_SL_CPE_MAPPING
-        notice = SL_NOTICE_ELEMENT
-        warning = SL_WARNING
-        derivative = "Scientific Linux"
 
     tree = ssg.xml.open_xml(options.input_content)
     root = tree.getroot()
@@ -94,11 +89,14 @@ def main():
         raise RuntimeError("No Benchmark found!")
 
     for namespace, benchmark in benchmarks:
-        if args[1] != "cs9" and not args[1].startswith("centos"):
+        if args[1] not in ("cs9", "cs10") and not args[1].startswith("centos"):
             # In all CentOS and CentOS Streams, profiles are kept because they are systems
             # intended to test content that will get into RHEL
             ssg.build_derivatives.profile_handling(benchmark, namespace)
         if not ssg.build_derivatives.add_cpes(benchmark, namespace, mapping):
+            import pprint
+            pprint.pprint(namespace)
+            pprint.pprint(mapping)
             raise RuntimeError(
                 "Could not add derivative OS CPEs to Benchmark '%s'."
                 % (benchmark)
@@ -112,10 +110,15 @@ def main():
             )
 
     ssg.build_derivatives.replace_platform(root, oval_ns, derivative)
-    ssg.build_derivatives.add_cpe_item_to_dictionary(
-        root, args[0], args[1], options.id_name, options.cpe_items_dir)
+    oval_def_id = ssg.build_derivatives.add_cpe_item_to_dictionary(
+        root, args[0], args[1], options.id_name, options.cpe_items_dir
+    )
+    if oval_def_id is not None:
+        ssg.build_derivatives.add_oval_definition_to_cpe_oval(
+            root, options.unlinked_oval_file_path, oval_def_id
+        )
 
-    tree.write(options.output)
+    store_xml(tree, options.output)
 
 
 if __name__ == "__main__":

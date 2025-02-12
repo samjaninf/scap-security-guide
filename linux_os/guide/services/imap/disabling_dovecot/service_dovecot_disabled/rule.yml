@@ -1,7 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux3,anolis23,anolis8,rhel7,rhel8,rhel9,sle12,sle15
-
 title: 'Disable Dovecot Service'
 
 description: |-
@@ -14,17 +12,16 @@ rationale: |-
 severity: unknown
 
 identifiers:
-    cce@rhel7: CCE-80294-2
     cce@rhel8: CCE-82760-0
     cce@rhel9: CCE-84242-7
     cce@sle12: CCE-92248-4
     cce@sle15: CCE-91368-1
+    cce@slmicro5: CCE-93915-7
 
 references:
-    cis@alinux3: 2.2.8
-    cis@rhel7: 2.2.11
     cis@sle12: 2.2.12
     cis@sle15: 2.2.12
+    cis@slmicro5: 2.2.12
 
 ocil_clause: |-
     {{{ ocil_clause_service_disabled(service="dovecot") }}}
@@ -32,9 +29,10 @@ ocil_clause: |-
 ocil: |-
     {{{ ocil_service_disabled(service="dovecot") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled
     vars:
         servicename: dovecot
+        packagename@ubuntu2404: dovecot-core

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Authenticate Zone Transfers'
 
@@ -54,7 +53,6 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80328-8
     cce@rhel8: CCE-82410-2
 
 references:

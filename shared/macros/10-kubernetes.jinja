@@ -6,6 +6,8 @@
 
 # This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 
+Include /etc/ssh/sshd_config.d/*.conf
+
 # The strategy used for options in the default sshd_config shipped with
 # OpenSSH is to specify options with their default value where
 # possible, but leave them commented.  Uncommented options override the
@@ -174,6 +176,10 @@ spec:
         overwrite: true
 {{%- endmacro -%}}
 
+{{%- macro kubernetes_variable_instruction(field_name='', variable_name='') -%}}
+Remediation will set field {{{ field_name }}} to {{ .{{{ variable_name }}} }} based on the variable {{{ variable_name }}}.
+{{%- endmacro -%}}
+
 
 {{#
   Macro which generates Kubernetes remediation in MachineConfig format with
@@ -197,34 +203,6 @@ metadata:
 {{%- if k8s_version_range|length > 0 %}}
     complianceascode.io/k8s-version: '{{{ k8s_version_range }}}'
 {{%- endif %}}
-spec:
-  config:
-    ignition:
-      version: 3.1.0
-    storage:
-      files:
-      - contents:
-          source: data:,{{ {{{ url_encode(source) }}} }}
-        mode: {{{ file_permissions_mode }}}
-        path: {{{ path }}}
-        overwrite: true
-{{%- endmacro -%}}
-
-
-{{#
-  Macro which generates Kubernetes remediation in MachineConfig format with
-  required value
-    - path (String): Path to the configuration file.
-    - file_permissions_mode (String): File permissions to be applied to the file represented by path argument
-    - source_content (String): The source of the content to be applied.
-    - vals (list): The list of required values for this remediation to be applies for example: var_something
-#}}
-{{%- macro kubernetes_machine_config_file_with_required_value(path='', file_permissions_mode='', source='', vals=[]) -%}}
-apiVersion: machineconfiguration.openshift.io/v1
-kind: MachineConfig
-metadata:
-  annotations:
-    complianceascode.io/value-input-required: {{{ vals | join(",") }}}
 spec:
   config:
     ignition:
@@ -479,8 +457,8 @@ AuditBackend=LinuxAudit
 
 {{% macro audit_syscalls_rule(syscalls=[], key='', fields='') %}}
 {{%- for syscall in syscalls -%}}
--a always,exit -F arch=b64 -S {{{ syscall }}}{{% if fields %}} -F {{{ fields }}}{{% endif %}} -k {{{ key }}}
--a always,exit -F arch=b32 -S {{{ syscall }}}{{% if fields %}} -F {{{ fields }}}{{% endif %}} -k {{{ key }}}
+-a always,exit -F arch=b64 -S {{{ syscall }}}{{% if fields %}} -F {{{ fields }}}{{% endif %}}{{% if key %}} -k {{{ key }}}{{% endif %}}
+-a always,exit -F arch=b32 -S {{{ syscall }}}{{% if fields %}} -F {{{ fields }}}{{% endif %}}{{% if key %}} -k {{{ key }}}{{% endif %}}
 {{% endfor %}}
 {{%- endmacro %}}
 
@@ -628,11 +606,6 @@ plugin_dir = /etc/audit/plugins.d
 {{%- endmacro %}}
 
 
-{{% macro kubernetes_machineconfig_auditd_config_with_required_value(vals=[]) -%}}
-{{{ kubernetes_machine_config_file_with_required_value(path='/etc/audit/auditd.conf', file_permissions_mode='0640', source=rhcos_auditd_config(),vals=vals)}}}
-{{%- endmacro %}}
-
-
 {{#
   Macro to generate MachineConfig setting our recommended chrony.conf
 #}}
@@ -666,7 +639,7 @@ spec:
 {{% macro ntp_server() -%}}
 #
 # This file controls the configuration of the ntp server
-# {{.var_multiple_time_servers}} we have to put variable array name here for mutilines remediation 
+# {{.var_multiple_time_servers}} we have to put variable array name here for mutilines remediation
 {{$var_time_service_set_maxpoll:=.var_time_service_set_maxpoll}}
 {{range $element:=.var_multiple_time_servers|toArrayByComma}}server {{$element}} minpoll 4 maxpoll {{$var_time_service_set_maxpoll}}
 {{end}}

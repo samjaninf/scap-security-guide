@@ -18,12 +18,11 @@ warnings:
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-88745-5
     cce@rhel8: CCE-88746-3
     cce@rhel9: CCE-88747-1
+    cce@rhel10: CCE-87905-6
 
-references:
-    anssi: BP28(R25)
+platform: x86_64_arch
 
 ocil_clause: 'the kernel was not built with the required value'
 

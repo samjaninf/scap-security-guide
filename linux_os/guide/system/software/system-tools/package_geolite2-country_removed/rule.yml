@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,rhel7,rhel8,rhel9
 
 title: 'Uninstall geolite2-country Package'
 
@@ -13,7 +12,6 @@ rationale: |-
 severity: low
 
 identifiers:
-    cce@rhel7: CCE-82937-4
     cce@rhel8: CCE-82936-6
 
 {{{ complete_ocil_entry_package(package="geolite2-country") }}}

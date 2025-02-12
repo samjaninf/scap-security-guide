@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7
 
 title: 'Enable the Docker service'
 
@@ -15,9 +14,6 @@ rationale: |-
     has to be enabled.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80440-1
 
 ocil: |-
     {{{ ocil_service_enabled(service="docker") }}}

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Disable Print Server Capabilities'
 
@@ -24,9 +23,6 @@ rationale: |-
     a particular set of users, use the Policy directive.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80284-3
 
 references:
     cis-csc: 11,14,3,9

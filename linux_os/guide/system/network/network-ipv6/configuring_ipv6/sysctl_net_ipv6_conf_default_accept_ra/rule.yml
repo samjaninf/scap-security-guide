@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,ol9,rhcos4,rhel7,rhel8,rhel9,rhv4,sle12,sle15,ubuntu2004,ubuntu2204
 
 title: 'Disable Accepting Router Advertisements on all IPv6 Interfaces by Default'
 
@@ -12,22 +11,18 @@ severity: medium
 
 identifiers:
     cce@rhcos4: CCE-82468-0
-    cce@rhel7: CCE-80181-1
     cce@rhel8: CCE-81007-7
     cce@rhel9: CCE-84124-7
+    cce@rhel10: CCE-90557-0
     cce@sle12: CCE-92316-9
     cce@sle15: CCE-92474-6
+    cce@slmicro5: CCE-93994-2
 
 references:
-    ccn@rhel9: A.8.SEC-RHEL6
     cis-csc: 11,14,3,9
-    cis@alinux2: 3.2.9
-    cis@alinux3: 3.3.9
-    cis@rhel7: 3.3.9
-    cis@rhel8: 3.3.9
-    cis@rhel9: 3.3.9
     cis@sle12: 3.3.9
     cis@sle15: 3.3.9
+    cis@slmicro5: 3.3.9
     cis@ubuntu2004: 3.3.9
     cis@ubuntu2204: 3.3.9
     cobit5: BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS05.02,DSS05.05,DSS06.06
@@ -50,7 +45,7 @@ fixtext: |-
 
 srg_requirement: '{{{ full_name }}} must not accept router advertisements on all IPv6 interfaces by default.'
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

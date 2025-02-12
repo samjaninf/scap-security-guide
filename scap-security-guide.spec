@@ -25,7 +25,7 @@ BuildArch:	noarch
 %if 0%{?_rhel_like} == 7
 BuildRequires:  libxslt, openscap-scanner >= 1.2.5, cmake >= 2.8, python, python-jinja2, PyYAML, python-setuptools
 %else
-BuildRequires:  libxslt, openscap-scanner >= 1.2.5, cmake >= 2.8, /usr/bin/python3, python%{python3_pkgversion}, python%{python3_pkgversion}-jinja2, python%{python3_pkgversion}-PyYAML, python%{python3_pkgversion}-setuptools
+BuildRequires:  libxslt, openscap-scanner >= 1.2.5, cmake >= 2.8, python%{python3_pkgversion}, python%{python3_pkgversion}-jinja2, python%{python3_pkgversion}-PyYAML, python%{python3_pkgversion}-setuptools
 %endif
 Requires:	xml-common, openscap-scanner >= 1.2.5
 
@@ -53,12 +53,16 @@ present in %{name} package.
 %prep
 %autosetup -p1
 
-%define cmake_defines_common -DSSG_SEPARATE_SCAP_FILES_ENABLED=OFF -DSSG_BASH_SCRIPTS_ENABLED=OFF -DSSG_BUILD_SCAP_12_DS=OFF -DSSG_BUILD_DISA_DELTA_FILES=OFF
+%define cmake_defines_common -DSSG_SEPARATE_SCAP_FILES_ENABLED=OFF -DSSG_BASH_SCRIPTS_ENABLED=OFF -DSSG_BUILD_DISA_DELTA_FILES=OFF
 %define cmake_defines_specific %{nil}
 %define centos_8_specific %{nil}
 
 %if 0%{?_rhel_like}
-%define cmake_defines_specific -DSSG_PRODUCT_DEFAULT:BOOLEAN=FALSE -DSSG_PRODUCT_RHEL%{_rhel_like}:BOOLEAN=TRUE -DSSG_SCIENTIFIC_LINUX_DERIVATIVES_ENABLED:BOOL=OFF -DSSG_CENTOS_DERIVATIVES_ENABLED:BOOL=ON
+%if 0%{?_rhel_like} == 7 || 0%{?_rhel_like} == 8
+%define cmake_defines_specific -DSSG_PRODUCT_DEFAULT:BOOLEAN=FALSE -DSSG_PRODUCT_RHEL%{_rhel_like}:BOOLEAN=TRUE -DSSG_CENTOS_DERIVATIVES_ENABLED:BOOL=ON
+%else
+%define cmake_defines_specific -DSSG_PRODUCT_DEFAULT:BOOLEAN=FALSE -DSSG_PRODUCT_RHEL%{_rhel_like}:BOOLEAN=TRUE -DSSG_CENTOS_DERIVATIVES_ENABLED:BOOL=ON -DSSG_SCE_ENABLED:BOOL=ON
+%endif
 %endif
 %if 0%{?fedora}
 %define cmake_defines_specific -DSSG_PRODUCT_DEFAULT:BOOLEAN=FALSE -DSSG_PRODUCT_FEDORA:BOOLEAN=TRUE

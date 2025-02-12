@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8,rhel9
 
 title: 'Disable the authlogin_nsswitch_use_ldap SELinux Boolean'
 
@@ -14,8 +13,8 @@ rationale: ""
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-80425-2
     cce@rhel8: CCE-84296-3
+    cce@rhel10: CCE-90335-1
 
 references:
     cui: 3.7.2

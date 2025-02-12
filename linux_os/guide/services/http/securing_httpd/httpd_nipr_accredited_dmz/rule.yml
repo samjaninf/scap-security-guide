@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'A public web server, if hosted on the NIPRNet, must be isolated in an accredited DoD DMZ extension'
 
@@ -27,8 +26,6 @@ rationale: |-
 
 severity: medium
 
-references:
-    stigid: "WA060"
 
 ocil_clause: 'the web server is not isolated in an accredited DoD DMZ Extension'
 

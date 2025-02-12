@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8,rhel9
 
 title: 'Enable the antivirus_can_scan_system SELinux Boolean'
 
@@ -13,9 +12,6 @@ description: |-
 rationale: ""
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80422-9
 
 references:
     cui: 3.7.2

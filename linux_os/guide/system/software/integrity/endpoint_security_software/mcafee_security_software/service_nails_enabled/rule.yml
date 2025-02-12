@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Enable nails Service'
 
@@ -14,9 +13,6 @@ rationale: |-
     computer viruses, as well as to limit their spread to other systems.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80128-2
 
 references:
     cis-csc: 12,13,14,4,7,8
@@ -32,7 +28,7 @@ references:
 ocil: |-
     {{{ ocil_service_enabled(service="nails") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_enabled

@@ -37,6 +37,7 @@ class Profile(XCCDFEntity, SelectionHandler):
     KEYS = dict(
         description=lambda: "",
         extends=lambda: "",
+        hidden=lambda: "",
         metadata=lambda: None,
         reference=lambda: None,
         selections=lambda: list(),
@@ -53,6 +54,10 @@ class Profile(XCCDFEntity, SelectionHandler):
         "title",
         "description",
         "selections",
+    }
+
+    ALTERNATIVE_KEYS = {
+        "selections": "extends",
     }
 
     @classmethod
@@ -108,6 +113,9 @@ class Profile(XCCDFEntity, SelectionHandler):
             'version'] is not None
 
     def to_xml_element(self):
+        if self.hidden:
+            return ET.Comment(text='Hidden Profile: %s (%s)' % (self.title, self.id_))
+
         element = ET.Element('{%s}Profile' % XCCDF12_NS)
         element.set("id", OSCAP_PROFILE + self.id_)
         if self._should_have_version():
@@ -245,9 +253,18 @@ class Profile(XCCDFEntity, SelectionHandler):
         profile_rules = set(self.selected)
         is_empty, empty_groups = self._find_empty_groups(root_group, profile_rules)
         if is_empty:
-            msg = "Profile {0} unselects all groups.".format(self.id_)
+            msg = ("Profile {0} unselects all groups. "
+                   "Check whether it selects any rule or extends any profile."
+                   .format(self.id_))
             raise ValueError(msg)
         self.unselected_groups.extend(sorted(empty_groups))
+
+    def remove_components_not_included(self, components_to_not_include):
+        rules_to_not_include = components_to_not_include.get("rules", set())
+        groups_to_not_include = components_to_not_include.get("groups", set())
+        self.selected = sorted(set(self.selected) - rules_to_not_include)
+        self.unselected = sorted(set(self.unselected) - rules_to_not_include)
+        self.unselected_groups = sorted(set(self.unselected_groups) - groups_to_not_include)
 
     def __sub__(self, other):
         profile = Profile(self.id_)
@@ -256,6 +273,7 @@ class Profile(XCCDFEntity, SelectionHandler):
         profile.extends = self.extends
         profile.platforms = self.platforms
         profile.platform = self.platform
+        profile.hidden = self.hidden
         profile.selected = list(set(self.selected) - set(other.selected))
         profile.selected.sort()
         profile.unselected = list(set(self.unselected) - set(other.unselected))

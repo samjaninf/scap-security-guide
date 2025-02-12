@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol8,ol9,rhcos4,rhel8,rhel9
 
 title: 'Disable the use of user namespaces'
 
@@ -28,6 +27,7 @@ identifiers:
     cce@rhcos4: CCE-82503-4
     cce@rhel8: CCE-82211-4
     cce@rhel9: CCE-83956-3
+    cce@rhel10: CCE-89527-6
 
 references:
     disa: CCI-000366
@@ -55,7 +55,7 @@ fixtext: |-
 
 srg_requirement: '{{{ full_name }}} must disable the use of user namespaces.'
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: sysctl

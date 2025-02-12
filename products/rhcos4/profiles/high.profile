@@ -1,6 +1,7 @@
 documentation_complete: true
 
 metadata:
+    version: Revision 4
     SMEs:
         - JAORMX
         - mrogers950
@@ -35,5 +36,4 @@ description: |-
     content as minor divergences, such as bugfixes, work through the
     consensus and release processes.
 
-selections:
-    - nist_rhcos4:all:high
+extends: high-rev-4

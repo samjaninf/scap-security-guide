@@ -19,8 +19,7 @@ from ssg.constants import FULL_NAME_TO_PRODUCT_MAPPING
 from ssg.constants import OSCAP_RULE
 from ssg.jinja import process_file_with_macros
 from ssg.products import product_yaml_path, load_product_yaml
-from ssg.rules import get_rule_dir_yaml, is_rule_dir
-from ssg.rule_yaml import parse_prodtype
+from ssg.rules import get_rule_dir_yaml
 from ssg.utils import mkdir_p
 from ssg_test_suite.log import LogHelper
 
@@ -309,19 +308,13 @@ def load_rule_and_env(rule_dir_path, env_yaml, product=None):
     rule = RuleYAML.from_yaml(rule_path, env_yaml)
     rule.normalize(product)
 
-    # Note that most places would check prodtype, but we don't care
-    # about that here: if the rule is available to the product, we
-    # load and parse it anyways as we have no knowledge of the
-    # top-level profile or rule passed into the test suite.
-    prodtypes = parse_prodtype(rule.prodtype)
-
     # Our local copy of env_yaml needs some properties from rule.yml
     # for completeness.
     local_env_yaml = dict()
     local_env_yaml.update(env_yaml)
     local_env_yaml['rule_id'] = rule.id_
     local_env_yaml['rule_title'] = rule.title
-    local_env_yaml['products'] = prodtypes
+    local_env_yaml['products'] = {product}
 
     return rule, local_env_yaml
 
@@ -331,10 +324,18 @@ def write_rule_test_content_to_dir(rule_dir, test_content):
         scenario_file_path = os.path.join(rule_dir, scenario.script)
         with open(scenario_file_path, "w") as f:
             f.write(scenario.contents)
-    for file_name, file_content in test_content.other_content.items():
-        file_path = os.path.join(rule_dir, file_name)
+    for rel_file_path, file_content in test_content.other_content.items():
+        if os.path.dirname(rel_file_path) != "":
+            # file_path contains a directory, make sure it exists
+            subdir = os.path.join(rule_dir, os.path.dirname(rel_file_path))
+            if not os.path.exists(subdir):
+                os.mkdir(subdir)
+        file_path = os.path.join(rule_dir, rel_file_path)
         with open(file_path, "w") as f:
             f.write(file_content)
+            # Ensure newline at the end of the file because
+            # process_file_with_macros strips it off
+            f.write("\n")
 
 
 def create_tarball(test_content_by_rule_id):
@@ -356,7 +357,6 @@ def create_tarball(test_content_by_rule_id):
         with tempfile.NamedTemporaryFile(
                 "wb", suffix=".tar.gz", delete=False) as fp:
             with tarfile.TarFile.open(fileobj=fp, mode="w") as tarball:
-                tarball.add(_SHARED_DIR, arcname="shared", filter=_make_file_root_owned)
                 for rule_id in os.listdir(tmpdir):
                     # When a top-level directory exists under the temporary
                     # templated tests directory, we've already validated that
@@ -507,6 +507,7 @@ def load_templated_tests(
 def load_test(absolute_path, rule_template, local_env_yaml):
     template_name = rule_template['name']
     template_vars = rule_template['vars']
+    template_vars["_rule_id"] = local_env_yaml["rule_id"]
     # Load template parameters and apply it to the test case.
     maybe_template = ssg.templates.Template.load_template(_SHARED_TEMPLATES, template_name)
     if maybe_template is not None:
@@ -577,11 +578,12 @@ INSTALL_COMMANDS = dict(
     ol7=("yum", "install", "-y"),
     ol8=("yum", "install", "-y"),
     ol9=("yum", "install", "-y"),
-    rhel7=("yum", "install", "-y"),
     rhel8=("yum", "install", "-y"),
     rhel9=("yum", "install", "-y"),
+    rhel10=("dnf", "install", "-y"),
     sles=("zypper", "install", "-y"),
     ubuntu=("DEBIAN_FRONTEND=noninteractive", "apt", "install", "-y"),
+    debian=("DEBIAN_FRONTEND=noninteractive", "apt", "install", "-y"),
 )
 
 
@@ -615,7 +617,7 @@ def _match_rhel_version(cpe):
 
 
 def cpe_to_platform(cpe):
-    trivials = ["fedora", "sles", "ubuntu"]
+    trivials = ["fedora", "sles", "ubuntu", "debian"]
     for platform in trivials:
         if platform in cpe:
             return platform

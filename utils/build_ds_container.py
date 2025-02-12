@@ -42,6 +42,21 @@ parser.add_argument(
         '--product and --debug flags.'),
     action='store_true',
     default=False)
+# with upstream prefix option as default
+parser.add_argument(
+    '-np', '--no-upstream-prefix',
+    help=(
+        'The prefix for bundle names. The default is "upstream" if not specified. '
+        'To disable prefix, use --no-upstream-prefix.',
+        'This option is ignored when building content in the cluster using '
+        '--build-in-cluster.'),
+    action='store_true',
+    default=False)
+parser.add_argument(
+    '-i', '--push-content-image',
+    help=(
+        'Do not build any content. Create profile bundles from the referenced k8s content image'),
+    )
 parser.add_argument(
     '-d', '--debug',
     help=(
@@ -216,7 +231,10 @@ def create_profile_bundles(products, content_image=None):
     """
     for product in products:
         content_file = 'ssg-' + product + '-ds.xml'
-        product_name = 'upstream-' + product
+        if args.no_upstream_prefix:
+            product_name = product
+        else:
+            product_name = 'upstream-' + product
         profile_bundle_update = {
             'apiVersion': 'compliance.openshift.io/v1alpha1',
             'kind': 'ProfileBundle',
@@ -269,6 +287,10 @@ def get_image_repository():
     image_repo = subprocess.run(command, check=True, capture_output=True).stdout
     return image_repo.decode().strip()
 
+
+if args.push_content_image:
+    create_profile_bundles(args.products, args.push_content_image)
+    sys.exit(0)
 
 log.info(f'Building content for {", ".join(args.products)}')
 ensure_namespace_exists()

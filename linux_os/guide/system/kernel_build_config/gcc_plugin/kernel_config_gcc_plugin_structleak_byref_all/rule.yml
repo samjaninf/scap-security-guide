@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel9
 
 title: 'zero-init everything passed by reference'
 
@@ -22,9 +21,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-87089-9
     cce@rhel9: CCE-87090-7
-
-references:
-    anssi: BP28(R21)
+    cce@rhel10: CCE-90006-8
 
 ocil_clause: 'the kernel was not built with the required value'
 

@@ -11,6 +11,7 @@ import time
 
 import ssg_test_suite
 from ssg_test_suite import common
+from ssg_test_suite.log import LogHelper
 
 
 class SavedState(object):
@@ -62,6 +63,7 @@ class TestEnv(object):
         self.running_state = None
 
         self.scanning_mode = scanning_mode
+        self.sce_support = False
         self.backend = None
         self.ssh_port = None
 
@@ -101,6 +103,7 @@ class TestEnv(object):
         by subsequent procedures.
         """
         self.refresh_connection_parameters()
+        self.check_sce_support()
 
     def refresh_connection_parameters(self):
         self.domain_ip = self.get_ip_address()
@@ -129,6 +132,7 @@ class TestEnv(object):
         remote_dest = "root@{ip}".format(ip=self.domain_ip)
         result = common.retry_with_stdout_logging(
             "ssh", tuple(self.ssh_additional_options) + (remote_dest, command), log_file)
+        log_file.flush()
         if result.returncode:
             error_msg = error_msg_template.format(
                 command=command, remote_dest=remote_dest,
@@ -197,6 +201,16 @@ class TestEnv(object):
 
     def offline_scan(self, args, verbose_path):
         raise NotImplementedError()
+
+    def check_sce_support(self):
+        log_file_name = os.path.join(LogHelper.LOG_DIR, "env-preparation.log")
+        with open(log_file_name, 'a') as log_file:
+            oscap_output = self.execute_ssh_command("oscap --version", log_file)
+            sce_regex = r"SCE Version: [\d.]+ \(from libopenscap_sce.so.\d+\)"
+            for line in oscap_output.splitlines():
+                if re.match(sce_regex, line):
+                    self.sce_support = True
+                    return
 
 
 class VMTestEnv(TestEnv):

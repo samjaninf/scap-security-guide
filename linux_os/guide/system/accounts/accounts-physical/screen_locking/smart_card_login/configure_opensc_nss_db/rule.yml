@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,rhel7
 
 title: 'Configure NSS DB To Use opensc'
 
@@ -17,9 +16,6 @@ rationale: |-
     (public key infrastructure) in order to provide and verify credentials.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80567-1
 
 references:
     cis-csc: 1,12,15,16,5

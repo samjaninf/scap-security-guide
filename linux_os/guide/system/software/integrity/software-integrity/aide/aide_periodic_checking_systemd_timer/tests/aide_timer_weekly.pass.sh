@@ -1,3 +1,4 @@
+# platform = multi_platform_ol,multi_platform_rhel,multi_platform_sle,multi_platform_slmicro,multi_platform_almalinux
 #!/bin/bash
 # packages = aide
 
@@ -7,7 +8,7 @@ cat > /etc/systemd/system/aidecheck.service <<EOF
 Description=Aide Check
 [Service]
 Type=simple
-ExecStart=/usr/sbin/aide --check
+ExecStart={{{ aide_bin_path }}} --check
 [Install]
 WantedBy=multi-user.target
 EOF

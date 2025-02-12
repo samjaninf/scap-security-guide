@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel8,rhel9
 
 title: 'Force initialization of variables containing userspace addresses'
 
@@ -26,9 +25,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-87046-9
     cce@rhel9: CCE-87047-7
-
-references:
-    anssi: BP28(R21)
+    cce@rhel10: CCE-90661-0
 
 ocil_clause: 'the kernel was not built with the required value'
 

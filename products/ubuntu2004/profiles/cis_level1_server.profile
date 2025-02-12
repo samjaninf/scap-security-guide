@@ -162,7 +162,7 @@ selections:
     - grub2_enable_apparmor
 
     #### 1.7.1.3 Ensure all AppArmor Profiles are in enforce or complain mode (Automated)
-    - var_apparmor_mode=complain
+    - var_apparmor_mode=enforce
     - all_apparmor_profiles_in_enforce_complain_mode
 
     #### 1.7.1.4 Ensure all AppArmor Profiles are enforcing (Automated)
@@ -416,6 +416,11 @@ selections:
     - set_nftables_table
 
     #### 3.5.2.5 Ensure base chains exist (Automated)
+    - var_nftables_base_chain_names=chain_names
+    - var_nftables_base_chain_types=chain_types
+    - var_nftables_base_chain_hooks=chain_hooks
+    - var_nftables_base_chain_priorities=chain_priorities
+    - var_nftables_base_chain_policies=chain_policies
     - set_nftables_base_chain
 
     #### 3.5.2.6 Ensure loopback traffic is configured (Automated)

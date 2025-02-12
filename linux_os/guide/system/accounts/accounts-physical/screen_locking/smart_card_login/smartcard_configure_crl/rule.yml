@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ubuntu2004
 
 title: 'Configure Smart Card Local Cache of Revocation Data'
 
@@ -20,9 +19,10 @@ rationale: |-
 severity: medium
 
 references:
-    disa: CCI-001991
+    disa: CCI-004068,CCI-004068
     srg: SRG-OS-000384-GPOS-00167
     stigid@ubuntu2004: UBTU-20-010066
+    stigid@ubuntu2204: UBTU-22-612035
 
 ocil_clause: 'crl_auto or crl_offline is not configured'
 

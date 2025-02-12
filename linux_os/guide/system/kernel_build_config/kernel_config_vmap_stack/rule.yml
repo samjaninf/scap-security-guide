@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel8,rhel9
 
 title: 'User a virtually-mapped stack'
 
@@ -21,9 +20,7 @@ severity: medium
 identifiers:
     cce@rhel8: CCE-86251-6
     cce@rhel9: CCE-86252-4
-
-references:
-    anssi: BP28(R15)
+    cce@rhel10: CCE-90287-4
 
 ocil_clause: 'the kernel was not built with the required value'
 

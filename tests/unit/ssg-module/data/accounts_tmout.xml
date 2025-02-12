@@ -9,7 +9,7 @@ The <html:code>TMOUT</html:code>
 setting in a file loaded by <html:code>/etc/profile</html:code>, e.g.
 <html:code>/etc/profile.d/tmout.sh</html:code> should read as follows:
 <html:pre>declare -xr TMOUT=<ns0:sub idref="xccdf_org.ssgproject.content_value_var_accounts_tmout" use="legacy"/></html:pre></ns0:description>
-  <ns0:reference href="http://www.ssi.gouv.fr/administration/bonnes-pratiques/">BP28(R29)</ns0:reference>
+  <ns0:reference href="https://cyber.gouv.fr/sites/default/files/document/linux_configuration-en-v2.pdf">R29</ns0:reference>
   <ns0:reference href="https://www.cisecurity.org/controls/">1</ns0:reference>
   <ns0:reference href="https://www.cisecurity.org/controls/">12</ns0:reference>
   <ns0:reference href="https://www.cisecurity.org/controls/">15</ns0:reference>
@@ -37,18 +37,18 @@ setting in a file loaded by <html:code>/etc/profile</html:code>, e.g.
   <ns0:reference href="https://www.isa.org/products/ansi-isa-62443-3-3-99-03-03-2013-security-for-indu">SR 1.7</ns0:reference>
   <ns0:reference href="https://www.isa.org/products/ansi-isa-62443-3-3-99-03-03-2013-security-for-indu">SR 1.8</ns0:reference>
   <ns0:reference href="https://www.isa.org/products/ansi-isa-62443-3-3-99-03-03-2013-security-for-indu">SR 1.9</ns0:reference>
-  <ns0:reference href="https://www.iso.org/standard/54534.html">A.18.1.4</ns0:reference>
-  <ns0:reference href="https://www.iso.org/standard/54534.html">A.9.2.1</ns0:reference>
-  <ns0:reference href="https://www.iso.org/standard/54534.html">A.9.2.4</ns0:reference>
-  <ns0:reference href="https://www.iso.org/standard/54534.html">A.9.3.1</ns0:reference>
-  <ns0:reference href="https://www.iso.org/standard/54534.html">A.9.4.2</ns0:reference>
-  <ns0:reference href="https://www.iso.org/standard/54534.html">A.9.4.3</ns0:reference>
-  <ns0:reference href="https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx">CIP-004-6 R2.2.3</ns0:reference>
-  <ns0:reference href="https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx">CIP-007-3 R5.1</ns0:reference>
-  <ns0:reference href="https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx">CIP-007-3 R5.2</ns0:reference>
-  <ns0:reference href="https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx">CIP-007-3 R5.3.1</ns0:reference>
-  <ns0:reference href="https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx">CIP-007-3 R5.3.2</ns0:reference>
-  <ns0:reference href="https://www.nerc.com/pa/Stand/Standard%20Purpose%20Statement%20DL/US_Standard_One-Stop-Shop.xlsx">CIP-007-3 R5.3.3</ns0:reference>
+  <ns0:reference href="https://www.iso.org/contents/data/standard/05/45/54534.html">A.18.1.4</ns0:reference>
+  <ns0:reference href="https://www.iso.org/contents/data/standard/05/45/54534.html">A.9.2.1</ns0:reference>
+  <ns0:reference href="https://www.iso.org/contents/data/standard/05/45/54534.html">A.9.2.4</ns0:reference>
+  <ns0:reference href="https://www.iso.org/contents/data/standard/05/45/54534.html">A.9.3.1</ns0:reference>
+  <ns0:reference href="https://www.iso.org/contents/data/standard/05/45/54534.html">A.9.4.2</ns0:reference>
+  <ns0:reference href="https://www.iso.org/contents/data/standard/05/45/54534.html">A.9.4.3</ns0:reference>
+  <ns0:reference href="https://www.nerc.com/pa/Stand/AlignRep/One%20Stop%20Shop.xlsx">CIP-004-6 R2.2.3</ns0:reference>
+  <ns0:reference href="https://www.nerc.com/pa/Stand/AlignRep/One%20Stop%20Shop.xlsx">CIP-007-3 R5.1</ns0:reference>
+  <ns0:reference href="https://www.nerc.com/pa/Stand/AlignRep/One%20Stop%20Shop.xlsx">CIP-007-3 R5.2</ns0:reference>
+  <ns0:reference href="https://www.nerc.com/pa/Stand/AlignRep/One%20Stop%20Shop.xlsx">CIP-007-3 R5.3.1</ns0:reference>
+  <ns0:reference href="https://www.nerc.com/pa/Stand/AlignRep/One%20Stop%20Shop.xlsx">CIP-007-3 R5.3.2</ns0:reference>
+  <ns0:reference href="https://www.nerc.com/pa/Stand/AlignRep/One%20Stop%20Shop.xlsx">CIP-007-3 R5.3.3</ns0:reference>
   <ns0:reference href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf">AC-12</ns0:reference>
   <ns0:reference href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf">SC-10</ns0:reference>
   <ns0:reference href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r4.pdf">AC-2(5)</ns0:reference>

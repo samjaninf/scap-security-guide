@@ -1,12 +1,11 @@
 documentation_complete: true
 
-prodtype: alinux3,ol7,ol8,rhel7,rhel8,sle12,sle15
 
 title: 'Ensure sudo passwd_timeout is appropriate - sudo passwd_timeout'
 
 description: |-
     The sudo <tt>passwd_timeout</tt> tag sets the amount of time sudo password prompt waits.
-{{%- if product in ["rhel7", "rhel8"] %}}
+{{%- if 'rhel' in product or 'ol' in families %}}
     On {{{ full_name }}}, the default <tt>passwd_timeout</tt> value is 5 minutes.
 {{% endif %}}
     The passwd_timeout should be configured by making sure that the
@@ -20,13 +19,9 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-83963-9
     cce@rhel8: CCE-83964-7
     cce@sle12: CCE-91495-2
     cce@sle15: CCE-91187-5
-
-references:
-    cis@alinux3: 5.3.6
 
 ocil_clause: 'passwd_timeout is not set with the appropriate value for sudo'
 

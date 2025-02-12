@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Ensure Remote Administrative Access Is Encrypted'
 
@@ -20,9 +19,6 @@ rationale: |-
     Local administration at the console implies physical access to the server.
 
 severity: high
-
-references:
-    stigid: WG230
 
 ocil: |-
     {{{ ocil_service_enabled(service="sshd") }}}

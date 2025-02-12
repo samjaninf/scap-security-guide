@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Deny BOOTP Queries'
 
@@ -15,9 +14,6 @@ rationale: |-
     vectors against the DHCP server.
 
 severity: unknown
-
-identifiers:
-    cce@rhel7: CCE-80334-6
 
 references:
     cis-csc: 11,14,3,9

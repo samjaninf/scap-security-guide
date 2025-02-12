@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,rhel7,rhel8
 
 title: 'Disable Secure RPC Server Service (rpcsvcgssd)'
 
@@ -15,16 +14,13 @@ rationale: 'Unnecessary services should be disabled to decrease the attack surfa
 
 severity: unknown
 
-identifiers:
-    cce@rhel7: CCE-80238-9
-
 ocil_clause: |-
     {{{ ocil_clause_service_disabled(service="rpcsvcgssd") }}}
 
 ocil: |-
     {{{ ocil_service_disabled(service="rpcsvcgssd") }}}
 
-platform: machine
+platform: system_with_kernel
 
 template:
     name: service_disabled

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: fedora,ol7,ol8,ol9,rhel7,rhel8,rhel9
 
 title: 'Uninstall iprutils Package'
 
@@ -14,12 +13,12 @@ rationale: |-
 severity: medium
 
 identifiers:
-    cce@rhel7: CCE-82947-3
     cce@rhel8: CCE-82946-5
     cce@rhel9: CCE-83519-9
+    cce@rhel10: CCE-89809-8
 
 references:
-    disa: CCI-000366
+    disa: CCI-000366,CCI-000381
     srg: SRG-OS-000095-GPOS-00049,SRG-OS-000480-GPOS-00227
     stigid@ol8: OL08-00-040380
     stigid@rhel8: RHEL-08-040380

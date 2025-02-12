@@ -1,11 +1,10 @@
 import pytest
-import logging
 import os
+import sys
 
 import ssg.controls
 import ssg.build_yaml
 from ssg.environment import open_environment
-from ssg.products import load_product_yaml
 
 ssg_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "data"))
@@ -98,6 +97,18 @@ def test_controls_load(controls_manager):
     _load_test(controls_manager, "abcd")
 
 
+@pytest.mark.skipif(sys.version_info[0] < 3, reason="requires python3 or higher")
+def test_controls_invalid_rules(env_yaml):
+    existing_rules = {"accounts_tmout", "configure_crypto_policy"}
+    controls_manager = ssg.controls.ControlsManager(
+        controls_dir, env_yaml, existing_rules)
+    with pytest.raises(ValueError) as exc:
+        controls_manager.load()
+    assert str(exc.value) == \
+        "Control abcd:R1 contains nonexisting rule(s) sshd_set_idle_timeout"
+
+
+@pytest.mark.skipif(sys.version_info[0] < 3, reason="requires python3 or higher")
 def test_controls_levels(controls_manager):
     # Default level is the lowest level
     c_1 = controls_manager.get_control("abcd-levels", "S1")
@@ -475,6 +486,37 @@ def test_policy_parse_from_ours_and_foreign():
     assert "really_ours" in control.selections
     assert "foreign" in control.selections
 
+def test_policy_parse_foreign_with_all():
+    main_control_dict = dict(id="top", controls=["foreign:all:level_1", "ours", "P:ours_qualified"])
+    main_subcontrol_dicts = [dict(id="ours", rules=["ours"]), dict(id="ours_qualified", rules=["really_ours"])]
+    foreign_control_dicts = [dict(id="req1", rules=["foreign_1"], levels=["level_1"]),
+                            dict(id="req2", rules=["foreign_2"], levels=["level_1", "level_2"]),
+                            dict(id="req3", rules=["foreign_3"], levels=["level_2"])]
+
+    main_policy = ssg.controls.Policy("")
+    main_policy.id = "P"
+    main_policy.save_controls_tree([main_control_dict] + main_subcontrol_dicts)
+
+    foreign_policy = ssg.controls.Policy("")
+    foreign_policy.id = "foreign"
+    level1 = ssg.controls.Level.from_level_dict(dict(id="level_1"))
+    level2 = ssg.controls.Level.from_level_dict(dict(id="level_2"))
+
+    foreign_policy.levels = [level1, level2]
+    foreign_policy.levels_by_id = {"level_1": level1, "level_2": level2}
+    foreign_policy.save_controls_tree(foreign_control_dicts)
+
+    controls_manager = ssg.controls.ControlsManager("", dict())
+    controls_manager.policies[main_policy.id] = main_policy
+    controls_manager.policies[foreign_policy.id] = foreign_policy
+
+    controls_manager.resolve_controls()
+    control = controls_manager.get_control("P", "top")
+    assert "ours" in control.selections
+    assert "really_ours" in control.selections
+    assert "foreign_1" in control.selections
+    assert "foreign_2" in control.selections
+    assert "foreign_3" not in control.selections
 
 def test_policy_parse_from_referenced(minimal_empty_controls, one_simple_subcontrol):
     nested_controls = minimal_empty_controls
@@ -500,3 +542,54 @@ def test_control_with_bad_key():
     except ValueError as e:
         assert type(e) is ValueError
     assert control_obj is None
+
+
+def test_control_with_bad_level():
+    control = {'id': 'abcd', 'levels': 'medium', }
+    control_obj = None
+    try:
+        control_obj = ssg.controls.Control.from_control_dict(control)
+    except ValueError as e:
+        assert type(e) is ValueError
+    assert control_obj is None
+
+
+def test_validating_policy_levels(env_yaml):
+    c1_path = os.path.join(data_dir, "policy_with_different_than_implicit_default_level.yml")
+    c2_path = os.path.join(data_dir, "policy_with_invalid_level.yml")
+    for policy_path in [c1_path, c2_path]:
+        policy = ssg.controls.Policy(policy_path, env_yaml)
+        with pytest.raises(ValueError):
+            policy.load()
+
+
+@pytest.fixture
+def rules_for_test_references_from_controls():
+    rule_filenames = [
+        "compiled_references_test_rule.yml",
+        "compiled_references_test_rule_2.yml"
+    ]
+    rules = {}
+    for filename in rule_filenames:
+        rule_file = os.path.join(data_dir, filename)
+        rule = ssg.build_yaml.Rule.from_yaml(rule_file)
+        rules[rule.id_] = rule
+    return rules
+
+
+def test_references_from_controls(controls_manager, rules_for_test_references_from_controls):
+    rules = rules_for_test_references_from_controls
+    # in rule.yml the first rule has no references
+    assert rules["compiled_references_test_rule"].references == {}
+    # in rule.yml the second rule has only stig references
+    assert len(rules["compiled_references_test_rule_2"].references["stig"]) == 1
+    assert "cis" not in rules["compiled_references_test_rule_2"].references
+    assert rules["compiled_references_test_rule_2"].references["stig"] == ["17"]
+    # add references to rules from all controls
+    controls_manager.add_references(rules)
+    # The "uvwx" control file should add cis references to rules
+    assert len(rules["compiled_references_test_rule"].references) == 1
+    assert rules["compiled_references_test_rule"].references["cis"] == ["R1", "R2"]
+    assert len(rules["compiled_references_test_rule_2"].references) == 2
+    assert rules["compiled_references_test_rule_2"].references["cis"] == ["R2"]
+    assert rules["compiled_references_test_rule_2"].references["stig"] == ["17"]

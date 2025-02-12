@@ -9,24 +9,19 @@ description: |-
   Then, add the following entry to <tt>/etc/security/namespace.conf</tt>:
   <pre>/var/tmp /var/tmp/tmp-inst/    level      root,adm</pre>
 
-rationale: |- 
+rationale: |-
   Polyinstantiation of temporary directories is a proactive security measure
   which reduces chances of attacks that are made possible by /var/tmp
   directories being world-writable.
 
 severity: low
 
-platform: not osbuild
-
 identifiers:
-  cce@rhel7: CCE-83777-3
   cce@rhel8: CCE-83778-1
   cce@rhel9: CCE-83642-9
+  cce@rhel10: CCE-88424-7
   cce@sle12: CCE-91507-4
   cce@sle15: CCE-91198-2
-
-references:
-  anssi: BP28(R39)
 
 ocil_clause: is not configured
 

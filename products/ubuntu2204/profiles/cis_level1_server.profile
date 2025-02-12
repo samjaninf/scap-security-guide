@@ -157,7 +157,7 @@ selections:
     - grub2_enable_apparmor
 
     #### 1.6.1.3 Ensure all AppArmor Profiles are in enforce or complain mode (Automated)
-    - var_apparmor_mode=complain
+    - var_apparmor_mode=enforce
     - all_apparmor_profiles_in_enforce_complain_mode
 
     #### 1.6.1.4 Ensure all AppArmor Profiles are enforcing (Automated)
@@ -194,6 +194,7 @@ selections:
     # Skip due to being Level 2
 
     ### 1.8.2 Ensure GDM login banner is configured (Automated)
+    - enable_dconf_user_profile
     - login_banner_text=cis_default
     - dconf_gnome_banner_enabled
     - dconf_gnome_login_banner_text
@@ -449,6 +450,11 @@ selections:
     - set_nftables_table
 
     #### 3.5.2.5 Ensure nftables base chains exist (Automated)
+    - var_nftables_base_chain_names=chain_names
+    - var_nftables_base_chain_types=chain_types
+    - var_nftables_base_chain_hooks=chain_hooks
+    - var_nftables_base_chain_priorities=chain_priorities
+    - var_nftables_base_chain_policies=chain_policies
     - set_nftables_base_chain
 
     #### 3.5.2.6 Ensure nftables loopback traffic is configured (Automated)
@@ -841,6 +847,7 @@ selections:
 
     ## 5.4 Configure PAM ##
     ### 5.4.1 Ensure password creation requirements are configured (Automated)
+    - package_pam_pwquality_installed
     - var_password_pam_minlen=14
     - accounts_password_pam_minlen
     - var_password_pam_minclass=4
@@ -865,7 +872,7 @@ selections:
     - accounts_passwords_pam_faillock_unlock_time
 
     ### 5.4.3 Ensure password reuse is limited (Automated)
-    - var_password_pam_remember=5
+    - var_password_pam_unix_remember=5
     - accounts_password_pam_unix_remember
 
     ### 5.4.4 Ensure password hashing algorithm is up to date with the latest standards (Automated)

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: ol7,ol8,rhel7,rhel8,rhv4
 
 title: 'Install McAfee Virus Scanning Software'
 
@@ -16,7 +15,7 @@ rationale: |-
 severity: high
 
 identifiers:
-    cce@rhel7: CCE-80127-4
+    cce@sle12: CCE-92354-0
 
 references:
     cis-csc: 12,13,14,4,7,8
@@ -28,7 +27,7 @@ references:
     nist: CM-6(a),SC-28,SI-3(a)
     nist-csf: DE.CM-4,DE.DP-3,PR.DS-1
     srg: SRG-OS-000480-GPOS-00227
-    stigid@rhel7: RHEL-07-032000
+    stigid@sle12: SLES-12-030611
 
 ocil_clause: 'virus scanning software is not installed or running'
 
@@ -43,4 +42,4 @@ warnings:
         Due to McAfee HIPS being 3rd party software, automated
         remediation is not available for this configuration check.
 
-platform: machine
+platform: system_with_kernel

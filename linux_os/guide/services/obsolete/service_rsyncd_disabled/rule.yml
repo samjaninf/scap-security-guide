@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: alinux2,alinux3,anolis23,anolis8,fedora,ol7,ol8,rhel7,rhel8,rhel9,rhv4,sle12,sle15
 
 title: 'Ensure rsyncd service is disabled'
 
@@ -13,24 +12,18 @@ rationale: |-
 
 severity: medium
 
-platform: machine
+platform: system_with_kernel
 
 identifiers:
-    cce@rhel7: CCE-83334-3
     cce@rhel8: CCE-83335-0
     cce@rhel9: CCE-84140-3
+    cce@rhel10: CCE-88179-7
     cce@sle12: CCE-91673-4
     cce@sle15: CCE-91305-3
 
 references:
-    cis@alinux2: 2.1.20
-    cis@alinux3: 2.2.3
-    cis@rhel7: 2.2.19
-    cis@rhel8: 2.2.20
-    cis@rhel9: 2.2.18
     cis@sle12: 2.2.17
     cis@sle15: 2.2.17
-    pcidss4: "2.2.4"
 
 ocil_clause: |-
     {{{ ocil_clause_service_disabled(service="rsyncd") }}}
@@ -43,7 +36,9 @@ template:
     vars:
         servicename: rsyncd
         packagename: rsync-daemon
-        packagename@rhel7: rsync
         packagename@ol7: rsync
         packagename@sle12: rsync
         packagename@sle15: rsync
+        packagename@openeuler2203: rsync
+        servicename@ubuntu2404: rsync
+        packagename@ubuntu2404: rsync

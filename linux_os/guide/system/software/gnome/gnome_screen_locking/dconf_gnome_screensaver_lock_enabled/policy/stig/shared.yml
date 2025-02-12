@@ -1,36 +1,37 @@
 srg_requirement: |-
-    {{{ full_name }}} must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions.
+    {{{ full_name }}} must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface.
 
 vuldiscussion: |-
-    A session lock is a temporary action taken when a user stops work and moves away from the immediate physical vicinity of the information system but does not want to log out because of the temporary nature of the absence.
+    A session time-out lock is a temporary action taken when a user stops work and moves away from the immediate physical vicinity of the information system but does not log out because of the temporary nature of the absence. Rather than relying on the user to manually lock their operating system session prior to vacating the vicinity, operating systems need to be able to identify when a user's session has idled and take action to initiate the session lock.
 
-    The session lock is implemented at the point where session activity can be determined.
+    The session lock is implemented at the point where session activity can be determined and/or controlled.
 
-    Regardless of where the session lock is determined and implemented, once invoked, the session lock must remain in place until the user reauthenticates. No other activity aside from reauthentication must unlock the system.
+    Implementing session settings will have little value if a user is able to manipulate these settings from the defaults prescribed in the other requirements of this implementation guide.
 
 checktext: |-
-    Verify {{{ full_name }}} enables a user's session lock until that user re-establishes access using established identification and authentication procedures with the following command:
-
     Note: This requirement assumes the use of the {{{ full_name }}} default graphical user interface, Gnome Shell. If the system does not have any graphical user interface installed, this requirement is Not Applicable.
 
-    $ gsettings get org.gnome.desktop.screensaver lock-enabled
+    Verify {{{ full_name }}} prevents a user from overriding settings for graphical user interfaces.
 
-    true
+    $ gsettings writable org.gnome.desktop.screensaver lock-enabled
 
-    If the setting is "false", this is a finding.
+    false
+
+    If "lock-enabled" is writable and the result is "true", this is a finding.
 
 fixtext: |-
-    Configure {{{ full_name }}} to enable a user's session lock until that user re-establishes access using established identification and authentication procedures.
+    Configure {{{ full_name }}} to prevent a user from overriding settings for graphical user interfaces.
 
-    Create a database to contain the system-wide screensaver settings (if it does not already exist) with the following example:
+    Create a database to contain the systemwide screensaver settings (if it does not already exist) with the following command:
 
-    $ sudo vi /etc/dconf/db/local.d/00-screensaver
+    Note: The example below is using the database "local" for the system. If the system is using another database in "/etc/dconf/profile/user", the file should be created under the appropriate subdirectory.
 
-    Edit the "[org/gnome/desktop/screensaver]" section of the database file and add or update the following lines:
+    $ sudo touch /etc/dconf/db/local.d/locks/session
 
-    # Set this to true to lock the screen when the screensaver activates
-    lock-enabled=true
+    Add the following setting to prevent nonprivileged users from modifying it:
 
-    Update the system databases:
+    /org/gnome/desktop/screensaver/lock-enabled
+
+    Run the following command to update the database:
 
     $ sudo dconf update

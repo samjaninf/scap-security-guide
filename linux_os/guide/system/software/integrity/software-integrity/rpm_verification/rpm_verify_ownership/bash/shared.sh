@@ -1,4 +1,4 @@
-# platform = multi_platform_rhel,multi_platform_ol,multi_platform_rhv
+# platform = multi_platform_rhel,multi_platform_ol,multi_platform_rhv,multi_platform_almalinux
 # reboot = false
 # strategy = restrict
 # complexity = high
@@ -22,5 +22,5 @@ done
 # correct values
 for RPM_PACKAGE in "${!SETPERMS_RPM_DICT[@]}"
 do
-        rpm --setugids "${RPM_PACKAGE}"
+        rpm --restore "${RPM_PACKAGE}"
 done

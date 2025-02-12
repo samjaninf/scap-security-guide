@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Require Client Certificates'
 
@@ -17,12 +16,6 @@ rationale: |-
     decisions.
 
 severity: medium
-
-identifiers:
-    cce@rhel7: CCE-80558-0
-
-references:
-    stigid: WG140
 
 ocil_clause: 'it is not'
 

@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'A private web server must be located on a separate controlled access subnet'
 
@@ -21,8 +20,6 @@ rationale: |-
 
 severity: medium
 
-references:
-    stigid: "WA070"
 
 ocil_clause: 'the private web server is not on a separate controlled access subnet'
 

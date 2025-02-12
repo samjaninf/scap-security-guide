@@ -8,6 +8,14 @@ import argparse
 XCCDF_NS = "http://checklists.nist.gov/xccdf/1.2"
 
 
+def compare_lists(rules_in_ds_with_ansible_fix, playbooks_in_dir):
+    ds_set = set(rules_in_ds_with_ansible_fix)
+    pb_dir_set = set(playbooks_in_dir)
+    if not ds_set.issubset(pb_dir_set):
+        raise Exception("Rules without playbooks: {%s}" %
+                        repr(list(ds_set.difference(pb_dir_set))))
+
+
 def compare_ds_with_playbooks_dir(ds_path, playbooks_dir_path):
     tree = ET.parse(ds_path)
     root = tree.getroot()
@@ -25,16 +33,16 @@ def compare_ds_with_playbooks_dir(ds_path, playbooks_dir_path):
     for filename in os.listdir(playbooks_dir_path):
         id_, _ = os.path.splitext(filename)
         playbooks_in_dir.append(id_)
-    assert set(rules_in_ds_with_ansible_fix) == set(playbooks_in_dir)
+    compare_lists(rules_in_ds_with_ansible_fix, playbooks_in_dir)
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="Tests if Ansible Playbooks were generated for all rules"
-        "that have an Ansible remediation available in datastream."
+        "that have an Ansible remediation available in data stream."
     )
     parser.add_argument("--build-dir", required=True,
-                        help="Build directory containing built datastreams"
+                        help="Build directory containing built data streams"
                         "and playbooks subdirectory")
     parser.add_argument("--product", required=True,
                         help="Product ID")

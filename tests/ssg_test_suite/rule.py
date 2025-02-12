@@ -11,17 +11,18 @@ import os
 import os.path
 import re
 import shutil
-import subprocess
 import tempfile
 
 from ssg.constants import OSCAP_PROFILE, OSCAP_PROFILE_ALL_ID, OSCAP_RULE
+from ssg.jinja import process_file_with_macros
+from ssg.rules import is_rule_dir
+
 from ssg_test_suite import oscap
 from ssg_test_suite import xml_operations
 from ssg_test_suite import test_env
 from ssg_test_suite import common
 from ssg_test_suite.log import LogHelper
 
-import ssg.templates
 
 Rule = collections.namedtuple(
     "Rule",
@@ -34,7 +35,7 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 def get_viable_profiles(selected_profiles, datastream, benchmark, script=None):
-    """Read datastream, and return set intersection of profiles of given
+    """Read data stream, and return set intersection of profiles of given
     benchmark and those provided in `selected_profiles` parameter.
     """
 
@@ -54,10 +55,10 @@ def get_viable_profiles(selected_profiles, datastream, benchmark, script=None):
 
     if not valid_profiles:
         if script:
-            logging.warning('Script {0} - profile {1} not found in datastream'
+            logging.warning('Script {0} - profile {1} not found in data stream'
                             .format(script, ", ".join(selected_profiles)))
         else:
-            logging.warning('Profile {0} not found in datastream'
+            logging.warning('Profile {0} not found in data stream'
                             .format(", ".join(selected_profiles)))
     return valid_profiles
 
@@ -280,7 +281,7 @@ class RuleChecker(oscap.Checker):
             List of named tuples Rule having these fields:
                 directory -- absolute path to the rule "tests" subdirectory
                             containing the test scenarios in Bash
-                id -- full rule id as it is present in datastream
+                id -- full rule id as it is present in data stream
                 short_id -- short rule ID, the same as basename of the directory
                             containing the test scenarios in Bash
                 template -- name of the template the rule uses
@@ -302,7 +303,7 @@ class RuleChecker(oscap.Checker):
 
         for dirpath, dirnames, filenames in common.walk_through_benchmark_dirs(
                 product):
-            if not common.is_rule_dir(dirpath):
+            if not is_rule_dir(dirpath):
                 continue
             short_rule_id = os.path.basename(dirpath)
             full_rule_id = OSCAP_RULE + short_rule_id
@@ -321,17 +322,6 @@ class RuleChecker(oscap.Checker):
             # Load the rule itself to check for a template.
             rule, local_env_yaml = common.load_rule_and_env(
                 dirpath, product_yaml, product)
-
-            # Before we get too far, we wish to search the rule YAML to see if
-            # it is applicable to the current product. If we have a product
-            # and the rule isn't applicable for the product, there's no point
-            # in continuing with the rest of the loading. This should speed up
-            # the loading of the templated tests. Note that we've already
-            # parsed the prodtype into local_env_yaml
-            if product and local_env_yaml['products']:
-                prodtypes = local_env_yaml['products']
-                if "all" not in prodtypes and product not in prodtypes:
-                    continue
 
             tests_dir = os.path.join(dirpath, "tests")
             template_name = None
@@ -417,6 +407,7 @@ class RuleChecker(oscap.Checker):
         return all_tests
 
     def _get_rule_test_content(self, rule):
+        checks = xml_operations.find_checks_in_rule(self.datastream, self.benchmark_id, rule.id)
         all_tests = self._load_all_tests(rule)
         scenarios = []
         other_content = dict()
@@ -425,12 +416,27 @@ class RuleChecker(oscap.Checker):
             if re.search(scenario_matches_regex, file_name):
                 scenario = Scenario(file_name, file_content)
                 scenario.override_profile(self.scenarios_profile)
-                if scenario.matches_regex_and_platform(
-                        self.scenarios_regex, self.benchmark_cpes):
+                if scenario.matches_regex_and_check_and_platform(
+                        self.scenarios_regex, checks, self.benchmark_cpes):
                     scenarios.append(scenario)
             else:
                 other_content[file_name] = file_content
         return RuleTestContent(scenarios, other_content)
+
+    def _get_shared_test_content(self):
+        product_yaml = common.get_product_context(self.test_env.product)
+        other_content = dict()
+        for dirpath, _, filenames in os.walk(common._SHARED_DIR):
+            for file_name in filenames:
+                file_path = os.path.join(dirpath, file_name)
+                rel_path = os.path.relpath(file_path, common._SHARED_DIR)
+                try:
+                    file_content = process_file_with_macros(file_path, product_yaml)
+                except Exception as e:
+                    logging.error("Error processing file {0}: {1}".format(file_path, str(e)))
+                    continue
+                other_content[rel_path] = file_content
+        return RuleTestContent([], other_content)
 
     def _get_test_content_by_rule_id(self, rules_to_test):
         test_content_by_rule_id = dict()
@@ -439,6 +445,7 @@ class RuleChecker(oscap.Checker):
             test_content_by_rule_id[rule.id] = rule_test_content
         sliced_test_content_by_rule_id = self._slice_sbr(
             test_content_by_rule_id, self.slice_current, self.slice_total)
+        sliced_test_content_by_rule_id["shared"] = self._get_shared_test_content()
         return sliced_test_content_by_rule_id
 
     def _test_target(self):
@@ -538,8 +545,18 @@ class RuleChecker(oscap.Checker):
                     "Rule {0} isn't part of profile {1} requested by "
                     "script {2}.".format(rule_id, profile_id, script)
                 )
+                return False
+        return True
+
 
     def _check_rule_scenario(self, scenario, remote_rule_dir, rule_id, remediation_available):
+        if "sce" in scenario.script_params["check"] and not self.test_env.sce_support:
+            logging.warning(
+                "Scenario {0} is used for SCE testing but OpenSCAP installed "
+                "on the back end doesn't support SCE. To test SCE, please "
+                "install the openscap-engine-sce package on the back end.".format(scenario.script)
+            )
+            return
         if not _apply_script(
                 remote_rule_dir, self.test_env, scenario.script):
             logging.error("Environment failed to prepare, skipping test")
@@ -554,17 +571,12 @@ class RuleChecker(oscap.Checker):
         logging.debug('Using test script {0} with context {1}'
                       .format(scenario.script, scenario.context))
 
-        if scenario.script_params['profiles']:
-            profiles = get_viable_profiles(
-                scenario.script_params['profiles'], self.datastream, self.benchmark_id, scenario.script)
-            self._verify_rule_presence(rule_id, scenario.script, profiles)
-        else:
-            # Special case for combined mode when scenario.script_params['profiles']
-            # is empty which means scenario is not applicable on given profile.
-            logging.warning('Script {0} is not applicable on given profile'
-                            .format(scenario.script))
+        profiles = get_viable_profiles(
+            scenario.script_params['profiles'],
+            self.datastream, self.benchmark_id, scenario.script)
+        logging.debug("viable profiles are {0}".format(profiles))
+        if not self._verify_rule_presence(rule_id, scenario.script, profiles):
             return
-
         test_data = dict(scenario=scenario,
                          rule_id=rule_id,
                          remediation_available=remediation_available)
@@ -599,6 +611,7 @@ class Scenario():
             'templates': [],
             'packages': [],
             'platform': ['multi_platform_all'],
+            'check': ['any'],
             'remediation': ['all'],
             'variables': [],
         }
@@ -658,9 +671,22 @@ class Scenario():
                 self.script)
             return False
 
-    def matches_regex_and_platform(self, scenarios_regex, benchmark_cpes):
+    def matches_check(self, rule_checks):
+        if "any" in self.script_params["check"]:
+            return True
+        for check in self.script_params["check"]:
+            if check in rule_checks:
+                return True
+        logging.warning(
+            "Script %s is not applicable for %s check type" %
+            (self.script, ", ".join(self.script_params['check'])))
+        return False
+
+
+    def matches_regex_and_check_and_platform(self, scenarios_regex, checks, benchmark_cpes):
         return (
             self.matches_regex(scenarios_regex)
+            and self.matches_check(checks)
             and self.matches_platform(benchmark_cpes))
 
 

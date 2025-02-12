@@ -1,6 +1,5 @@
 documentation_complete: true
 
-prodtype: rhel7,rhel8
 
 title: 'Each Web Content Directory Must Contain An index.html File'
 
@@ -22,8 +21,6 @@ rationale: |-
 
 severity: low
 
-references:
-    stigid: WG170
 
 ocil_clause: 'it is not'
 

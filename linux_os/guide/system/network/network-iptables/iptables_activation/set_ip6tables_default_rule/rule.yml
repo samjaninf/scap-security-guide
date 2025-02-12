@@ -6,7 +6,11 @@ description: |-
     To set the default policy to DROP (instead of ACCEPT) for
     the built-in INPUT chain which processes incoming packets,
     add or correct the following line in
+    {{% if 'ubuntu' in product %}}
+    <tt>/etc/iptables/rules.v6</tt>:
+    {{% else %}}
     <tt>/etc/sysconfig/ip6tables</tt>:
+    {{% endif %}}
     <pre>:INPUT DROP [0:0]</pre>
     If changes were required, reload the ip6tables rules:
     <pre>$ sudo service ip6tables reload</pre>
@@ -23,18 +27,18 @@ severity: medium
 platform: not package[nftables] and not package[ufw] and package[iptables]
 
 identifiers:
-    cce@rhel7: CCE-86718-4
     cce@rhel8: CCE-85965-2
     cce@rhel9: CCE-85966-0
+    cce@rhel10: CCE-86740-8
     cce@sle12: CCE-91648-6
     cce@sle15: CCE-91342-6
+    cce@slmicro5: CCE-94003-1
 
 references:
     cis-csc: 11,14,3,9
-    cis@rhel7: 3.5.3.3.4
-    cis@rhel8: 3.4.3.3.4
     cis@sle12: 3.5.3.4
     cis@sle15: 3.5.3.3.1
+    cis@slmicro5: 3.5.3.3.1
     cis@ubuntu2004: 3.5.3.3.1
     cis@ubuntu2204: 3.5.3.3.1
     cobit5: BAI10.01,BAI10.02,BAI10.03,BAI10.05,DSS05.02,DSS05.05,DSS06.06
@@ -44,7 +48,6 @@ references:
     nerc-cip: CIP-003-8 R4,CIP-003-8 R5,CIP-004-6 R3
     nist: AC-4,CM-7(b),CA-3(5),SC-7(21),CM-6(a)
     nist-csf: PR.IP-1,PR.PT-3
-    pcidss4: "1.4.1"
 
 ocil_clause: 'the default policy for the INPUT chain is not set to DROP'
 
